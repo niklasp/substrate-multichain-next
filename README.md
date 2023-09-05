@@ -1,6 +1,6 @@
 # Next.js & NextUI Template
 
-This is a template for creating applications using Next.js 13 (app directory) and NextUI (v2).
+This is a template for creating applications using Next.js 13 (app directory) and NextUI (v2) Wirkung with polkadot JS and polkadot Browser extension.
 
 ## Technologies Used
 
