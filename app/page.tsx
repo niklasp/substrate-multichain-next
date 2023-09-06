@@ -5,10 +5,13 @@ import { title, subtitle } from "@/components/primitives";
 import { ChainSwitch } from "@/components/chain-switch";
 import { useChainDetails } from "@/store/server/chain/queries";
 import { useAppStore } from "./zustand";
+import { useAccountBalance } from "@/hooks/use-account-balance";
+import { formatBalance } from "@polkadot/util";
 
 export default function Home() {
   const { data: chainDetails, isLoading } = useChainDetails();
   const user = useAppStore((state) => state.user);
+  const { data: accountBalance } = useAccountBalance();
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -25,7 +28,15 @@ export default function Home() {
           Beautiful, fast and modern React UI library.
         </h2>
       </div>
-
+      <div className="text-xs">
+        Free Account Balance:{" "}
+        {formatBalance(accountBalance?.data?.free, {
+          decimals: 12,
+          forceUnit: "-",
+          withSi: true,
+          withUnit: chainDetails?.chainProperties?.tokenSymbol,
+        })}
+      </div>
       <div className="items-stretch max-w-lg w-full">
         <p>Api connected to:</p>
         <pre className="text-xs">{JSON.stringify(chainDetails, null, 2)}</pre>

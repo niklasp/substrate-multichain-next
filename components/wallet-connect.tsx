@@ -17,6 +17,10 @@ import { Key } from "react";
 import UseCases from "@w3f/polkadot-icons/keyline/UseCases";
 import Users from "@w3f/polkadot-icons/keyline/Users";
 import { encodeAddress } from "@polkadot/keyring";
+import ConnectWallet from "@w3f/polkadot-icons/keyline/ConnectWallet";
+import { usePolkadotExtensionWithContext } from "@/providers/polkadot-extension-provider";
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 
 export const WalletConnect = () => {
   const selectedChain = useAppStore((state) => state.chain);
@@ -26,13 +30,42 @@ export const WalletConnect = () => {
   const setAccountIdx = useAppStore((state) => state.setAccountIdx);
   const { data: chainDetails, isLoading } = useChainDetails();
   const { ss58Prefix } = chainDetails || {};
+  const { extensionSetup } = usePolkadotExtensionWithContext();
+  const router = useRouter();
 
-  const handleChange = (address: Key) => {
+  const handleChange = (key: Key) => {
+    if (["logout", "profile"].includes(key as string)) {
+      router.push(`/${key}`);
+      return;
+    }
     const accountIdx =
-      accounts?.findIndex((account) => account.address === address) || 0;
-
+      accounts?.findIndex((account) => account.address === key) || 0;
     setAccountIdx(accountIdx);
   };
+
+  const handleConnect = () => {
+    console.log("connect");
+    extensionSetup();
+  };
+
+  const disconnect = () => {
+    console.log("disconnect");
+  };
+
+  if (!isExtensionReady) {
+    return (
+      <div className="max-w-xs">
+        <Button
+          onClick={handleConnect}
+          variant="bordered"
+          size="lg"
+          isIconOnly={true}
+        >
+          <ConnectWallet stroke="currentColor" width={20} height={20} />
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-xs">
@@ -67,7 +100,6 @@ export const WalletConnect = () => {
                     size={30}
                     theme="polkadot"
                     className="hover:cursor-pointer"
-                    // prefix={ss58Prefix}
                   />
                 }
                 aria-label={account.address}
@@ -81,11 +113,11 @@ export const WalletConnect = () => {
               startContent={
                 <Users width={20} height={20} stroke="currentColor" />
               }
-              key={"logout"}
-              value={"logout"}
-              aria-label={"logout"}
+              key={"profile"}
+              value={"profile"}
+              aria-label={"profile"}
             >
-              Profile
+              <NextLink href={"/profile"}>Profile</NextLink>
             </DropdownItem>
             <DropdownItem
               startContent={

@@ -20,7 +20,12 @@ const getChainDetails = async (api: ApiPromise) => {
     nodeVersion,
     chainType,
     ss58Prefix,
-    chainProperties,
+    chainProperties: {
+      ss58Format: ss58Prefix.toNumber(),
+      tokenDecimals:
+        chainProperties?.tokenDecimals.unwrap()[0].toNumber() ?? 10,
+      tokenSymbol: chainProperties?.tokenSymbol.unwrap()[0].toString() ?? "DOT",
+    },
   };
 };
 

@@ -9,7 +9,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { useAppStore } from "./zustand";
 import { documentReadyPromise } from "@/hooks/utils";
 
-// import { web3AccountsSubscribe, web3Enable } from "@polkadot/extension-dapp";
+import { web3AccountsSubscribe, web3Enable } from "@polkadot/extension-dapp";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -31,7 +31,6 @@ export function Providers({ children, themeProps }: ProvidersProps) {
     const extensionSetup = async () => {
       const extensionDapp = await import("@polkadot/extension-dapp");
       const { web3AccountsSubscribe, web3Enable } = extensionDapp;
-
       const injectedPromise = documentReadyPromise(() =>
         web3Enable(
           process.env.NEXT_PUBLIC_APP_NAME || "Polkadot Multi Chain App"
@@ -59,6 +58,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
         // note that `web3AccountsSubscribe` returns the function to unsubscribe
         unsubscribe = await web3AccountsSubscribe((injectedAccounts) => {
           console.log("accounts", injectedAccounts);
+          setIsExtensionReady(true);
           setAccounts(injectedAccounts);
         });
 

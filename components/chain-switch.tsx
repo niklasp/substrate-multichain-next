@@ -7,37 +7,53 @@ import { Select, SelectItem } from "@nextui-org/select";
 import { PolkadotIcon } from "./icons";
 import { chains } from "@/config/chains";
 import clsx from "clsx";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@nextui-org/dropdown";
+import { Button } from "@nextui-org/button";
+import { Key } from "react";
 
 export const ChainSwitch = ({ className }: { className?: string }) => {
   const selectedChain = useAppStore((state) => state.chain);
   const switchChain = useAppStore((state) => state.switchChain);
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    switchChain(event.target.value as SubstrateChain);
+  const handleChange = (key: Key) => {
+    switchChain(key as SubstrateChain);
   };
 
   return (
-    <div className={clsx("items-stretch max-w-xs w-36", className)}>
-      <Select
+    <div className={className}>
+      <Dropdown
         placeholder="Select your Chain"
-        className="max-w-xs"
-        selectedKeys={new Set([selectedChain.name])}
-        onChange={handleChange}
+        className="md:max-w-xs"
         size="sm"
-        startContent={<selectedChain.icon />}
-        aria-label="Select your Chain"
       >
-        {Object.values(chains).map((chain) => (
-          <SelectItem
-            key={chain.name}
-            value={chain.name}
-            startContent={<chain.icon />}
-            aria-label={chain.name}
+        <DropdownTrigger>
+          <Button
+            variant="bordered"
+            size="lg"
+            isIconOnly={false}
+            className="min-w-unit-12 px-unit-1 md:px-unit-4"
           >
-            {chain.name}
-          </SelectItem>
-        ))}
-      </Select>
+            <selectedChain.icon />
+            <span className="hidden md:flex">{selectedChain.name}</span>
+          </Button>
+        </DropdownTrigger>
+        <DropdownMenu onAction={handleChange} aria-label="Select Chain">
+          {Object.values(chains).map((chain) => (
+            <DropdownItem
+              key={chain.name}
+              value={chain.name}
+              startContent={<chain.icon />}
+            >
+              {chain.name}
+            </DropdownItem>
+          ))}
+        </DropdownMenu>
+      </Dropdown>
     </div>
   );
 };

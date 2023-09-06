@@ -1,5 +1,6 @@
 import { getChainByName } from "@/config/chains";
 import { kusama } from "@/config/chains/kusama";
+import { usePolkadotExtension } from "@/hooks/use-polkadot-extension";
 import { ChainConfig, SubstrateChain } from "@/types";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import {
@@ -7,7 +8,7 @@ import {
   InjectedExtension,
 } from "@polkadot/extension-inject/types";
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { persist, createJSONStorage, devtools } from "zustand/middleware";
 
 interface AppState {
   chain: ChainConfig;
@@ -21,18 +22,21 @@ interface AppState {
   setIsExtensionReady: (isReady: boolean) => void;
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setAccountIdx: (idx: number) => void;
+  disconnect: () => void;
   switchChain: (chain: SubstrateChain) => void;
 }
+
+const emptyUser = {
+  extensions: [],
+  accounts: [],
+  actingAccountIdx: 0,
+  isExtensionReady: false,
+};
 
 export const useAppStore = create<AppState>()(
   devtools((set, get) => ({
     chain: kusama,
-    user: {
-      extensions: [],
-      accounts: [],
-      actingAccountIdx: 0,
-      isExtensionReady: false,
-    },
+    user: emptyUser,
     setExtensions: (extensions) => {
       const { user } = get();
       set({
@@ -67,6 +71,11 @@ export const useAppStore = create<AppState>()(
           ...user,
           actingAccountIdx: idx,
         },
+      });
+    },
+    disconnect: () => {
+      set({
+        user: emptyUser,
       });
     },
     switchChain: async (newChain) => {
