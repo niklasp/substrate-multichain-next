@@ -1,5 +1,7 @@
 import * as React from "react";
 import { IconSvgProps } from "@/types";
+import Image from "next/image";
+import clsx from "clsx";
 
 export const KusamaIcon: React.FC<IconSvgProps> = ({
   size = 24,
@@ -78,26 +80,25 @@ export const PolkadotIcon: React.FC<IconSvgProps> = ({
   </svg>
 );
 
-export const Logo: React.FC<IconSvgProps> = ({
-  size = 36,
+export const Logo = ({
+  size = 30,
   width,
   height,
+  className,
   ...props
+}: {
+  size?: number;
+  width?: number;
+  height?: number;
+  className?: string;
 }) => (
-  <svg
-    fill="none"
-    height={size || height}
-    viewBox="0 0 32 32"
+  <Image
+    className={clsx(className, "rounded-full")}
+    src="/proof-of-chaos-logo.png"
+    alt="Proof of Chaos Logo"
     width={size || width}
-    {...props}
-  >
-    <path
-      clipRule="evenodd"
-      d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-      fill="currentColor"
-      fillRule="evenodd"
-    />
-  </svg>
+    height={size || height}
+  />
 );
 
 export const DiscordIcon: React.FC<IconSvgProps> = ({

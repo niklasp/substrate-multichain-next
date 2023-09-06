@@ -13,13 +13,15 @@ import { persist, createJSONStorage, devtools } from "zustand/middleware";
 interface AppState {
   chain: ChainConfig;
   user: {
-    extensions: InjectedExtension[];
-    accounts: InjectedAccountWithMeta[];
-    actingAccountIdx: number;
-    isExtensionReady: boolean;
+    extensionInjectedPromise?: Promise<InjectedExtension[]>; // promise of injected extension
+    extensions: InjectedExtension[]; // injected extension
+    accounts: InjectedAccountWithMeta[]; // injected accounts
+    actingAccountIdx: number; // acting account index
+    isExtensionReady: boolean; // is extension ready
   };
   setExtensions: (extension: InjectedExtension[]) => void;
   setIsExtensionReady: (isReady: boolean) => void;
+  setExtensionInjectedPromise: (promise: Promise<InjectedExtension[]>) => void;
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setAccountIdx: (idx: number) => void;
   disconnect: () => void;
@@ -37,6 +39,15 @@ export const useAppStore = create<AppState>()(
   devtools((set, get) => ({
     chain: kusama,
     user: emptyUser,
+    setExtensionInjectedPromise: (promise) => {
+      const { user } = get();
+      set({
+        user: {
+          ...user,
+          extensionInjectedPromise: promise,
+        },
+      });
+    },
     setExtensions: (extensions) => {
       const { user } = get();
       set({

@@ -11,7 +11,9 @@ import { formatBalance } from "@polkadot/util";
 export default function Home() {
   const { data: chainDetails, isLoading } = useChainDetails();
   const user = useAppStore((state) => state.user);
-  const { data: accountBalance } = useAccountBalance();
+  console.log("user in home", user);
+  const { data: accountBalance, isLoading: isAccountBalanceLoading } =
+    useAccountBalance();
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -29,6 +31,7 @@ export default function Home() {
         </h2>
       </div>
       <div className="text-xs">
+        {isAccountBalanceLoading ? "Loading Balance ..." : ""}
         Free Account Balance:{" "}
         {formatBalance(accountBalance?.data?.free, {
           decimals: 12,
