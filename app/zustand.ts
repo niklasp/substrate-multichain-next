@@ -96,7 +96,7 @@ export const useAppStore = create<AppState>()(
   }))
 );
 
-getChainByName(SubstrateChain.Kusama).then((chain) => {
-  console.log("async get chain ready");
-  useAppStore.setState({ chain });
-});
+// getChainByName(SubstrateChain.Kusama).then((chain) => {
+//   console.log("async get chain ready");
+//   useAppStore.setState({ chain });
+// });

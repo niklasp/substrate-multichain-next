@@ -13,15 +13,20 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/dropdown";
+import { Spinner } from "@nextui-org/spinner";
 import { Button } from "@nextui-org/button";
-import { Key } from "react";
+import { Key, useState } from "react";
 
 export const ChainSwitch = ({ className }: { className?: string }) => {
   const selectedChain = useAppStore((state) => state.chain);
   const switchChain = useAppStore((state) => state.switchChain);
 
-  const handleChange = (key: Key) => {
-    switchChain(key as SubstrateChain);
+  const [isChainApiLoading, setIsChainApiLoading] = useState<boolean>(false);
+
+  const handleChange = async (key: Key) => {
+    setIsChainApiLoading(true);
+    const switched = await switchChain(key as SubstrateChain);
+    setIsChainApiLoading(false);
   };
 
   return (
@@ -38,7 +43,11 @@ export const ChainSwitch = ({ className }: { className?: string }) => {
             isIconOnly={false}
             className="min-w-unit-12 px-unit-1 md:px-unit-4"
           >
-            <selectedChain.icon />
+            {isChainApiLoading ? (
+              <Spinner size="sm" color="secondary" />
+            ) : (
+              <selectedChain.icon />
+            )}
             <span className="hidden md:flex">{selectedChain.name}</span>
           </Button>
         </DropdownTrigger>

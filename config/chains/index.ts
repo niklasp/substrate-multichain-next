@@ -23,6 +23,8 @@ export async function getChainByName(name: SubstrateChain) {
   if (!chainSettings.provider) {
     console.log(`creating provider for ${name}`);
     chainSettings.provider = new WsProvider(chainSettings.endpoints[0].url);
+  } else {
+    console.log(`provider from cache for ${name}`);
   }
   if (!chainSettings.api) {
     console.log(`creating api for ${name}`);
@@ -37,6 +39,8 @@ export async function getChainByName(name: SubstrateChain) {
     chainSettings.api.on("error", () => {
       console.log(`error from ${name}`);
     });
+  } else {
+    console.log(`api from cache for ${name}`);
   }
 
   console.log(`waiting for api ready for ${name}`);
