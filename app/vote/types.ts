@@ -104,7 +104,7 @@ export interface ReferendumPolkadot {
   status: ReferendaStatus;
   endsAt?: string;
   endedAt?: string;
-  track?: PalletReferendaTrackInfo;
+  track?: string;
   trackId?: string;
   tally?: {
     ayes: string;
@@ -112,6 +112,14 @@ export interface ReferendumPolkadot {
     support: string;
     total: string;
   };
+  deciding: any;
+  decisionDeposit: string;
+  enactment: string;
+  origin: any;
+  proposal: string;
+  submissionDeposit: any;
+  submitted: string;
+  createdAtHash: string;
 }
 
 export interface ReferendumPolkassembly {
@@ -131,3 +139,5 @@ export interface ReferendumPolkassembly {
 export interface UIReferendum
   extends ReferendumPolkadot,
     ReferendumPolkassembly {}
+
+export type UITrack = any;

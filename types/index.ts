@@ -20,6 +20,7 @@ export type ChainConfig = {
   ss58Format: number;
   blockTime: number;
   endpoints: Endpoint[];
+  tracks: any[];
   icon: React.FC<IconSvgProps>;
   provider?: WsProvider;
   api?: ApiPromise;

@@ -1,4 +1,4 @@
-import type { StorageKey, u32, Option } from "@polkadot/types";
+import type { StorageKey, u16, u32, Option } from "@polkadot/types";
 import type { ApiPromise } from "@polkadot/api";
 import type {
   PalletConvictionVotingTally,
@@ -18,6 +18,7 @@ import type {
 
 import { getGovernanceTracks } from "@polkadot/apps-config";
 import { ReferendumPolkassembly } from "./types";
+import { create } from "zustand";
 import {
   BN,
   BN_BILLION,
@@ -272,11 +273,14 @@ export function calcCurves({
  * @param param0
  * @returns
  */
-export const transformReferenda = ([id, info]: [
+export const transformReferendum = ([id, info]: [
   id: StorageKey<[u32]>,
   info: Option<PalletReferendaReferendumInfoConvictionVotingTally>
 ]) => {
   let refInfo = info.isSome ? info.unwrap() : null;
+
+  // console.log("refInof", refInfo);
+
   const status = refInfo?.isApproved
     ? "approved"
     : refInfo?.isRejected
@@ -289,21 +293,26 @@ export const transformReferenda = ([id, info]: [
     ? "timedOut"
     : "unknown";
 
-  const endedAt = refInfo?.isApproved
-    ? refInfo.asApproved[0]
-    : refInfo?.isRejected
-    ? refInfo.asRejected[0]
-    : refInfo?.isCancelled
-    ? refInfo.asCancelled[0]
-    : refInfo?.isTimedOut
-    ? refInfo.asTimedOut[0]
-    : 0;
-
   try {
     if (refInfo?.isOngoing) {
       let {
         tally: { ayes, nays, support },
+        deciding,
+        decisionDeposit,
+        enactment,
+        origin,
+        proposal,
+        submissionDeposit,
+        submitted,
+        track,
+        createdAtHash,
       } = refInfo.asOngoing;
+
+      // const decidingValue = deciding.unwrapOrDefault();
+      // const endBlock = decidingValue.confirming
+      //   ? decidingValue.confirming
+      //   : decidingValue.since + track.info.decisionPeriod;
+
       return {
         index: id.toHuman()?.toString(),
         status,
@@ -313,7 +322,16 @@ export const transformReferenda = ([id, info]: [
           support: support.toHuman(),
           total: ayes.add(nays).toJSON(),
         },
-        endsAt: refInfo.asOngoing.enactment?.asAfter.toHuman(),
+        track: track.toString(),
+        deciding: deciding.toJSON(),
+        decisionDeposit: decisionDeposit.toJSON(),
+        enactment: enactment.toJSON(),
+        origin: origin.toJSON(),
+        proposal: proposal.toJSON(),
+        submissionDeposit: submissionDeposit.toJSON(),
+        submitted: submitted.toString(),
+        createdAtHash: createdAtHash?.toString(),
+        // endBlock: endBlock.toNumber(),
       } as ReferendumPolkadot;
     } else {
       return {
@@ -332,6 +350,8 @@ export const decorateWithPolkassemblyInfo = async (
 ) => {
   const refIndex = ref?.index;
   const decoratedRef = await getTitleAndContentForRef(refIndex);
+
+  console.log(decoratedRef);
 
   const { title, content, proposer, requested, tags, proposed_call } =
     decoratedRef;
@@ -377,3 +397,44 @@ export async function getTitleAndContentForRef(
       .catch((error) => reject(error));
   });
 }
+
+export const transformTrack = ([id, info]: [
+  id: u16,
+  info: PalletReferendaTrackInfo
+]) => {
+  const {
+    name,
+    maxDeciding,
+    decisionDeposit,
+    preparePeriod,
+    decisionPeriod,
+    confirmPeriod,
+    minEnactmentPeriod,
+    minApproval,
+    minSupport,
+  } = info;
+  return {
+    id: id.toString(),
+    name: name.toString(),
+    maxDeciding: maxDeciding.toString(),
+    decisionDeposit: decisionDeposit.toString(),
+    preparePeriod: preparePeriod.toString(),
+    decisionPeriod: decisionPeriod.toString(),
+    confirmPeriod: confirmPeriod.toString(),
+    minEnactmentPeriod: minEnactmentPeriod.toString(),
+    minApproval: minApproval.toJSON(),
+    minSupport: minSupport.toJSON(),
+  };
+};
+
+export const getEndDateByBlock = (
+  blockNumber: string,
+  currentBlockNumber: string,
+  currentTimestamp: Date
+) => {
+  let newStamp =
+    parseInt(currentTimestamp.toString()) +
+    (parseInt(blockNumber.toString()) - currentBlockNumber.toNumber()) *
+      BLOCK_DURATION;
+  return new Date(newStamp);
+};
