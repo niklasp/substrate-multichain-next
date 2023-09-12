@@ -16,39 +16,35 @@ import { Key, useEffect, useState, useTransition } from "react";
 import { cookies } from "next/headers";
 import { storeChain } from "@/app/vote/server-actions/switch-chain";
 import { getChain } from "@/app/vote/server-actions/get-chain";
+import { usePathname, useRouter } from "next/navigation";
 
 //TODO init chain from server
 export const ChainSwitch = ({ className }: { className?: string }) => {
-  const [selectedChain, setSelectedChain] = useState<SubstrateChain | null>(
-    null
-  );
-
   const [selectedChainConfig, setSelectedChainConfig] = useState<ChainConfig>();
-  const [isPending, startTransition] = useTransition();
+  // const [isPending, startTransition] = useTransition();
   const [isChainApiLoading, setIsChainApiLoading] = useState<boolean>(false);
 
-  const switchChain = useAppStore((state) => state.switchChain);
-
-  useEffect(() => {
-    const getSelectedChainFromServer = async () => {
-      const chain = await getChain();
-      setSelectedChain(chain);
-      const chainConfig = await getChainByName(chain);
-      setSelectedChainConfig(chainConfig);
-
-      if (chain !== SubstrateChain.Kusama) {
-        switchChain(chain);
-      }
-    };
-    getSelectedChainFromServer();
-  }, []);
+  const pathname = usePathname();
+  const router = useRouter();
 
   const handleChange = async (key: Key) => {
+    console.log(
+      "pathname",
+      pathname,
+      selectedChainConfig?.name?.toLowerCase() as string,
+      key as string
+    );
+    const newPath = pathname.replace(
+      selectedChainConfig?.name?.toLowerCase() as string,
+      key as string
+    );
+    console.log("newPath", newPath);
+    router.push(newPath);
     setIsChainApiLoading(true);
     // const switched = await switchChain(key as SubstrateChain);
-    startTransition(() => {
-      storeChain(key as SubstrateChain);
-    });
+    // startTransition(() => {
+    //   storeChain(key as SubstrateChain);
+    // });
     const chainConfig = await getChainByName(key as SubstrateChain);
     setSelectedChainConfig(chainConfig);
     setIsChainApiLoading(false);
@@ -68,9 +64,7 @@ export const ChainSwitch = ({ className }: { className?: string }) => {
             isIconOnly={false}
             className="min-w-unit-12 px-unit-1 md:px-unit-4"
           >
-            {isChainApiLoading ||
-            isPending ||
-            typeof selectedChainConfig === "undefined" ? (
+            {isChainApiLoading || typeof selectedChainConfig === "undefined" ? (
               <Spinner size="sm" color="secondary" />
             ) : (
               <selectedChainConfig.icon />

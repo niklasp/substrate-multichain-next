@@ -14,7 +14,8 @@ export const chains = {
  * @returns
  */
 export async function getChainByName(name: SubstrateChain) {
-  const chainSettings = chains[name];
+  const chainSettings = chains[name?.toLowerCase()];
+  console.log(`getChainByName ${name}`, chains[name?.toLowerCase()]);
 
   if (!chainSettings) {
     throw `can not get chain settings of ${name}`;

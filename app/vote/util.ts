@@ -17,7 +17,7 @@ import type {
 } from "./types.js";
 
 import { getGovernanceTracks } from "@polkadot/apps-config";
-import { ReferendumPolkassembly } from "./types";
+import { ReferendumPolkassembly } from "./types.js";
 import { create } from "zustand";
 import { SubstrateChain } from "../../types/index";
 import {
@@ -280,7 +280,7 @@ export const transformReferendum = ([id, info]: [
 ]) => {
   let refInfo = info.isSome ? info.unwrap() : null;
 
-  console.log("refInof", id.toHuman(), refInfo?.isOngoing);
+  // console.log("refInof", id.toHuman(), refInfo?.isOngoing);
 
   const status = refInfo?.isApproved
     ? "approved"
