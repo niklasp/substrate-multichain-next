@@ -1803,6 +1803,16 @@
   resolved "https://registry.yarnpkg.com/@nextui-org/shared-utils/-/shared-utils-2.0.3.tgz#a14fa7d7863e87eca0eae6b2abb261379122dcb8"
   integrity sha512-4Q4RfYU+fRUPbisjq6RYw3+oq4kn9nEp3eP5+0oD+nS9at8uSlovn7Kj3N2iz6clN6vVxxbyXi35DPTs63heRQ==
 
+"@nextui-org/skeleton@^2.0.18":
+  version "2.0.18"
+  resolved "https://registry.yarnpkg.com/@nextui-org/skeleton/-/skeleton-2.0.18.tgz#4bc87058bf84438e1accee3eb940b0585ce49a94"
+  integrity sha512-7W6FE8RyV3RwRd2yUzQ1RxEJd7gi1vaT+j+qQan4JbaHCM/MJAs33FDHYUEGQ5qx2kcvBG2S/FpOgHRZPQqBcw==
+  dependencies:
+    "@nextui-org/react-utils" "2.0.8"
+    "@nextui-org/shared-utils" "2.0.3"
+    "@nextui-org/system-rsc" "2.0.5"
+    "@nextui-org/theme" "2.1.8"
+
 "@nextui-org/snippet@2.0.19":
   version "2.0.19"
   resolved "https://registry.yarnpkg.com/@nextui-org/snippet/-/snippet-2.0.19.tgz#50e26ddd3bbe73c268a48034660d52a32d044a4a"

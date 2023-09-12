@@ -1,10 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/app/zustand";
-import {
-  getAccountBalance,
-  useAccountBalance,
-} from "@/hooks/use-account-balance";
+import { useAccountBalance } from "@/hooks/use-account-balance";
 
 export const AccountBalance = () => {
   const chain = useAppStore((state) => state.chain);

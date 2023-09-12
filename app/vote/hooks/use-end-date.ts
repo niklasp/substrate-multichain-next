@@ -1,14 +1,29 @@
 import { useAppStore } from "@/app/zustand";
+import { useEffect } from "react";
 import { useQuery } from "react-query";
 
 export const useEndDate = (endBlock: number) => {
-  const { api, name, blockTime } = useAppStore((s) => s.chain);
+  const chain = useAppStore((s) => s.chain);
+  const { api, blockTime, name } = chain || {};
+  const isChainApiReady = useAppStore((s) => s.isChainApiReady);
 
   return useQuery({
-    queryKey: ["referendumEndDate", endBlock, name],
-    enabled: !!api && !!endBlock,
+    queryKey: ["referendumEndDate", endBlock, name, isChainApiReady],
+    enabled: !!isChainApiReady,
     queryFn: async () => {
-      await api?.isReady;
+      console.log(
+        "useEndDate",
+        endBlock,
+        name,
+        api,
+        blockTime,
+        isChainApiReady
+      );
+      if (!api) {
+        return;
+      }
+
+      await api.isReady;
 
       const { hash, number: latestBlockNumber } =
         (await api?.rpc.chain.getHeader()) || {};

@@ -11,6 +11,7 @@ import {
 } from "../util";
 import { bnToBn, formatBalance } from "@polkadot/util";
 import { ReferendumDetail } from "./referendum-detail";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Vote",
@@ -18,16 +19,31 @@ export const metadata: Metadata = {
 };
 
 const getReferenda = async () => {
-  const { api } = await getChainByName(SubstrateChain.Kusama);
+  let selectedChain = "kusama";
+
+  const cookieStore = cookies();
+  if (cookieStore.has("chain")) {
+    const value = cookieStore.get("chain")?.value;
+    if (value && Object.values(SubstrateChain).includes(value as any)) {
+      selectedChain = value;
+    }
+  }
+
+  console.log("selected chain is", selectedChain);
+  const { api } = await getChainByName(selectedChain as SubstrateChain);
   const openGovRefs = await api?.query.referenda.referendumInfoFor.entries();
   const referenda = openGovRefs
     ?.map(transformReferendum)
     ?.filter((ref) => ref?.status === "ongoing");
 
-  const decoratedRefs = Promise.all(
-    referenda?.map(decorateWithPolkassemblyInfo) ?? []
-  );
-  return decoratedRefs;
+  return referenda;
+
+  // const decoratedRefs = Promise.all(
+  //   referenda?.map((ref) =>
+  //     decorateWithPolkassemblyInfo(ref, selectedChain as SubstrateChain)
+  //   ) ?? []
+  // );
+  // return decoratedRefs;
 };
 
 const getTracks = async () => {

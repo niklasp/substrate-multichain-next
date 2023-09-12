@@ -10,6 +10,8 @@ import { useAppStore } from "./zustand";
 import { documentReadyPromise } from "@/hooks/utils";
 
 import { web3AccountsSubscribe, web3Enable } from "@polkadot/extension-dapp";
+import { getChainByName } from "@/config/chains";
+import { SubstrateChain } from "@/types";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -18,13 +20,28 @@ export interface ProvidersProps {
 
 export function Providers({ children, themeProps }: ProvidersProps) {
   const queryClient = new QueryClient();
+  const chain = useAppStore((state) => state.chain);
   const user = useAppStore((state) => state.user);
   const { accounts, actingAccountIdx, isExtensionReady } = user;
   const setExtensions = useAppStore((state) => state.setExtensions);
   const setIsExtensionReady = useAppStore((state) => state.setIsExtensionReady);
   const setAccounts = useAppStore((state) => state.setAccounts);
+  const switchChain = useAppStore((state) => state.switchChain);
+  const setIsChainApiReady = useAppStore((state) => state.setIsChainApiReady);
   const setAccountIdx = useAppStore((state) => state.setAccountIdx);
   const actingAccount = accounts && accounts[actingAccountIdx];
+  const [isChainApiLoading, setIsChainApiLoading] = useState<boolean>(false);
+
+  // connect the api as early as possible
+  useEffect(() => {
+    const connectApi = async () => {
+      setIsChainApiReady(false);
+      await switchChain(SubstrateChain.Kusama);
+      setIsChainApiReady(true);
+    };
+
+    connectApi();
+  }, []);
 
   useEffect(() => {
     // This effect is used to setup the browser extension

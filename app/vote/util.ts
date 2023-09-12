@@ -19,6 +19,7 @@ import type {
 import { getGovernanceTracks } from "@polkadot/apps-config";
 import { ReferendumPolkassembly } from "./types";
 import { create } from "zustand";
+import { SubstrateChain } from "../../types/index";
 import {
   BN,
   BN_BILLION,
@@ -279,7 +280,7 @@ export const transformReferendum = ([id, info]: [
 ]) => {
   let refInfo = info.isSome ? info.unwrap() : null;
 
-  // console.log("refInof", refInfo);
+  console.log("refInof", id.toHuman(), refInfo?.isOngoing);
 
   const status = refInfo?.isApproved
     ? "approved"
@@ -346,12 +347,11 @@ export const transformReferendum = ([id, info]: [
 };
 
 export const decorateWithPolkassemblyInfo = async (
-  ref: UIReferendum | undefined
+  ref: UIReferendum | undefined,
+  chain: SubstrateChain = SubstrateChain.Kusama
 ) => {
   const refIndex = ref?.index;
-  const decoratedRef = await getTitleAndContentForRef(refIndex);
-
-  console.log(decoratedRef);
+  const decoratedRef = await getTitleAndContentForRef(refIndex, chain);
 
   const { title, content, proposer, requested, tags, proposed_call } =
     decoratedRef;
@@ -376,11 +376,11 @@ export async function getTitleAndContentForRefs(referendumIds: string[]) {
 
 export async function getTitleAndContentForRef(
   refId: string | undefined,
-  chainName: string = "kusama"
+  chainName: SubstrateChain = SubstrateChain.Kusama
 ): Promise<UIReferendum> {
   return new Promise(async (resolve, reject) => {
     var myHeaders = new Headers();
-    myHeaders.append("x-network", chainName);
+    myHeaders.append("x-network", (chainName as SubstrateChain).toLowerCase());
 
     var requestOptions: RequestInit = {
       method: "GET",

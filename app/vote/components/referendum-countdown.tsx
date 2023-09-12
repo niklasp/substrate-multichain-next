@@ -1,11 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Countdown, { zeroPad } from "react-countdown";
 import { useEndDate } from "../hooks/use-end-date";
 import { Spinner } from "@nextui-org/spinner";
+import { useAppStore } from "@/app/zustand";
 
-const renderer = ({ days, hours, minutes, seconds, completed }) => {
+const renderer = ({
+  days,
+  hours,
+  minutes,
+  seconds,
+  completed,
+}: {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  completed: boolean;
+}) => {
   if (completed) {
     return <div></div>;
   } else {
@@ -51,14 +64,14 @@ export default function ReferendumCountdown({
 }: {
   endBlock: number;
 }) {
-  const { data: endDate, isLoading } = useEndDate(endBlock);
+  const chain = useAppStore((state) => state.chain);
 
-  console.log("endDate", endDate);
+  let { data: endDate, isLoading } = useEndDate(endBlock);
 
   if (isLoading) {
     return (
       <div className="referendum-countdown">
-        <Spinner />
+        <Spinner label="Calculating Remaining Time" />
       </div>
     );
   }

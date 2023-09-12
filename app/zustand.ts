@@ -12,6 +12,8 @@ import { persist, createJSONStorage, devtools } from "zustand/middleware";
 
 interface AppState {
   chain: ChainConfig;
+  isChainApiReady: boolean;
+  setIsChainApiReady: (isReady: boolean) => void;
   user: {
     extensionInjectedPromise?: Promise<InjectedExtension[]>; // promise of injected extension
     extensions: InjectedExtension[]; // injected extension
@@ -21,7 +23,6 @@ interface AppState {
   };
   setExtensions: (extension: InjectedExtension[]) => void;
   setIsExtensionReady: (isReady: boolean) => void;
-  setExtensionInjectedPromise: (promise: Promise<InjectedExtension[]>) => void;
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setAccountIdx: (idx: number) => void;
   disconnect: () => void;
@@ -38,16 +39,8 @@ const emptyUser = {
 export const useAppStore = create<AppState>()(
   devtools((set, get) => ({
     chain: kusama,
+    isChainApiReady: false,
     user: emptyUser,
-    setExtensionInjectedPromise: (promise) => {
-      const { user } = get();
-      set({
-        user: {
-          ...user,
-          extensionInjectedPromise: promise,
-        },
-      });
-    },
     setExtensions: (extensions) => {
       const { user } = get();
       set({
@@ -89,14 +82,17 @@ export const useAppStore = create<AppState>()(
         user: emptyUser,
       });
     },
+    setIsChainApiReady: (isReady) => {
+      set({
+        isChainApiReady: isReady,
+      });
+    },
     switchChain: async (newChain) => {
+      console.log("switchChain start", newChain);
       const chain = await getChainByName(newChain);
+      await chain.api?.isReady;
+      console.log("switchChain ready", newChain);
       set({ chain });
     },
   }))
 );
-
-getChainByName(SubstrateChain.Kusama).then((chain) => {
-  console.log("async get chain ready");
-  useAppStore.setState({ chain });
-});

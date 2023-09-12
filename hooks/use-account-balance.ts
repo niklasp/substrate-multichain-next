@@ -1,5 +1,4 @@
 import { useAppStore } from "@/app/zustand";
-import { getChainByName } from "@/config/chains";
 import { ApiPromise } from "@polkadot/api";
 import { InjectedExtension } from "@polkadot/extension-inject/types";
 import { useQuery } from "react-query";

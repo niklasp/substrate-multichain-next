@@ -15,7 +15,7 @@ export const ReferendumBadges = ({
 }) => {
   const { status, deciding, origin } = referendum;
 
-  const isConfirming = status === "ongoing" && deciding.confirming;
+  const isConfirming = status === "ongoing" && deciding?.confirming;
 
   let percentage = isConfirming ? confirmingPercentage : decidingPercentage;
   const fromColor = status === "ongoing" ? "#86EFAC" : "#facc15";
@@ -42,7 +42,11 @@ export const ReferendumBadges = ({
           className="text-sm py-1 px-2 rounded-sm flex-1 cursor-default flex items-center justify-center"
           style={{ background: statusBadgeBg }}
         >
-          {status}
+          {status === "ongoing"
+            ? isConfirming
+              ? "confirming"
+              : "deciding"
+            : status}
         </div>
       </Tooltip>
     </div>
