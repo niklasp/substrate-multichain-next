@@ -2,12 +2,19 @@ import { ChainConfig, SubstrateChain } from "@/types";
 import { KusamaIcon, PolkadotIcon } from "@/components/icons";
 import { BN, formatBalance } from "@polkadot/util";
 
+const kusamaConfig = {
+  symbol: "KSM",
+  decimals: 12,
+  ss58Format: 2,
+  blockTime: 6000,
+};
+
 const formatSpend = (mul: number, value: BN): string =>
   `${formatBalance(value.muln(mul), {
-    decimals: 12,
+    decimals: kusamaConfig.decimals,
     forceUnit: "-",
     withSi: true,
-    withUnit: "KSM",
+    withUnit: kusamaConfig.symbol,
   })}`;
 
 // https://github.com/paritytech/polkadot/blob/6e3f2c5b4b6e6927915de2f784e1d831717760fa/runtime/kusama/constants/src/lib.rs#L28-L32
@@ -155,11 +162,8 @@ const tracks = [
 
 export const kusama: ChainConfig = {
   name: SubstrateChain.Kusama,
-  symbol: "KSM",
-  decimals: 12,
-  ss58Format: 2,
-  blockTime: 6000,
   endpoints,
   icon: KusamaIcon,
   tracks,
+  ...kusamaConfig,
 };

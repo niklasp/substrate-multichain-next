@@ -121,9 +121,9 @@ export const ReferendumDetail = ({
         <b>trackInfo:</b>
         {JSON.stringify(track, null, 2)}
       </pre> */}
-      <pre className="text-xs">
+      {/* <pre className="text-xs">
         <b>refInfo:</b> {JSON.stringify(referendum, null, 2)}
-      </pre>
+      </pre> */}
     </div>
   );
 };
