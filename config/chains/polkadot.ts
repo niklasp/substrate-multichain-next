@@ -45,4 +45,5 @@ export const polkadot: ChainConfig = {
   blockTime: 6000,
   endpoints,
   icon: PolkadotIcon,
+  tracks: [],
 };

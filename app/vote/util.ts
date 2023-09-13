@@ -337,7 +337,7 @@ export const transformReferendum = ([id, info]: [
       } as ReferendumPolkadot;
     } else {
       return {
-        index: id.toHuman()?.toString(),
+        index: typeof id === "string" ? id : id.toHuman()?.toString(),
         status,
         // endedAt,
       } as ReferendumPolkadot;

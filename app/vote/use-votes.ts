@@ -109,10 +109,10 @@ export const openGovReferendumFetcher = async (
   //   return onlyActiveRefs.sort((a, b) => a.index - b.index);
 };
 
-export const useGov2Referendums = () => {
-  const { name: chainName, api } = useAppStore((state) => state.chain);
-  return useQuery({
-    queryKey: ["gov2-referendums", chainName],
-    queryFn: async () => openGovReferendumFetcher(api, "all"),
-  });
-};
+// export const useGov2Referendums = () => {
+//   const { name: chainName, api } = useAppStore((state) => state.chain);
+//   return useQuery({
+//     queryKey: ["gov2-referendums", chainName],
+//     queryFn: async () => openGovReferendumFetcher(api, "all"),
+//   });
+// };

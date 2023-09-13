@@ -27,7 +27,6 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   const setExtensions = useAppStore((state) => state.setExtensions);
   const setIsExtensionReady = useAppStore((state) => state.setIsExtensionReady);
   const setAccounts = useAppStore((state) => state.setAccounts);
-  const switchChain = useAppStore((state) => state.switchChain);
   const setIsChainApiReady = useAppStore((state) => state.setIsChainApiReady);
   const setAccountIdx = useAppStore((state) => state.setAccountIdx);
   const actingAccount = accounts && accounts[actingAccountIdx];

@@ -12,6 +12,7 @@ import ReferendumVoteButtons from "./referendum-vote-buttons";
 import { ReferendumUserInfoCard } from "./referendum-user-info";
 import { useReferendumDetail } from "@/hooks/vote/use-referendum-detail";
 import { Skeleton } from "@nextui-org/skeleton";
+import { useSubstrateChain } from "@/context/substrate-chain-context";
 
 export const ReferendumDetailLoading = ({
   isLoaded,
@@ -42,16 +43,17 @@ export const ReferendumDetail = ({
   const { index, deciding } = referendum;
   const [isDescriptionExpanded, setIsDescriptionExpanded] =
     useState<boolean>(isExpanded);
+  const { activeChain } = useSubstrateChain();
 
   const { data: referendumDetail, isLoading: isReferendumDetailLoading } =
-    useReferendumDetail(index);
+    useReferendumDetail(index, activeChain?.name);
 
   console.log(`referendumDetail for ${index} is`, referendumDetail?.title);
 
   const { title, content } = referendumDetail ?? {};
 
   const referendumEndBlock =
-    deciding === null || deciding === undefined
+    deciding === null || deciding === undefined || track === undefined
       ? 0
       : deciding.confirming !== null
       ? bnToBn(deciding.confirming).toNumber()
@@ -119,9 +121,9 @@ export const ReferendumDetail = ({
         <b>trackInfo:</b>
         {JSON.stringify(track, null, 2)}
       </pre> */}
-      {/* <pre className="text-xs">
+      <pre className="text-xs">
         <b>refInfo:</b> {JSON.stringify(referendum, null, 2)}
-      </pre> */}
+      </pre>
     </div>
   );
 };

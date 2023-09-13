@@ -8,7 +8,7 @@ import { GET_REFERENDUM_NFTS } from "@/data/queries";
 import request from "graphql-request";
 import { useNFTs } from "@/hooks/use-nfts";
 
-async function fetchReferendumNFTsDistinct() {
+async function fetchReferendumNFTsDistinct(): Promise<{ nfts: any[] }> {
   return await request(
     websiteConfig.singular_graphql_endpoint,
     GET_REFERENDUM_NFTS,

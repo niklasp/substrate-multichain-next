@@ -3,7 +3,7 @@ import { request, gql } from "graphql-request";
 import { websiteConfig } from "@/data/website-config";
 import { GET_REFERENDUM_NFTS } from "@/data/queries";
 
-async function fetchReferendumNFTsDistinct() {
+async function fetchReferendumNFTsDistinct(): Promise<any> {
   return await request(
     websiteConfig.singular_graphql_endpoint,
     GET_REFERENDUM_NFTS,
@@ -34,13 +34,14 @@ async function fetchReferendumNFTsDistinct() {
   );
 }
 
-export function useNFTs(queryOptions) {
+export function useNFTs(queryOptions: any) {
   return useQuery(
     ["NFTs"],
     async () => {
       const { nfts } = await fetchReferendumNFTsDistinct();
       const transformedNFTs = await Promise.all(
-        nfts.map(async (item) => {
+        //TODO type
+        nfts.map(async (item: any) => {
           let attr = item.metadata_properties;
 
           const regex = /\n+/;

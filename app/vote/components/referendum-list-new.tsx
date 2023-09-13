@@ -16,14 +16,17 @@ interface Props {
 }
 
 const Loading = ({ isLoaded }: { isLoaded: boolean }) => {
-  return [1, 2, 3, 4, 5].map((i) => (
-    <ReferendumDetailLoading key={i} isLoaded={isLoaded} />
-  ));
+  return (
+    <>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <ReferendumDetailLoading key={i} isLoaded={isLoaded} />
+      ))}
+    </>
+  );
 };
 
 export default function ReferendumList() {
   const { referenda, tracks, isLoading } = useReferenda();
-  const { activeChainName } = useSubstrateChain();
 
   if (isLoading) {
     return <Loading isLoaded={!isLoading} />;
@@ -39,6 +42,7 @@ export default function ReferendumList() {
             );
             return (
               <ReferendumDetail
+                key={ref.index}
                 referendum={ref}
                 track={track}
                 isExpanded={false}

@@ -2,17 +2,21 @@ import { useAppStore } from "@/app/zustand";
 import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { getTitleAndContentForRef } from "@/app/vote/util";
+import { SubstrateChain } from "@/types";
 
-export const useReferendumDetail = (refId: string) => {
-  const chain = useAppStore((s) => s.chain);
-  const { name } = chain || {};
-  const isChainApiReady = useAppStore((s) => s.isChainApiReady);
+export const useReferendumDetail = (
+  refId: string,
+  chain: SubstrateChain | undefined
+) => {
+  let safeChain = chain || SubstrateChain.Kusama;
 
   return useQuery({
-    queryKey: ["referendumDetail", refId, name, isChainApiReady],
-    enabled: !!isChainApiReady,
+    queryKey: ["referendumDetail", refId, safeChain],
     queryFn: async () => {
-      const { title, content } = await getTitleAndContentForRef(refId, name);
+      const { title, content } = await getTitleAndContentForRef(
+        refId,
+        safeChain
+      );
       return { title, content };
     },
   });
