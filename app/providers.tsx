@@ -12,6 +12,7 @@ import { documentReadyPromise } from "@/hooks/utils";
 import { web3AccountsSubscribe, web3Enable } from "@polkadot/extension-dapp";
 import { getChainByName } from "@/config/chains";
 import { SubstrateChain } from "@/types";
+import { SubstrateChainProvider } from "@/context/substrate-chain-context";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -33,15 +34,15 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   const [isChainApiLoading, setIsChainApiLoading] = useState<boolean>(false);
 
   // connect the api as early as possible
-  useEffect(() => {
-    const connectApi = async () => {
-      setIsChainApiReady(false);
-      await switchChain(SubstrateChain.Kusama);
-      setIsChainApiReady(true);
-    };
+  // useEffect(() => {
+  //   const connectApi = async () => {
+  //     setIsChainApiReady(false);
+  //     await switchChain(SubstrateChain.Kusama);
+  //     setIsChainApiReady(true);
+  //   };
 
-    connectApi();
-  }, []);
+  //   connectApi();
+  // }, []);
 
   useEffect(() => {
     // This effect is used to setup the browser extension
@@ -89,10 +90,12 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   }, [isExtensionReady]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <NextUIProvider>
-        <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
-      </NextUIProvider>
-    </QueryClientProvider>
+    <NextUIProvider>
+      <QueryClientProvider client={queryClient}>
+        <SubstrateChainProvider>
+          <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
+        </SubstrateChainProvider>
+      </QueryClientProvider>
+    </NextUIProvider>
   );
 }

@@ -140,4 +140,15 @@ export interface UIReferendum
   extends ReferendumPolkadot,
     ReferendumPolkassembly {}
 
-export type UITrack = any;
+export interface UITrack {
+  id: string;
+  name: string;
+  maxDeciding: string;
+  decisionDeposit: string;
+  preparePeriod: string;
+  decisionPeriod: string;
+  confirmPeriod: string;
+  minEnactmentPeriod: string;
+  minApproval: any;
+  minSupport: any;
+}

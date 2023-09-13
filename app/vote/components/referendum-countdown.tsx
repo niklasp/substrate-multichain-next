@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Countdown, { zeroPad } from "react-countdown";
-import { useEndDate } from "../hooks/use-end-date";
+import { useEndDate } from "@/hooks/vote/use-end-date";
 import { Spinner } from "@nextui-org/spinner";
 import { useAppStore } from "@/app/zustand";
 

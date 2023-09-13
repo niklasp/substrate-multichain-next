@@ -10,8 +10,25 @@ import { ReferendumBadges } from "./referendum-badges";
 import ReferendumCountdownCard from "./referendum-countdown-card";
 import ReferendumVoteButtons from "./referendum-vote-buttons";
 import { ReferendumUserInfoCard } from "./referendum-user-info";
-import { useReferendumDetail } from "../hooks/use-referendum-detail";
+import { useReferendumDetail } from "@/hooks/vote/use-referendum-detail";
 import { Skeleton } from "@nextui-org/skeleton";
+
+export const ReferendumDetailLoading = ({
+  isLoaded,
+}: {
+  isLoaded: boolean;
+}) => {
+  return (
+    <>
+      <Skeleton
+        isLoaded={isLoaded}
+        className="my-4 border border-dashed border-gray-300"
+      >
+        <div className="my-4 relative w-full h-[450px]"></div>
+      </Skeleton>
+    </>
+  );
+};
 
 export const ReferendumDetail = ({
   referendum,
@@ -19,7 +36,7 @@ export const ReferendumDetail = ({
   isExpanded,
 }: {
   referendum: UIReferendum;
-  track: UITrack;
+  track: UITrack | undefined;
   isExpanded: boolean;
 }) => {
   const { index, deciding } = referendum;
@@ -102,9 +119,9 @@ export const ReferendumDetail = ({
         <b>trackInfo:</b>
         {JSON.stringify(track, null, 2)}
       </pre> */}
-      <pre className="text-xs">
+      {/* <pre className="text-xs">
         <b>refInfo:</b> {JSON.stringify(referendum, null, 2)}
-      </pre>
+      </pre> */}
     </div>
   );
 };

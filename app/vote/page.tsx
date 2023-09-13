@@ -1,6 +1,6 @@
 import { title } from "@/components/primitives";
 import { Metadata } from "next";
-import ReferendumList from "@/app/vote/components/referendum-list";
+import ReferendumList from "@/app/vote/components/referendum-list-new";
 import Vote from "@w3f/polkadot-icons/keyline/Vote";
 
 export const metadata: Metadata = {

@@ -18,10 +18,9 @@ import UseCases from "@w3f/polkadot-icons/keyline/UseCases";
 import Users from "@w3f/polkadot-icons/keyline/Users";
 import { encodeAddress } from "@polkadot/keyring";
 import ConnectWallet from "@w3f/polkadot-icons/keyline/ConnectWallet";
-import { usePolkadotExtensionWithContext } from "@/providers/polkadot-extension-provider";
+import { usePolkadotExtensionWithContext } from "@/context/polkadot-extension-provider";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { SubstrateChain } from "@/types";
 
 export const WalletConnect = () => {
   const selectedChain = useAppStore((state) => state.chain);

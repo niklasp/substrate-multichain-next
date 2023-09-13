@@ -14,6 +14,7 @@ import type {
   TrackDescription,
   TrackInfoExt,
   UIReferendum,
+  UITrack,
 } from "./types.js";
 
 import { getGovernanceTracks } from "@polkadot/apps-config";
@@ -275,12 +276,12 @@ export function calcCurves({
  * @returns
  */
 export const transformReferendum = ([id, info]: [
-  id: StorageKey<[u32]>,
+  id: StorageKey<[u32]> | string,
   info: Option<PalletReferendaReferendumInfoConvictionVotingTally>
-]) => {
+]): UIReferendum => {
   let refInfo = info.isSome ? info.unwrap() : null;
 
-  console.log("refInof", id.toHuman(), refInfo?.isOngoing);
+  // console.log("refInof", id.toHuman(), refInfo?.isOngoing);
 
   const status = refInfo?.isApproved
     ? "approved"
@@ -315,7 +316,7 @@ export const transformReferendum = ([id, info]: [
       //   : decidingValue.since + track.info.decisionPeriod;
 
       return {
-        index: id.toHuman()?.toString(),
+        index: typeof id === "string" ? id : id.toHuman()?.toString(),
         status,
         tally: {
           ayes: ayes.toHuman(),
@@ -343,6 +344,7 @@ export const transformReferendum = ([id, info]: [
     }
   } catch (e) {
     console.error(e);
+    throw e;
   }
 };
 
@@ -367,11 +369,26 @@ export const decorateWithPolkassemblyInfo = async (
   } as UIReferendum;
 };
 
-export async function getTitleAndContentForRefs(referendumIds: string[]) {
-  const promises = referendumIds.map((id) => getTitleAndContentForRef(id));
-  return Promise.all(promises).then((values) => {
-    return values;
-  });
+export async function getTitleAndContentForRefs(
+  referendumIds: string[],
+  chainName: SubstrateChain = SubstrateChain.Kusama
+) {
+  var myHeaders = new Headers();
+  myHeaders.append("x-network", (chainName as SubstrateChain).toLowerCase());
+
+  var requestOptions: RequestInit = {
+    method: "GET",
+    headers: myHeaders,
+    redirect: "follow",
+  };
+
+  const posts = await fetch(
+    "https://api.polkassembly.io/api/v1/listing/on-chain-posts?page=1&proposalType=referendums_v2&listingLimit=100&trackNo=1&trackStatus=All&sortBy=newest",
+    requestOptions
+  );
+
+  const postsJson = await posts.json();
+  return postsJson;
 }
 
 export async function getTitleAndContentForRef(
@@ -401,7 +418,7 @@ export async function getTitleAndContentForRef(
 export const transformTrack = ([id, info]: [
   id: u16,
   info: PalletReferendaTrackInfo
-]) => {
+]): UITrack => {
   const {
     name,
     maxDeciding,
@@ -425,16 +442,4 @@ export const transformTrack = ([id, info]: [
     minApproval: minApproval.toJSON(),
     minSupport: minSupport.toJSON(),
   };
-};
-
-export const getEndDateByBlock = (
-  blockNumber: string,
-  currentBlockNumber: string,
-  currentTimestamp: Date
-) => {
-  let newStamp =
-    parseInt(currentTimestamp.toString()) +
-    (parseInt(blockNumber.toString()) - currentBlockNumber.toNumber()) *
-      BLOCK_DURATION;
-  return new Date(newStamp);
 };

@@ -1,32 +1,73 @@
-import { NextResponse } from "next/server";
+import type { PalletReferendaReferendumInfoConvictionVotingTally } from "@polkadot/types/lookup";
+import { StorageKey, u32, Option } from "@polkadot/types";
+import { NextResponse, NextRequest } from "next/server";
 import { SubstrateChain } from "@/types/index";
 import { getChainByName } from "@/config/chains";
+import {
+  decorateWithPolkassemblyInfo,
+  transformReferendum,
+  transformTrack,
+} from "@/app/vote/util";
+import { UIReferendum, UITrack } from "@/app/vote/types";
 
-export async function POST(req: Request) {
-  const { chain, refId }: { chain: SubstrateChain; refId: string } =
+export async function POST(req: NextRequest) {
+  let { chain, refId }: { chain: SubstrateChain; refId: string } =
     await req.json();
+
   const chainConfig = await getChainByName(chain);
+  let openGovRefs: [
+      id: StorageKey<[u32]>,
+      info: Option<PalletReferendaReferendumInfoConvictionVotingTally>
+    ][],
+    referenda: UIReferendum[] = [],
+    tracks: UITrack[] = [];
 
-  console.log("got", chain, refId);
+  if (typeof refId === "undefined") {
+    refId = "all";
+  }
 
-  // let openGovRefs;
+  const { api, tracks: trackInfo } = chainConfig;
 
-  // if (typeof refId === "undefined") {
-  //   return [];
-  // }
+  if (typeof api === "undefined") {
+    throw `can not get api of ${chain}`;
+  }
 
-  // const { api } = chainConfig;
+  if (refId === "all") {
+    openGovRefs = await api?.query.referenda.referendumInfoFor.entries();
+    referenda = openGovRefs
+      ?.map(transformReferendum)
+      ?.filter((ref) => ref?.status === "ongoing");
 
-  // if (refId === "all") {
-  //   openGovRefs = await api?.query.referenda.referendumInfoFor.entries();
-  // } else if (isFinite(parseInt(refId))) {
-  //   openGovRefs = await api?.query.referenda.referendumInfoFor(refId);
-  //   openGovRefs = [[refId, openGovRefs]];
-  // } else {
-  //   return [];
-  // }
+    // const decoratedRefs = await Promise.all(
+    //   referenda?.map((ref) =>
+    //     decorateWithPolkassemblyInfo(ref, chainConfig.name)
+    //   ) ?? []
+    // );
 
-  // console.log("OPENGOV refs", openGovRefs);
+    // referenda = decoratedRefs;
+  } else if (isFinite(parseInt(refId))) {
+    const refFromChain = await api?.query.referenda.referendumInfoFor(refId);
+    const ref = transformReferendum([refId, refFromChain]);
+    const decoratedRef = await decorateWithPolkassemblyInfo(
+      ref,
+      chainConfig.name
+    );
+    referenda = [decoratedRef];
+  } else {
+    return [];
+  }
 
-  return NextResponse.json({ hello: "kitty" });
+  const tracksFromChain = await api?.consts.referenda.tracks;
+  tracks = tracksFromChain?.map(transformTrack);
+  tracks = tracks?.map((track) => {
+    const info = trackInfo?.find(
+      (trackInfo) => trackInfo.id.toString() === track.id.toString()
+    );
+    return {
+      ...track,
+      text: info?.text,
+    };
+  });
+
+  return NextResponse.json({ referenda, tracks });
 }

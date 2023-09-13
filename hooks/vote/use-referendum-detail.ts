@@ -1,7 +1,7 @@
 import { useAppStore } from "@/app/zustand";
 import { useEffect } from "react";
 import { useQuery } from "react-query";
-import { getTitleAndContentForRef } from "../util";
+import { getTitleAndContentForRef } from "@/app/vote/util";
 
 export const useReferendumDetail = (refId: string) => {
   const chain = useAppStore((s) => s.chain);
