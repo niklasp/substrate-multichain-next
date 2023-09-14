@@ -14,7 +14,6 @@ export async function POST(req: NextRequest) {
   let { chain, refId }: { chain: SubstrateChain; refId: string } =
     await req.json();
 
-  const chainConfig = await getChainByName(chain);
   let openGovRefs: [
       id: StorageKey<[u32]>,
       info: Option<PalletReferendaReferendumInfoConvictionVotingTally>
@@ -26,6 +25,7 @@ export async function POST(req: NextRequest) {
     refId = "all";
   }
 
+  const chainConfig = await getChainByName(chain);
   const { api, tracks: trackInfo } = chainConfig;
 
   if (typeof api === "undefined") {
