@@ -11,6 +11,8 @@ import { ReferendumDetail, ReferendumDetailLoading } from "./referendum-detail";
 import ReferendumTracksFilter from "./referendum-tracks-filter";
 import { useState } from "react";
 import { useUserVotes } from "@/hooks/vote/use-user-votes";
+import { AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export const revalidate = 3600;
 
@@ -61,19 +63,28 @@ export default function ReferendumList() {
             trackFilter={trackFilter}
             setTrackFilter={setTrackFilter}
           />
-          {filteredReferenda?.map((ref) => {
-            const track = tracks?.find(
-              (track) => track.id.toString() === ref.track
-            );
-            return (
-              <ReferendumDetail
-                key={ref.index}
-                referendum={ref}
-                track={track}
-                isExpanded={false}
-              />
-            );
-          })}
+          <AnimatePresence>
+            {filteredReferenda?.map((ref) => {
+              const track = tracks?.find(
+                (track) => track.id.toString() === ref.track
+              );
+              return (
+                <motion.div
+                  key={ref.index}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                >
+                  <ReferendumDetail
+                    referendum={ref}
+                    track={track}
+                    isExpanded={false}
+                  />
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       ) : (
         <div>no referenda</div>

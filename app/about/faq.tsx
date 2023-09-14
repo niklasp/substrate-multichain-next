@@ -5,9 +5,9 @@ export const FAQ = () => {
         <h2 className="mb-4 text-xl font-bold md:text-3xl">
           Frequently Asked Questions
         </h2>
-        <div className="grid grid-cols-1 gap-0 text-gray-600 md:grid-cols-2 md:gap-16">
+        <div className="grid grid-cols-1 gap-0  md:grid-cols-2 md:gap-16">
           <div>
-            <h5 className="mt-10 mb-3 font-semibold text-gray-900">
+            <h5 className="mt-10 mb-3 font-semibold">
               What is this project trying to achieve?
             </h5>
             <p>
@@ -15,7 +15,7 @@ export const FAQ = () => {
               in Kusama governance!
             </p>
 
-            <h5 className="mt-10 mb-3 font-semibold text-gray-900">
+            <h5 className="mt-10 mb-3 font-semibold">
               When was this project started?{" "}
             </h5>
             <p>
@@ -24,7 +24,7 @@ export const FAQ = () => {
               Referendum 232 the Frame collection was launched.
             </p>
 
-            <h5 className="mt-10 mb-3 font-semibold text-gray-900">
+            <h5 className="mt-10 mb-3 font-semibold">
               Are you affiliated with Parity or any other organisation?
             </h5>
             <p>
@@ -33,15 +33,13 @@ export const FAQ = () => {
             </p>
           </div>
           <div>
-            <h5 className="mt-10 mb-3 font-semibold text-gray-900">
-              How do I get involved?
-            </h5>
+            <h5 className="mt-10 mb-3 font-semibold">How do I get involved?</h5>
             <p>
               <a href="https://discord.gg/MKbjet8QwG">Come join our discord!</a>
               . We would love to have you.{" "}
             </p>
 
-            <h5 className="mt-10 mb-3 font-semibold text-gray-900">
+            <h5 className="mt-10 mb-3 font-semibold">
               Will you expand to other parachains?
             </h5>
             <p>
@@ -49,7 +47,7 @@ export const FAQ = () => {
               decentralization also demonstrate a path for any and all
               parachains to implement their own incentives programs.
             </p>
-            <h5 className="mt-10 mb-3 font-semibold text-gray-900">
+            <h5 className="mt-10 mb-3 font-semibold">
               How is this project financed?
             </h5>
             <p>

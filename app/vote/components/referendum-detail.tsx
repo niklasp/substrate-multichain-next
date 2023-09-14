@@ -14,6 +14,7 @@ import { useReferendumDetail } from "@/hooks/vote/use-referendum-detail";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { useEndDate } from "@/hooks/vote/use-end-date";
+import { motion } from "framer-motion";
 
 export const ReferendumDetailLoading = ({
   isLoaded,
@@ -64,7 +65,7 @@ export const ReferendumDetail = ({
   );
 
   return (
-    <div className="referendum-detail relative w-full rounded-sm border border-dashed border-gray-300 p-3 sm:p-4 md:p-6 lg:p-10 xl:p-12 my-4 mb-0 hover:shadow-lg transition-all">
+    <div className="referendum-detail relative w-full rounded-sm border border-dashed border-gray-300 p-3 sm:p-4 md:p-6 lg:p-10 xl:p-12 my-4 mb-0 hover:shadow-lg dark:shadow-gray-700 transition-all">
       <div className="w-full flex flex-wrap">
         <div className="flex flex-col left w-full sm:w-7/12 md:w-8/12 pb-6 sm:pb-0 sm:pr-6 border-dashed sm:border-r border-b sm:border-b-0">
           <div className="referendum-heading text-2xl mb-3 font-bold">

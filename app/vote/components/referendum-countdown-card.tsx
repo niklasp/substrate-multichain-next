@@ -13,7 +13,7 @@ export default function ReferendumCountdownCard({
   const isConfirming = status === "ongoing" && !!deciding?.confirming;
 
   return (
-    <div className="referendum-countdown-card p-4 bg-gray-100 dark:bg-slate-800 rounded-sm mb-2 shadow-sm hover:shadow-md transition-shadow text-sm">
+    <div className="referendum-countdown-card p-4 bg-gray-100 dark:bg-slate-800 rounded-sm mb-2 shadow-sm hover:shadow-md dark:shadow-gray-800 transition-shadow text-sm">
       <Tooltip
         content={
           "If the referendum does not enter the confirming state, it will automatically be rejected"
