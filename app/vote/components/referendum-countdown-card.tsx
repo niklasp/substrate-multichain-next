@@ -18,6 +18,7 @@ export default function ReferendumCountdownCard({
         content={
           "If the referendum does not enter the confirming state, it will automatically be rejected"
         }
+        placement="bottom"
       >
         <h3 className="text-gray-900 mb-2 dark:md:text-gray-100 text-md">
           {`Referendum ${index} will be ${

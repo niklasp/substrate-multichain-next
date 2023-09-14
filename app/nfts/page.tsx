@@ -1,7 +1,5 @@
 import { title } from "@/components/primitives";
 import { SubstrateChain } from "@/types";
-import { useEffect } from "react";
-import { useAppStore } from "../zustand";
 import { cache } from "react";
 import { Metadata } from "next";
 

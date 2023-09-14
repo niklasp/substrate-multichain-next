@@ -26,7 +26,6 @@ interface AppState {
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setAccountIdx: (idx: number) => void;
   disconnect: () => void;
-  // switchChain: (chain: SubstrateChain) => void;
 }
 
 const emptyUser = {
@@ -87,12 +86,5 @@ export const useAppStore = create<AppState>()(
         isChainApiReady: isReady,
       });
     },
-    // switchChain: async (newChain) => {
-    //   console.log("switchChain start", newChain);
-    //   const chain = await getChainByName(newChain);
-    //   await chain.api?.isReady;
-    //   console.log("switchChain ready", newChain);
-    //   set({ chain });
-    // },
   }))
 );

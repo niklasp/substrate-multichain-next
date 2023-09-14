@@ -37,14 +37,6 @@ export async function POST(req: NextRequest) {
     referenda = openGovRefs
       ?.map(transformReferendum)
       ?.filter((ref) => ref?.status === "ongoing");
-
-    // const decoratedRefs = await Promise.all(
-    //   referenda?.map((ref) =>
-    //     decorateWithPolkassemblyInfo(ref, chainConfig.name)
-    //   ) ?? []
-    // );
-
-    // referenda = decoratedRefs;
   } else if (isFinite(parseInt(refId))) {
     const refFromChain = await api?.query.referenda.referendumInfoFor(refId);
     const ref = transformReferendum([refId, refFromChain]);

@@ -92,23 +92,26 @@ export function NFTSnippets() {
           return (
             <div
               key={idx}
-              className={clsx("nft-snippet-item absolute shadow-lg", {
-                "animate-floatingOne": idx % 3 === 0,
-                "animate-floatingTwo": idx % 3 === 1,
-                "animate-floatingThree": idx % 3 === 2,
-              })}
+              className={clsx(
+                "nft-snippet-item absolute shadow-lg hover:scale-105 transition-transform",
+                {
+                  "animate-floatingOne": idx % 3 === 0,
+                  "animate-floatingTwo": idx % 3 === 1,
+                  "animate-floatingThree": idx % 3 === 2,
+                }
+              )}
               style={{
                 left: l,
                 top: t,
-                width: 120,
-                height: 120,
+                width: 130,
+                height: 130,
               }}
             >
               <Image
                 src={`https://gateway.ipfs.io/ipfs/${nft.thumb}`}
                 alt={`Kusama NFT for ${nft.ref}`}
-                width={120}
-                height={120}
+                width={130}
+                height={130}
               />
               <div className="nft-snippet-overlay absolute top-0 right-0 bottom-0 left-0 w-full h-full overflow-hidden bg-fixed transition duration-300 ease-in-out" />
             </div>

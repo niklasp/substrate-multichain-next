@@ -7,7 +7,7 @@ body {
 }
 
 .nft-snippet-item > .nft-snippet-overlay {
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .nft-snippet-item:hover > .nft-snippet-overlay {

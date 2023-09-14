@@ -9,9 +9,6 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { useAppStore } from "./zustand";
 import { documentReadyPromise } from "@/hooks/utils";
 
-import { web3AccountsSubscribe, web3Enable } from "@polkadot/extension-dapp";
-import { getChainByName } from "@/config/chains";
-import { SubstrateChain } from "@/types";
 import { SubstrateChainProvider } from "@/context/substrate-chain-context";
 
 export interface ProvidersProps {
