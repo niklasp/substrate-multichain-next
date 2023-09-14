@@ -13,6 +13,7 @@ import { ReferendumUserInfoCard } from "./referendum-user-info";
 import { useReferendumDetail } from "@/hooks/vote/use-referendum-detail";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
+import { useEndDate } from "@/hooks/vote/use-end-date";
 
 export const ReferendumDetailLoading = ({
   isLoaded,
@@ -48,18 +49,19 @@ export const ReferendumDetail = ({
   const { data: referendumDetail, isLoading: isReferendumDetailLoading } =
     useReferendumDetail(index, activeChain?.name);
 
-  console.log(`referendumDetail for ${index} is`, referendumDetail?.title);
-
   const { title, content } = referendumDetail ?? {};
 
   const referendumEndBlock =
     deciding === null || deciding === undefined || track === undefined
-      ? 0
+      ? "0"
       : deciding.confirming !== null
-      ? bnToBn(deciding.confirming).toNumber()
-      : bnToBn(deciding.since).add(bnToBn(track.decisionPeriod)).toNumber();
+      ? bnToBn(deciding.confirming).toString()
+      : bnToBn(deciding.since).add(bnToBn(track.decisionPeriod)).toString();
 
-  console.log(`endblock for referendum ${index} is ${referendumEndBlock}`);
+  const { data: endDate, isLoading: isEndDateLoading } = useEndDate(
+    activeChain?.name,
+    referendumEndBlock
+  );
 
   return (
     <div className="referendum-detail relative w-full rounded-sm border border-dashed border-gray-300 p-3 sm:p-4 md:p-6 lg:p-10 xl:p-12 my-4 mb-0 hover:shadow-lg transition-all">
@@ -109,10 +111,7 @@ export const ReferendumDetail = ({
             decidingPercentage={0}
             confirmingPercentage={0}
           />
-          <ReferendumCountdownCard
-            endBlock={referendumEndBlock}
-            referendum={referendum}
-          />
+          <ReferendumCountdownCard endDate={endDate} referendum={referendum} />
           <ReferendumUserInfoCard referendum={referendum} />
           <ReferendumVoteButtons referendum={referendum} userVote={{}} />
         </div>

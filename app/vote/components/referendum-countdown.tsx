@@ -60,22 +60,10 @@ const renderer = ({
 };
 
 export default function ReferendumCountdown({
-  endBlock,
+  endDate,
 }: {
-  endBlock: number;
+  endDate: Date | undefined;
 }) {
-  const chain = useAppStore((state) => state.chain);
-
-  let { data: endDate, isLoading } = useEndDate(endBlock);
-
-  if (isLoading) {
-    return (
-      <div className="referendum-countdown">
-        <Spinner label="Calculating Remaining Time" />
-      </div>
-    );
-  }
-
   return (
     <div className="referendum-countdown">
       {endDate && (

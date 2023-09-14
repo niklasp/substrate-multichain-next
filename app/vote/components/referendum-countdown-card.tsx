@@ -3,10 +3,10 @@ import { ReactNode } from "react";
 import { ReferendaStatus, UIReferendum } from "../types";
 import ReferendumCountdown from "./referendum-countdown";
 export default function ReferendumCountdownCard({
-  endBlock,
+  endDate,
   referendum,
 }: {
-  endBlock: number;
+  endDate: Date | undefined;
   referendum: UIReferendum;
 }) {
   const { status, deciding, origin, index } = referendum;
@@ -26,7 +26,7 @@ export default function ReferendumCountdownCard({
           } in`}
         </h3>
       </Tooltip>
-      <ReferendumCountdown endBlock={endBlock} />
+      <ReferendumCountdown endDate={endDate} />
     </div>
   );
 }
