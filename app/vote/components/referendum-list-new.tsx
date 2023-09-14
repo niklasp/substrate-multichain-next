@@ -8,6 +8,9 @@ import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { ChainSwitch } from "@/components/chain-switch";
 import { Skeleton } from "@nextui-org/skeleton";
 import { ReferendumDetail, ReferendumDetailLoading } from "./referendum-detail";
+import ReferendumTracksFilter from "./referendum-tracks-filter";
+import { useState } from "react";
+import { useUserVotes } from "@/hooks/vote/use-user-votes";
 
 export const revalidate = 3600;
 
@@ -27,16 +30,38 @@ const Loading = ({ isLoaded }: { isLoaded: boolean }) => {
 
 export default function ReferendumList() {
   const { referenda, tracks, isLoading } = useReferenda();
+  const { activeChain } = useSubstrateChain();
+  const { data: userVotes, isLoading: isLoadingUserVotes } = useUserVotes(
+    activeChain?.name,
+    "DT7kRjGFvRKxGSx5CPUCA1pazj6gzJ6Db11xmkX4yYSNK7m"
+  );
+
+  const [trackFilter, setTrackFilter] = useState<string>("-1");
 
   if (isLoading) {
     return <Loading isLoaded={!isLoading} />;
   }
 
+  // -1 = all, -2 = voted, -3 = unvoted
+  const filteredReferenda =
+    trackFilter === "-1"
+      ? referenda
+      : !["-2", "-3"].includes(trackFilter)
+      ? referenda?.filter((ref) => ref.track === trackFilter)
+      : referenda;
+
   return (
     <div className="referendum-list">
       {referenda && referenda.length > 0 ? (
         <div>
-          {referenda?.map((ref) => {
+          {/* <pre>{JSON.stringify(userVotes, null, 2)}</pre> */}
+          <ReferendumTracksFilter
+            tracks={tracks}
+            referenda={referenda}
+            trackFilter={trackFilter}
+            setTrackFilter={setTrackFilter}
+          />
+          {filteredReferenda?.map((ref) => {
             const track = tracks?.find(
               (track) => track.id.toString() === ref.track
             );

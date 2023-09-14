@@ -151,4 +151,5 @@ export interface UITrack {
   minEnactmentPeriod: string;
   minApproval: any;
   minSupport: any;
+  text: string;
 }

@@ -17,6 +17,7 @@
     "@nextui-org/kbd": "2.0.14",
     "@nextui-org/link": "2.0.16",
     "@nextui-org/navbar": "2.0.16",
+    "@nextui-org/radio": "^2.0.21",
     "@nextui-org/select": "^2.1.8",
     "@nextui-org/skeleton": "^2.0.18",
     "@nextui-org/snippet": "2.0.19",

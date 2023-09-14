@@ -1,5 +1,5 @@
 import { titleCase } from "@/components/util";
-import { UIReferendum } from "../types";
+import { UIReferendum, UITrack } from "../types";
 import { Tooltip } from "@nextui-org/tooltip";
 
 export const ReferendumBadges = ({
@@ -9,7 +9,7 @@ export const ReferendumBadges = ({
   decidingPercentage,
 }: {
   referendum: UIReferendum;
-  track: any;
+  track: UITrack | undefined;
   confirmingPercentage: number;
   decidingPercentage: number;
 }) => {
@@ -26,10 +26,10 @@ export const ReferendumBadges = ({
 
   return (
     <div className="referendum-badges mb-2 flex transition-none text-black">
-      {track && origin?.origins && (
+      {track && (origin?.origins || track.id === "0") && (
         <Tooltip content={track.text}>
           <div className="text-sm bg-gray-200 py-1 px-2 rounded-sm flex-1 cursor-default mr-2 flex items-center justify-center">
-            {titleCase(origin.origins)}
+            {track.id === "0" ? "Root" : titleCase(origin.origins)}
           </div>
         </Tooltip>
       )}

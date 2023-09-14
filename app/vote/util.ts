@@ -396,12 +396,12 @@ export async function getTitleAndContentForRef(
   chainName: SubstrateChain = SubstrateChain.Kusama
 ): Promise<UIReferendum> {
   return new Promise(async (resolve, reject) => {
-    var myHeaders = new Headers();
-    myHeaders.append("x-network", (chainName as SubstrateChain).toLowerCase());
+    var headers = new Headers();
+    headers.append("x-network", (chainName as SubstrateChain).toLowerCase());
 
     var requestOptions: RequestInit = {
       method: "GET",
-      headers: myHeaders,
+      headers: headers,
       redirect: "follow",
     };
 
