@@ -48,7 +48,7 @@ export const ReferendumDetail = ({
   const { activeChain } = useSubstrateChain();
 
   const { data: referendumDetail, isLoading: isReferendumDetailLoading } =
-    useReferendumDetail(index, activeChain?.name);
+    useReferendumDetail(index);
 
   const { title, content } = referendumDetail ?? {};
 
@@ -114,7 +114,10 @@ export const ReferendumDetail = ({
           />
           <ReferendumCountdownCard endDate={endDate} referendum={referendum} />
           <ReferendumUserInfoCard referendum={referendum} />
-          <ReferendumVoteButtons referendum={referendum} userVote={{}} />
+          <ReferendumVoteButtons
+            referendum={{ ...referendum, ...referendumDetail }}
+            userVote={{}}
+          />
         </div>
       </div>
       {/* <pre className="text-xs">

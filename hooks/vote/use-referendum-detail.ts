@@ -3,19 +3,17 @@ import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { getTitleAndContentForRef } from "@/app/vote/util";
 import { SubstrateChain } from "@/types";
+import { useSubstrateChain } from "@/context/substrate-chain-context";
 
-export const useReferendumDetail = (
-  refId: string,
-  chain: SubstrateChain | undefined
-) => {
-  let safeChain = chain || SubstrateChain.Kusama;
+export const useReferendumDetail = (refId: string) => {
+  const { activeChain } = useSubstrateChain();
 
   return useQuery({
-    queryKey: ["referendumDetail", refId, safeChain],
+    queryKey: ["referendumDetail", refId, activeChain?.name],
     queryFn: async () => {
       const { title, content } = await getTitleAndContentForRef(
         refId,
-        safeChain
+        activeChain?.name
       );
       return { title, content };
     },

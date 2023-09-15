@@ -6,11 +6,9 @@ export async function POST(req: Request) {
   const { address, chain }: { address: String; chain: SubstrateChain } =
     await req.json();
   const chainConfig = await getChainByName(chain);
+  const { api } = chainConfig;
 
-  console.log(
-    `get account balance waiting for user extension injected promise ${address}`
-  );
-  const balance = await chainConfig.api?.query.system.account(address);
+  const balance = await api?.query.system.account(address);
 
   return NextResponse.json({ balance });
 }

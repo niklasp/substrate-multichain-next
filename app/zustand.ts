@@ -9,6 +9,7 @@ import {
 } from "@polkadot/extension-inject/types";
 import { create } from "zustand";
 import { persist, createJSONStorage, devtools } from "zustand/middleware";
+import { Modal, type ModalProps } from "@nextui-org/modal";
 
 interface AppState {
   chain: ChainConfig;
@@ -20,12 +21,24 @@ interface AppState {
     accounts: InjectedAccountWithMeta[]; // injected accounts
     actingAccountIdx: number; // acting account index
     isExtensionReady: boolean; // is extension ready
+    voteStates: any[]; // vote states
   };
+  modals: {
+    isOpen: boolean;
+    view: React.ReactNode;
+    modalProps?: ModalProps;
+  };
+  openModal: (view: React.ReactNode, modalProps?: any) => void;
+  closeModal: () => void;
   setExtensions: (extension: InjectedExtension[]) => void;
   setIsExtensionReady: (isReady: boolean) => void;
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setAccountIdx: (idx: number) => void;
   disconnect: () => void;
+
+  updateVoteState: (referendumId: string, vote: any) => void;
+  removeVoteState: (referendumId: string) => void;
+  clearVoteState: () => void;
 }
 
 const emptyUser = {
@@ -33,6 +46,7 @@ const emptyUser = {
   accounts: [],
   actingAccountIdx: 0,
   isExtensionReady: false,
+  voteStates: [],
 };
 
 export const useAppStore = create<AppState>()(
@@ -40,6 +54,30 @@ export const useAppStore = create<AppState>()(
     chain: kusama,
     isChainApiReady: false,
     user: emptyUser,
+    modals: {
+      isOpen: false,
+      view: null,
+    },
+    openModal: (view, modalProps) => {
+      const { modals } = get();
+      set({
+        modals: {
+          ...modals,
+          modalProps,
+          isOpen: true,
+          view,
+        },
+      });
+    },
+    closeModal: () => {
+      const { modals } = get();
+      set({
+        modals: {
+          ...modals,
+          isOpen: false,
+        },
+      });
+    },
     setExtensions: (extensions) => {
       const { user } = get();
       set({
@@ -85,6 +123,41 @@ export const useAppStore = create<AppState>()(
       set({
         isChainApiReady: isReady,
       });
+    },
+
+    updateVoteState: (referendumId: string, vote: any) => {
+      set((state) => ({
+        user: {
+          ...state.user,
+          voteStates: {
+            ...state.user.voteStates,
+            [`${referendumId}`]: {
+              ...state.user.voteStates?.[`${referendumId}`],
+              vote,
+            },
+          },
+        },
+      }));
+    },
+    removeVoteState: (referendumId: string) => {
+      set((state) => {
+        const newVoteStates = { ...state.user.voteStates };
+        delete newVoteStates[`${referendumId}`];
+        return {
+          user: {
+            ...state.user,
+            voteStates: newVoteStates,
+          },
+        };
+      });
+    },
+    clearVoteState: () => {
+      set((state) => ({
+        user: {
+          ...state.user,
+          voteStates: [],
+        },
+      }));
     },
   }))
 );

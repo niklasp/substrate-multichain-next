@@ -2,24 +2,31 @@ import { useAppStore } from "@/app/zustand";
 import { ApiPromise } from "@polkadot/api";
 import { InjectedExtension } from "@polkadot/extension-inject/types";
 import { useQuery } from "react-query";
-
-const getAccountBalance = async (
-  api: ApiPromise | undefined,
-  address: string
-) => {
-  let userAddress = address;
-  console.log("querying for balance");
-  const balance = await api?.query.system.account(userAddress);
-  return balance;
-};
+import { encodeAddress } from "@polkadot/keyring";
+import { useSubstrateChain } from "@/context/substrate-chain-context";
 
 export const useAccountBalance = () => {
-  const chain = useAppStore((state) => state.chain);
-  const { api } = chain;
+  const { activeChain } = useSubstrateChain();
+  const { ss58Format } = activeChain || {};
   const user = useAppStore((state) => state.user);
   const { address } = user?.accounts?.[user.actingAccountIdx] || {};
+  const userAddress = encodeAddress(address, ss58Format);
 
-  return useQuery([chain.name, address, "accountBalance"], async () =>
-    getAccountBalance(api, address)
-  );
+  console.log("useAccountBalance", activeChain?.name, address, userAddress);
+
+  return useQuery({
+    queryKey: [activeChain?.name, address, "accountBalance"],
+    enabled: !!activeChain && !!address,
+    queryFn: async () => {
+      const res = await fetch(`/api/account-balance`, {
+        method: "post",
+        body: JSON.stringify({
+          chain: activeChain?.name,
+          address: userAddress,
+        }),
+      });
+      const { balance } = await res.json();
+      return balance;
+    },
+  });
 };

@@ -153,3 +153,18 @@ export interface UITrack {
   minSupport: any;
   text?: string;
 }
+
+export enum VoteState {
+  AwaitingSignature = "AwaitingSignature",
+  Ready = "Ready",
+  InBlock = "InBlock",
+  Finalized = "Finalized",
+  None = "None",
+}
+
+export enum VoteChoice {
+  Aye = "Aye",
+  Nay = "Nay",
+  Split = "Split",
+  Abstain = "Abstain",
+}
