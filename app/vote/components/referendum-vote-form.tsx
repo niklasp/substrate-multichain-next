@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Slider, SliderTypeMap } from "@mui/material";
-import { castVote } from "../../../data/vote-service";
 import { useAccountBalance } from "@/hooks/use-account-balance";
 import { ButtonGroup } from "@nextui-org/button";
 import { VoteChoice } from "../types";
@@ -127,7 +126,7 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
     </>
   );
 
-  function sliderValueText(value) {
+  function sliderValueText(value: any) {
     return `${value} KSM`;
   }
 
@@ -171,21 +170,24 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
       api,
       voteExtrinsic,
       actingAccountSigner,
-      actingAccount?.address
+      actingAccount?.address,
+      {
+        title: `Vote on Referendum ${referendumId}`,
+      }
     );
 
     closeModal();
   }
 
-  const handleSliderChange = (e) => {
+  const handleSliderChange = (e: any) => {
     setSliderValue(VOTE_LOCK_OPTIONS[e.target.value]);
   };
 
-  function valuetext(value) {
+  function valuetext(value: any) {
     return `${value}°C`;
   }
 
-  function valueLabelFormat(value) {
+  function valueLabelFormat(value: any) {
     return marks[Math.floor(value)]?.label;
   }
 
@@ -205,13 +207,19 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
     },
   });
 
-  const watchAyeVoteAmount = watch("vote-amount-aye", 0);
-  const watchNayVoteAmount = watch("vote-amount-nay", 0);
-  const watchAbstainVoteAmount = watch("vote-amount-abstain", 0);
+  const watchAyeVoteAmount = watch<"vote-amount-aye">("vote-amount-aye", "0");
+  const watchNayVoteAmount = watch<"vote-amount-nay">("vote-amount-nay", "0");
+  const watchAbstainVoteAmount = watch<"vote-amount-abstain">(
+    "vote-amount-abstain",
+    "0"
+  );
 
   const totalAyeVotes = !isNaN(parseFloat(watchAyeVoteAmount))
     ? voteChoice === VoteChoice.Aye
-      ? (parseFloat(sliderValue.value) * parseFloat(watchAyeVoteAmount))
+      ? (
+          parseFloat(sliderValue.value.toString()) *
+          parseFloat(watchAyeVoteAmount)
+        )
           .toFixed(2)
           .replace(/[.,]00$/, "")
       : parseFloat(watchAyeVoteAmount)
@@ -221,7 +229,10 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
 
   const totalNayVotes = !isNaN(parseFloat(watchNayVoteAmount))
     ? voteChoice === VoteChoice.Nay
-      ? (parseFloat(sliderValue.value) * parseFloat(watchNayVoteAmount))
+      ? (
+          parseFloat(sliderValue.value.toString()) *
+          parseFloat(watchNayVoteAmount)
+        )
           .toFixed(2)
           .replace(/[.,]00$/, "")
       : parseFloat(watchNayVoteAmount)

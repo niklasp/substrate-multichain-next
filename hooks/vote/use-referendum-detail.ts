@@ -11,11 +11,11 @@ export const useReferendumDetail = (refId: string) => {
   return useQuery({
     queryKey: ["referendumDetail", refId, activeChain?.name],
     queryFn: async () => {
-      const { title, content } = await getTitleAndContentForRef(
+      const { title, content, requested } = await getTitleAndContentForRef(
         refId,
         activeChain?.name
       );
-      return { title, content };
+      return { title, content, requested };
     },
   });
 };

@@ -7,7 +7,8 @@ import { Navbar } from "@/components/navbar";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
 import ModalContainer from "@/components/modal-container";
-import { Toaster, ToastBar } from "react-hot-toast";
+import { Toaster, ToastBar, Toast } from "react-hot-toast";
+import { AppToastBar } from "@/components/AppToastBar";
 
 export const metadata: Metadata = {
   title: {
@@ -72,7 +73,9 @@ export default function RootLayout({
                 minHeight: "70px",
               },
             }}
-          ></Toaster>
+          >
+            {AppToastBar}
+          </Toaster>
           <ModalContainer />
         </Providers>
       </body>

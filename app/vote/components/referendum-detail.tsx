@@ -1,20 +1,27 @@
 "use client";
 
 import { UIReferendum, UITrack } from "../types";
+
 import clsx from "clsx";
-import { ScrollShadow } from "@nextui-org/scroll-shadow";
-import styles from "./style.module.scss";
+import { bnToBn, formatBalance } from "@polkadot/util";
+import PaperMoney from "@w3f/polkadot-icons/keyline/PaperMoney";
 import { useState } from "react";
-import { bnToBn } from "@polkadot/util";
+
+import { ScrollShadow } from "@nextui-org/scroll-shadow";
+import { Skeleton } from "@nextui-org/skeleton";
+import { Chip } from "@nextui-org/chip";
+
 import { ReferendumBadges } from "./referendum-badges";
 import ReferendumCountdownCard from "./referendum-countdown-card";
 import ReferendumVoteButtons from "./referendum-vote-buttons";
 import { ReferendumUserInfoCard } from "./referendum-user-info";
+import { ReferendumLinks } from "./referendum-links";
+
 import { useReferendumDetail } from "@/hooks/vote/use-referendum-detail";
-import { Skeleton } from "@nextui-org/skeleton";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { useEndDate } from "@/hooks/vote/use-end-date";
-import { motion } from "framer-motion";
+
+import styles from "./style.module.scss";
 
 export const ReferendumDetailLoading = ({
   isLoaded,
@@ -46,11 +53,12 @@ export const ReferendumDetail = ({
   const [isDescriptionExpanded, setIsDescriptionExpanded] =
     useState<boolean>(isExpanded);
   const { activeChain } = useSubstrateChain();
+  const { name: chainName, decimals, symbol } = activeChain ?? {};
 
   const { data: referendumDetail, isLoading: isReferendumDetailLoading } =
     useReferendumDetail(index);
 
-  const { title, content } = referendumDetail ?? {};
+  const { title, content, requested } = referendumDetail ?? {};
 
   const referendumEndBlock =
     deciding === null || deciding === undefined || track === undefined
@@ -60,7 +68,7 @@ export const ReferendumDetail = ({
       : bnToBn(deciding.since).add(bnToBn(track.decisionPeriod)).toString();
 
   const { data: endDate, isLoading: isEndDateLoading } = useEndDate(
-    activeChain?.name,
+    chainName,
     referendumEndBlock
   );
 
@@ -68,8 +76,29 @@ export const ReferendumDetail = ({
     <div className="referendum-detail relative w-full rounded-sm border border-dashed border-gray-300 p-3 sm:p-4 md:p-6 lg:p-10 xl:p-12 my-4 mb-0 hover:shadow-lg dark:shadow-gray-700 transition-all">
       <div className="w-full flex flex-wrap">
         <div className="flex flex-col left w-full sm:w-7/12 md:w-8/12 pb-6 sm:pb-0 sm:pr-6 border-dashed sm:border-r border-b sm:border-b-0">
-          <div className="referendum-heading text-2xl mb-3 font-bold">
+          <div className="referendum-heading text-2xl mb-3 font-bold flex w-full items-center justify-between">
             <div>Referendum {index}</div>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {requested && (
+                <Chip
+                  variant="flat"
+                  color="secondary"
+                  startContent={
+                    <PaperMoney
+                      stroke="currentColor"
+                      width={18}
+                      className="ml-2"
+                    />
+                  }
+                >
+                  {formatBalance(requested, {
+                    decimals,
+                    withUnit: symbol,
+                    forceUnit: "-",
+                  })}
+                </Chip>
+              )}
+            </span>
           </div>
           {isReferendumDetailLoading ? (
             <>
@@ -98,12 +127,9 @@ export const ReferendumDetail = ({
                   ></div>
                 </ScrollShadow>
               </div>
+              <ReferendumLinks referendumId={referendum.index} />
             </>
           )}
-          {/* <ReferendumLinks
-          referendumId={referendum.index}
-          className="referendum-links"
-        /> */}
         </div>
         <div className="right text-center w-full sm:w-5/12 md:w-4/12 pt-6 sm:pt-0 sticky self-start top-24 sm:pl-4 md:pl-6">
           <ReferendumBadges

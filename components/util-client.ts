@@ -39,11 +39,16 @@ export const sendAndFinalize = async (
     title: "Processing Transaction",
     messages: defaultToastMessages,
   }
-): Promise<SendAndFinalizeResult> => {
+): Promise<SendAndFinalizeResult | unknown> => {
   let toastId: string | undefined = undefined;
 
+  let toastMessages =
+    toast?.messages || toast.messages?.length !== 5
+      ? defaultToastMessages
+      : toast.messages;
+
   if (toast) {
-    toastId = hotToast.loading(toast.messages?.[0], {
+    toastId = hotToast.loading(toastMessages[0], {
       // @ts-ignore
       title: toast.title,
       className: "toaster",
@@ -100,78 +105,97 @@ export const sendAndFinalize = async (
 
     if (typeof call === "undefined" || !call?.signAndSend) {
       reject("call is not ready");
+      return;
     }
 
-    const unsub = await call.signAndSend(
-      address,
-      { signer: signer },
-      async (result) => {
-        const { status, dispatchError, events = [], txHash } = result;
-        if (status.isReady) {
-          if (toastId) {
-            hotToast.loading(toast.messages[1], {
-              id: toastId,
-            });
-          }
-        } else if (status.isInBlock) {
-          success = dispatchError ? false : true;
-          const signedBlock = await api?.rpc.chain.getBlock(status.asInBlock);
-          blockHeader = signedBlock?.block.header;
-          included = [...events];
-          if (toastId) {
-            hotToast.loading(toast.messages[2], {
-              id: toastId,
-            });
-          } else {
-            console.log("transaction in block waiting for finalization");
-          }
-        } else if (status.isFinalized) {
-          console.log(
-            `Transaction included at blockHash ${status.asFinalized}`
-          );
-          // events.forEach(({ phase, event: { data, method, section } }) => {
-          //   // console.log(`\t' ${phase}: ${section}.${method}:: ${data}`)
-          // });
-
-          if (dispatchError) {
-            if (dispatchError.isModule) {
-              // for module errors, we have the section indexed, lookup
-              const decoded = api?.registry.findMetaError(
-                dispatchError.asModule
-              );
-              const { docs, name, section } = decoded || {};
-
-              reject(docs?.join(" "));
+    try {
+      const unsub = await call.signAndSend(
+        address,
+        { signer: signer },
+        async (result) => {
+          const { status, dispatchError, events = [], txHash } = result;
+          if (status.isReady) {
+            if (toastId) {
+              hotToast.loading(toastMessages[1], {
+                id: toastId,
+              });
+            }
+          } else if (status.isInBlock) {
+            success = dispatchError ? false : true;
+            const signedBlock = await api?.rpc.chain.getBlock(status.asInBlock);
+            blockHeader = signedBlock?.block.header;
+            included = [...events];
+            if (toastId) {
+              hotToast.loading(toastMessages[2], {
+                id: toastId,
+              });
             } else {
-              // Other, CannotLookup, BadOrigin, no extra info
-              reject({ status: "error", message: dispatchError.toString() });
+              console.log("transaction in block waiting for finalization");
             }
+          } else if (status.isFinalized) {
+            console.log(
+              `Transaction included at blockHash ${status.asFinalized}`
+            );
+            // events.forEach(({ phase, event: { data, method, section } }) => {
+            //   // console.log(`\t' ${phase}: ${section}.${method}:: ${data}`)
+            // });
 
-            if (toastId) {
-              hotToast.error(toast.messages[4], {
-                id: toastId,
-                duration: 4000,
+            if (dispatchError) {
+              if (dispatchError.isModule) {
+                // for module errors, we have the section indexed, lookup
+                const decoded = api?.registry.findMetaError(
+                  dispatchError.asModule
+                );
+                const { docs, name, section } = decoded || {};
+
+                reject(docs?.join(" "));
+              } else {
+                // Other, CannotLookup, BadOrigin, no extra info
+                reject({ status: "error", message: dispatchError.toString() });
+              }
+
+              if (toastId) {
+                hotToast.error(toastMessages[4], {
+                  id: toastId,
+                  duration: 4000,
+                });
+              }
+            } else {
+              if (toastId) {
+                hotToast.success(toastMessages[3], {
+                  id: toastId,
+                  duration: 4000,
+                });
+              }
+
+              resolve({
+                status: "success",
+                message: `success signAndSend ${tx.toString()}`,
+                events,
+                txHash: txHash.toString(),
+                blockHeader,
               });
             }
-          } else {
-            if (toastId) {
-              hotToast.success(toast.messages[3], {
-                id: toastId,
-                duration: 4000,
-              });
-            }
-
-            resolve({
-              status: "success",
-              message: `success signAndSend ${tx.toString()}`,
-              events,
-              txHash: txHash.toString(),
-              blockHeader,
-            });
           }
         }
+      );
+      unsub;
+    } catch (error) {
+      console.error("signAndSend cancelled", error);
+      if (toastId) {
+        hotToast.dismiss(toastId);
       }
-    );
-    unsub;
+      reject(error);
+    }
+  }).catch((error) => {
+    console.error("sendAndFinalize error", error);
+
+    if (toastId) {
+      hotToast.dismiss(toastId);
+    }
+    return {
+      status: "error",
+      message: error,
+    };
   });
 };

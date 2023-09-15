@@ -57,5 +57,5 @@ export type ToastType =
   | undefined
   | {
       title: string;
-      messages: string[];
+      messages?: string[];
     };

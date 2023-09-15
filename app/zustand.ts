@@ -140,40 +140,39 @@ export const useAppStore = create<AppState>()(
         isChainApiReady: isReady,
       });
     },
-
     updateVoteState: (referendumId: string, vote: any) => {
-      set((state) => ({
-        user: {
-          ...state.user,
-          voteStates: {
-            ...state.user.voteStates,
-            [`${referendumId}`]: {
-              ...state.user.voteStates?.[`${referendumId}`],
-              vote,
-            },
-          },
-        },
-      }));
+      // set((state) => ({
+      //   user: {
+      //     ...state.user,
+      //     voteStates: {
+      //       ...state.user.voteStates,
+      //       [`${referendumId}`]: {
+      //         ...state.user.voteStates?.[`${referendumId}`],
+      //         vote,
+      //       },
+      //     },
+      //   },
+      // }));
     },
     removeVoteState: (referendumId: string) => {
-      set((state) => {
-        const newVoteStates = { ...state.user.voteStates };
-        delete newVoteStates[`${referendumId}`];
-        return {
-          user: {
-            ...state.user,
-            voteStates: newVoteStates,
-          },
-        };
-      });
+      // set((state) => {
+      //   const newVoteStates = { ...state.user.voteStates };
+      //   delete newVoteStates[`${referendumId}`];
+      //   return {
+      //     user: {
+      //       ...state.user,
+      //       voteStates: newVoteStates,
+      //     },
+      //   };
+      // });
     },
     clearVoteState: () => {
-      set((state) => ({
-        user: {
-          ...state.user,
-          voteStates: [],
-        },
-      }));
+      // set((state) => ({
+      //   user: {
+      //     ...state.user,
+      //     voteStates: [],
+      //   },
+      // }));
     },
   }))
 );
