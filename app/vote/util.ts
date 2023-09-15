@@ -405,6 +405,8 @@ export async function getTitleAndContentForRef(
       redirect: "follow",
     };
 
+    console.log("getTitleAndContentForRef", refId, chainName);
+
     fetch(
       `https://api.polkassembly.io/api/v1/posts/on-chain-post?proposalType=referendums_v2&postId=${refId}`,
       requestOptions

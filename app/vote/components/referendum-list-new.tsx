@@ -3,7 +3,6 @@
 import { chain } from "lodash";
 import { UIReferendum } from "../types";
 import { SubstrateChain } from "@/types";
-import { useReferenda } from "../referenda-context";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { ChainSwitch } from "@/components/chain-switch";
 import { Skeleton } from "@nextui-org/skeleton";
@@ -13,6 +12,7 @@ import { useState } from "react";
 import { useUserVotes } from "@/hooks/vote/use-user-votes";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
+import { useReferenda } from "@/hooks/vote/use-referenda";
 
 export const revalidate = 3600;
 
@@ -31,8 +31,10 @@ const Loading = ({ isLoaded }: { isLoaded: boolean }) => {
 };
 
 export default function ReferendumList() {
-  const { referenda, tracks, isLoading } = useReferenda();
+  const { data: refsAndTracks, isLoading } = useReferenda("all", true);
+  const { referenda, tracks } = refsAndTracks || {};
   const { activeChain } = useSubstrateChain();
+
   const { data: userVotes, isLoading: isLoadingUserVotes } = useUserVotes(
     activeChain?.name,
     "DT7kRjGFvRKxGSx5CPUCA1pazj6gzJ6Db11xmkX4yYSNK7m"

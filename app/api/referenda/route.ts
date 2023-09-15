@@ -11,8 +11,15 @@ import {
 import { UIReferendum, UITrack } from "@/app/vote/types";
 
 export async function POST(req: NextRequest) {
-  let { chain, refId }: { chain: SubstrateChain; refId: string } =
-    await req.json();
+  let {
+    chain,
+    refFilter,
+    withTracks = true,
+  }: {
+    chain: SubstrateChain;
+    refFilter: string;
+    withTracks: boolean;
+  } = await req.json();
 
   let openGovRefs: [
       id: StorageKey<[u32]>,
@@ -21,8 +28,8 @@ export async function POST(req: NextRequest) {
     referenda: UIReferendum[] = [],
     tracks: UITrack[] = [];
 
-  if (typeof refId === "undefined") {
-    refId = "all";
+  if (typeof refFilter === "undefined") {
+    refFilter = "all";
   }
 
   const chainConfig = await getChainByName(chain);
@@ -32,14 +39,28 @@ export async function POST(req: NextRequest) {
     throw `can not get api of ${chain}`;
   }
 
-  if (refId === "all") {
+  if (refFilter === "all" || refFilter === "past") {
     openGovRefs = await api?.query.referenda.referendumInfoFor.entries();
-    referenda = openGovRefs
-      ?.map(transformReferendum)
-      ?.filter((ref) => ref?.status === "ongoing");
-  } else if (isFinite(parseInt(refId))) {
-    const refFromChain = await api?.query.referenda.referendumInfoFor(refId);
-    const ref = transformReferendum([refId, refFromChain]);
+    referenda = openGovRefs?.map(transformReferendum);
+
+    if (refFilter === "all") {
+      referenda = referenda?.filter((ref) => ref?.status === "ongoing");
+    } else {
+      referenda = referenda
+        ?.filter(
+          (ref) =>
+            ref?.status === "approved" ||
+            ref?.status === "rejected" ||
+            ref?.status === "cancelled" ||
+            ref?.status === "timedOut"
+        )
+        .sort((a, b) => parseInt(b.index) - parseInt(a.index));
+    }
+  } else if (isFinite(parseInt(refFilter))) {
+    const refFromChain = await api?.query.referenda.referendumInfoFor(
+      refFilter
+    );
+    const ref = transformReferendum([refFilter, refFromChain]);
     const decoratedRef = await decorateWithPolkassemblyInfo(
       ref,
       chainConfig.name
@@ -49,17 +70,19 @@ export async function POST(req: NextRequest) {
     return [];
   }
 
-  const tracksFromChain = await api?.consts.referenda.tracks;
-  tracks = tracksFromChain?.map(transformTrack);
-  tracks = tracks?.map((track) => {
-    const info = trackInfo?.find(
-      (trackInfo) => trackInfo.id.toString() === track.id.toString()
-    );
-    return {
-      ...track,
-      text: info?.text,
-    };
-  });
+  if (withTracks) {
+    const tracksFromChain = await api?.consts.referenda.tracks;
+    tracks = tracksFromChain?.map(transformTrack);
+    tracks = tracks?.map((track) => {
+      const info = trackInfo?.find(
+        (trackInfo) => trackInfo.id.toString() === track.id.toString()
+      );
+      return {
+        ...track,
+        text: info?.text,
+      };
+    });
+  }
 
   return NextResponse.json({ referenda, tracks });
 }

@@ -1,7 +1,6 @@
 import { useAppStore } from "@/app/zustand";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { SubstrateChain } from "@/types";
-import { encodeAddress } from "@polkadot/keyring";
 import { useQuery } from "react-query";
 
 export const useUserVotes = (

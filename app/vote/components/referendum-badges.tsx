@@ -28,7 +28,7 @@ export const ReferendumBadges = ({
     <div className="referendum-badges mb-2 flex transition-none text-black">
       {track && (origin?.origins || track.id === "0") && (
         <Tooltip content={track.text}>
-          <div className="text-sm bg-gray-200 py-1 px-2 rounded-sm flex-1 cursor-default mr-2 flex items-center justify-center">
+          <div className="text-sm bg-gray-200 py-1 px-2 rounded-md shadow-sm flex-1 cursor-default mr-2 flex items-center justify-center">
             {track.id === "0" ? "Root" : titleCase(origin.origins)}
           </div>
         </Tooltip>
@@ -39,7 +39,7 @@ export const ReferendumBadges = ({
         } period has passed`}
       >
         <div
-          className="text-sm py-1 px-2 rounded-sm flex-1 cursor-default flex items-center justify-center"
+          className="text-sm py-1 px-2 rounded-md shadow-sm flex-1 cursor-default flex items-center justify-center"
           style={{ background: statusBadgeBg }}
         >
           {status === "ongoing"

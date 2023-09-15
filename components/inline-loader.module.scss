@@ -1,0 +1,22 @@
+.inlineLoader {
+  display: inline-flex;
+
+  span {
+    animation: loading01 1500ms infinite;
+
+    @for $i from 0 through 3 {
+      &:nth-child(#{$i+1}) {
+        animation-delay: #{$i*.1}s;
+      }
+    }
+  }
+}
+
+@keyframes loading01 {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}

@@ -4,17 +4,19 @@ import { useQuery } from "react-query";
 import { getTitleAndContentForRef } from "@/app/vote/util";
 import { SubstrateChain } from "@/types";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
+import { DEFAULT_CHAIN } from "@/config/chains";
 
 export const useReferendumDetail = (refId: string) => {
   const { activeChain } = useSubstrateChain();
+  const chainName = activeChain?.name || DEFAULT_CHAIN;
 
   return useQuery({
-    queryKey: ["referendumDetail", refId, activeChain?.name],
+    queryKey: ["referendumDetail", refId, chainName],
     queryFn: async () => {
-      const { title, content, requested } = await getTitleAndContentForRef(
-        refId,
-        activeChain?.name
-      );
+      const polkassemblyRef = await getTitleAndContentForRef(refId, chainName);
+
+      console.log("referendumDetail", polkassemblyRef);
+      const { title, content, requested } = polkassemblyRef;
       return { title, content, requested };
     },
   });

@@ -1,6 +1,7 @@
 import { useAppStore } from "@/app/zustand";
 import { UIReferendum } from "../types";
 import { formatBalance } from "@polkadot/util";
+import { Card } from "@nextui-org/card";
 
 export function ReferendumUserInfoCard({
   referendum,
@@ -31,7 +32,11 @@ export function ReferendumUserInfoCard({
   let lockPeriod = 0;
 
   return (
-    <div className="referendum-user-info-card flex flex-row justify-between p-4 bg-gray-100 dark:bg-slate-800 rounded-sm mb-2 shadow-sm hover:shadow-md transition-shadow text-sm">
+    <Card
+      radius="sm"
+      className="p-4 mb-2 text-sm bg-gray-100 dark:bg-slate-800"
+      shadow="sm"
+    >
       {!isUserVotesLoading && (
         <>
           <div className="flex-col w-full text-center">
@@ -104,6 +109,6 @@ export function ReferendumUserInfoCard({
           </div>
         </>
       )}
-    </div>
+    </Card>
   );
 }

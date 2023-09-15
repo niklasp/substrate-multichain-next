@@ -10,7 +10,7 @@ export const useAccountBalance = () => {
   const { ss58Format } = activeChain || {};
   const user = useAppStore((state) => state.user);
   const { address } = user?.accounts?.[user.actingAccountIdx] || {};
-  const userAddress = encodeAddress(address, ss58Format);
+  const userAddress = address && encodeAddress(address, ss58Format);
 
   console.log("useAccountBalance", activeChain?.name, address, userAddress);
 

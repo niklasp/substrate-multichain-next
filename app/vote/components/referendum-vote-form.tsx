@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Slider, SliderTypeMap } from "@mui/material";
 import { useAccountBalance } from "@/hooks/use-account-balance";
-import { ButtonGroup } from "@nextui-org/button";
+import { Button, ButtonGroup } from "@nextui-org/button";
 import { VoteChoice } from "../types";
 import clsx from "clsx";
 import { useAppStore } from "@/app/zustand";
@@ -10,10 +10,10 @@ import { formatBalance, bnToBn, BN_ZERO } from "@polkadot/util";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { Spinner } from "@nextui-org/spinner";
 import { Input } from "@nextui-org/input";
-import { Button } from "@/components/Button";
 import { getVoteTx } from "../util";
 import { sendAndFinalize } from "@/components/util-client";
 import { web3FromAddress } from "@polkadot/extension-dapp";
+import { vividButtonClasses } from "@/components/primitives";
 
 const VOTE_LOCK_OPTIONS = [
   {
@@ -86,6 +86,7 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
   const hasUserSubmittedAnswers = false;
   const latestUserVote = null;
 
+  const [isVoteLoading, setIsVoteLoading] = useState<boolean>(false);
   const [voteChoice, setVoteChoice] = useState(VoteChoice.Aye);
   const [sliderValue, setSliderValue] = useState(VOTE_LOCK_OPTIONS[1]);
   const sliderRef = useRef<any>(undefined);
@@ -166,6 +167,7 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
       conviction < 1 ? 0 : sliderValue.value
     );
 
+    setIsVoteLoading(true);
     await sendAndFinalize(
       api,
       voteExtrinsic,
@@ -175,8 +177,9 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
         title: `Vote on Referendum ${referendumId}`,
       }
     );
+    setIsVoteLoading(false);
 
-    closeModal();
+    // closeModal();
   }
 
   const handleSliderChange = (e: any) => {
@@ -262,11 +265,11 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
         </div>
       )}
       <form onSubmit={handleSubmit(onSubmit)} className="my-5 mx-1">
-        <ButtonGroup radius="sm" className="w-full">
+        <ButtonGroup radius="sm" className="w-full px-4 mb-4">
           <Button
             className={clsx(
               "aye vote-button h-10 rounded-none mr-0 w-1/4 bg-gradient-to-r border-y-2 border-l-2 text-black",
-              { selected: voteChoice === VoteChoice.Aye }
+              { "scale-125 z-10": voteChoice === VoteChoice.Aye }
             )}
             color="success"
             onClick={async () => setVoteChoice(VoteChoice.Aye)}
@@ -276,7 +279,7 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
           <Button
             className={clsx(
               "nay vote-button h-10 rounded-none mr-0 w-1/4 border-y-2 text-black",
-              { selected: voteChoice === VoteChoice.Nay }
+              { "scale-125 z-10": voteChoice === VoteChoice.Nay }
             )}
             color="danger"
             onClick={async () => setVoteChoice(VoteChoice.Nay)}
@@ -286,7 +289,7 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
           <Button
             className={clsx(
               "split vote-button h-10 rounded-none mr-0 w-1/4  border-y-2  text-black",
-              { selected: voteChoice === VoteChoice.Split }
+              { "scale-125 z-10": voteChoice === VoteChoice.Split }
             )}
             onClick={async () => setVoteChoice(VoteChoice.Split)}
             color="warning"
@@ -295,11 +298,10 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
           </Button>
           <Button
             className={clsx(
-              "abstain vote-button h-10 rounded-none mr-0 w-1/4 border-y-2 border-r-2 text-black",
-              { selected: voteChoice === VoteChoice.Abstain }
+              "abstain bg-gray-300 vote-button h-10 rounded-none mr-0 w-1/4 border-y-2 border-r-2 text-black",
+              { "scale-125 z-10": voteChoice === VoteChoice.Abstain }
             )}
             onClick={async () => setVoteChoice(VoteChoice.Abstain)}
-            color="default"
           >
             Abstain
           </Button>
@@ -487,11 +489,11 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
         </div>
         <Button
           type="submit"
-          color="vivid"
-          className="w-full mt-4 h-16"
+          className={clsx("w-full mt-4 h-16", vividButtonClasses)}
           radius="sm"
+          isLoading={isVoteLoading}
         >
-          Send Votes
+          Cast Votes
         </Button>
       </form>
     </div>

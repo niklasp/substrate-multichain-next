@@ -8,6 +8,8 @@ export const chains = {
   [polkadot.name]: polkadot,
 };
 
+export const DEFAULT_CHAIN = SubstrateChain.Kusama;
+
 /**
  * Get chain settings by name and create provider and api if not exists
  * @param name chain name

@@ -1,4 +1,5 @@
 import { Tooltip } from "@nextui-org/tooltip";
+import { Card } from "@nextui-org/card";
 import { ReactNode } from "react";
 import { ReferendaStatus, UIReferendum } from "../types";
 import ReferendumCountdown from "./referendum-countdown";
@@ -13,7 +14,11 @@ export default function ReferendumCountdownCard({
   const isConfirming = status === "ongoing" && !!deciding?.confirming;
 
   return (
-    <div className="referendum-countdown-card p-4 bg-gray-100 dark:bg-slate-800 rounded-sm mb-2 shadow-sm hover:shadow-md dark:shadow-gray-800 transition-shadow text-sm">
+    <Card
+      radius="sm"
+      className="p-4 mb-2 text-sm bg-gray-100 dark:bg-slate-800"
+      shadow="sm"
+    >
       <Tooltip
         content={
           "If the referendum does not enter the confirming state, it will automatically be rejected"
@@ -27,6 +32,6 @@ export default function ReferendumCountdownCard({
         </h3>
       </Tooltip>
       <ReferendumCountdown endDate={endDate} />
-    </div>
+    </Card>
   );
 }
