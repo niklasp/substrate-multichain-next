@@ -37,10 +37,10 @@ export const ChainSwitch = ({ className }: { className?: string }) => {
             className="min-w-unit-12 px-unit-1 md:px-unit-4"
           >
             {isConnecting || typeof activeChain === "undefined" ? (
-              <>
-                <Spinner size="sm" color="secondary" />
+              <span className="text-xs flex items-center">
+                <Spinner size="sm" color="secondary" className="mr-2" />
                 connecting
-              </>
+              </span>
             ) : (
               <activeChain.icon />
             )}

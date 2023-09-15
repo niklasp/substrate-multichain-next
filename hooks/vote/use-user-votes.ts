@@ -16,12 +16,6 @@ export const useUserVotes = (
     queryKey: ["userVotes", chain, address],
     enabled: !!chain && !!userAddress,
     queryFn: async () => {
-      console.log(
-        "useUserVotes",
-        chain,
-        activeChain?.ss58Format,
-        encodeAddress(userAddress, activeChain?.ss58Format)
-      );
       var headers = new Headers();
       headers.append(
         "x-network",

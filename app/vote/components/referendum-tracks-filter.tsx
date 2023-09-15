@@ -30,8 +30,6 @@ export default function ReferendumTracksFilter({
     count: totalCount,
   });
 
-  console.log("referendaCountPerTrack", referendaCountPerTrack);
-
   const distinctReferendaTrackIds = referenda
     ?.map((ref) => ref.track)
     .filter((value, index, self) => self.indexOf(value) === index);

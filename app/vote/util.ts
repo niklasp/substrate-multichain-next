@@ -18,7 +18,7 @@ import type {
 } from "./types.js";
 
 import { getGovernanceTracks } from "@polkadot/apps-config";
-import { ReferendumPolkassembly } from "./types";
+import { ReferendumPolkassembly, VoteChoice } from "./types";
 import { create } from "zustand";
 import { SubstrateChain } from "../../types/index";
 import {
@@ -443,3 +443,46 @@ export const transformTrack = ([id, info]: [
     minSupport: minSupport.toJSON(),
   };
 };
+
+export function getVoteTx(
+  api: ApiPromise | undefined,
+  voteChoice: VoteChoice,
+  ref: number,
+  balances: { aye: BN; nay: BN; abstain: BN },
+  conviction: number
+) {
+  let vote: any = {};
+
+  switch (voteChoice) {
+    case VoteChoice.Aye:
+    case VoteChoice.Nay:
+      vote = {
+        Standard: {
+          vote: {
+            aye: voteChoice === VoteChoice.Aye,
+            conviction: conviction,
+          },
+          balance: voteChoice === VoteChoice.Aye ? balances.aye : balances.nay,
+        },
+      };
+      break;
+    case VoteChoice.Split:
+      vote = {
+        Split: {
+          aye: balances.aye,
+          nay: balances.nay,
+        },
+      };
+      break;
+    case VoteChoice.Abstain:
+      vote = {
+        SplitAbstain: {
+          aye: balances.aye,
+          nay: balances.nay,
+          abstain: balances.abstain,
+        },
+      };
+  }
+
+  return api?.tx.convictionVoting.vote(ref, vote);
+}

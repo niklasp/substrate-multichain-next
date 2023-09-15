@@ -10,6 +10,7 @@ import {
 import { create } from "zustand";
 import { persist, createJSONStorage, devtools } from "zustand/middleware";
 import { Modal, type ModalProps } from "@nextui-org/modal";
+import { Signer } from "@polkadot/api/types";
 
 interface AppState {
   chain: ChainConfig;
@@ -20,6 +21,8 @@ interface AppState {
     extensions: InjectedExtension[]; // injected extension
     accounts: InjectedAccountWithMeta[]; // injected accounts
     actingAccountIdx: number; // acting account index
+    actingAccount?: InjectedAccountWithMeta; // acting account
+    actingAccountSigner?: Signer;
     isExtensionReady: boolean; // is extension ready
     voteStates: any[]; // vote states
   };
@@ -34,6 +37,7 @@ interface AppState {
   setIsExtensionReady: (isReady: boolean) => void;
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setAccountIdx: (idx: number) => void;
+  setActingAccountSigner: (signer: Signer) => void;
   disconnect: () => void;
 
   updateVoteState: (referendumId: string, vote: any) => void;
@@ -45,6 +49,8 @@ const emptyUser = {
   extensions: [],
   accounts: [],
   actingAccountIdx: 0,
+  actingAccount: undefined,
+  actingAccountSigner: undefined,
   isExtensionReady: false,
   voteStates: [],
 };
@@ -111,6 +117,16 @@ export const useAppStore = create<AppState>()(
         user: {
           ...user,
           actingAccountIdx: idx,
+          actingAccount: user.accounts[idx],
+        },
+      });
+    },
+    setActingAccountSigner: (signer) => {
+      const { user } = get();
+      set({
+        user: {
+          ...user,
+          actingAccountSigner: signer,
         },
       });
     },

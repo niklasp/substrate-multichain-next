@@ -4,6 +4,7 @@ import {
   InjectedExtension,
 } from "@polkadot/extension-inject/types";
 import { ReactNode, ReactSVGElement, SVGProps } from "react";
+import { Header } from "@polkadot/types/interfaces";
 
 export enum SubstrateChain {
   Kusama = "Kusama",
@@ -42,3 +43,19 @@ export type Endpoint = {
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
 };
+
+export interface SendAndFinalizeResult {
+  status: string;
+  message: string;
+  txHash?: string;
+  events?: any[];
+  blockHeader?: Header;
+  toast?: ToastType;
+}
+
+export type ToastType =
+  | undefined
+  | {
+      title: string;
+      messages: string[];
+    };

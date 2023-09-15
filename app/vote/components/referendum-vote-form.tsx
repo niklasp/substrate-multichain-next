@@ -7,11 +7,14 @@ import { ButtonGroup } from "@nextui-org/button";
 import { VoteChoice } from "../types";
 import clsx from "clsx";
 import { useAppStore } from "@/app/zustand";
-import { formatBalance } from "@polkadot/util";
+import { formatBalance, bnToBn, BN_ZERO } from "@polkadot/util";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { Spinner } from "@nextui-org/spinner";
 import { Input } from "@nextui-org/input";
 import { Button } from "@/components/Button";
+import { getVoteTx } from "../util";
+import { sendAndFinalize } from "@/components/util-client";
+import { web3FromAddress } from "@polkadot/extension-dapp";
 
 const VOTE_LOCK_OPTIONS = [
   {
@@ -91,7 +94,15 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
   //   const { voteOnRef } = useVoteManager(queryClient);
   const closeModal = useAppStore((state) => state.closeModal);
   const { activeChain } = useSubstrateChain();
-  const { decimals, symbol } = activeChain || {};
+  const { decimals, symbol, api } = activeChain || {};
+  const user = useAppStore((state) => state.user);
+  const {
+    accounts,
+    actingAccountIdx,
+    isExtensionReady,
+    actingAccount,
+    actingAccountSigner,
+  } = user;
 
   //   const { data: latestUserVote } = useLatestUserVoteForRef(referendumId);
   const { data: accountBalance, isLoading: isBalanceLoading } =
@@ -131,6 +142,38 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
     //   },
     //   sliderValue.value
     // );
+
+    const conviction = sliderValue.value;
+
+    const voteInChainDecimalsMultiplier = bnToBn(10).pow(bnToBn(decimals));
+
+    const voteBalances = {
+      aye: bnToBn(watchAyeVoteAmount.toString()).mul(
+        voteInChainDecimalsMultiplier
+      ),
+      nay: bnToBn(watchNayVoteAmount.toString()).mul(
+        voteInChainDecimalsMultiplier
+      ),
+      abstain: bnToBn(watchAbstainVoteAmount.toString()).mul(
+        voteInChainDecimalsMultiplier
+      ),
+    };
+
+    const voteExtrinsic = getVoteTx(
+      api,
+      voteChoice,
+      parseInt(referendumId),
+      voteBalances,
+      conviction < 1 ? 0 : sliderValue.value
+    );
+
+    await sendAndFinalize(
+      api,
+      voteExtrinsic,
+      actingAccountSigner,
+      actingAccount?.address
+    );
+
     closeModal();
   }
 

@@ -45,13 +45,13 @@ export const Navbar = () => {
             </p>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
+        <ul className="hidden lg:flex gap-4 justify-start ml-2 font-bold">
           {siteConfig.navItems.map((item) => (
             <NavbarItem key={item.href}>
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium"
+                  "text-lg data-[active=true]:text-primary data-[active=true]:font-bold"
                 )}
                 color="foreground"
                 href={item.href}

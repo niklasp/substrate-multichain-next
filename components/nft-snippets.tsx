@@ -71,7 +71,6 @@ async function getNFTs() {
 
 export function NFTSnippets() {
   const { data: nfts } = useNFTs({});
-  console.log("nfts are", nfts);
   const positions = [
     [10, 10],
     [12, 80],
