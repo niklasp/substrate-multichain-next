@@ -2,6 +2,7 @@ import type {
   PalletReferendaReferendumInfoConvictionVotingTally,
   PalletReferendaReferendumInfoRankedCollectiveTally,
   PalletReferendaTrackInfo,
+  PalletConvictionVotingVoteVoting
 } from "@polkadot/types/lookup";
 import type { BN } from "@polkadot/util";
 import { u32 } from "@polkadot/types";
@@ -120,6 +121,12 @@ export interface ReferendumPolkadot {
   submissionDeposit: any;
   submitted: string;
   createdAtHash: string;
+}
+
+export interface VotePolkadot {
+  accountId: string;
+  voteIndex: number;
+  voteData: PalletConvictionVotingVoteVoting;
 }
 
 export interface ReferendumPolkassembly {

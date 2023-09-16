@@ -7,6 +7,7 @@ import type {
   PalletReferendaReferendumInfoConvictionVotingTally,
   PalletReferendaReferendumInfoRankedCollectiveTally,
   PalletReferendaTrackInfo,
+  PalletConvictionVotingVoteVoting
 } from "@polkadot/types/lookup";
 import type {
   CurveGraph,
@@ -15,7 +16,9 @@ import type {
   TrackInfoExt,
   UIReferendum,
   UITrack,
+  VotePolkadot,
 } from "./types.js";
+import { AccountId32 } from '@polkadot/types/interfaces';
 
 import { getGovernanceTracks } from "@polkadot/apps-config";
 import { ReferendumPolkassembly, VoteChoice } from "./types";
@@ -34,6 +37,7 @@ import {
   objectSpread,
   stringPascalCase,
 } from "@polkadot/util";
+import { Codec } from '@polkadot/types/types';
 
 const CURVE_LENGTH = 500;
 
@@ -278,7 +282,7 @@ export function calcCurves({
 export const transformReferendum = ([id, info]: [
   id: StorageKey<[u32]> | string,
   info: Option<PalletReferendaReferendumInfoConvictionVotingTally>
-]): UIReferendum => {
+]): ReferendumPolkadot => {
   let refInfo = info.isSome ? info.unwrap() : null;
 
   // console.log("refInof", id.toHuman(), refInfo?.isOngoing);
@@ -346,6 +350,30 @@ export const transformReferendum = ([id, info]: [
     console.error(e);
     throw e;
   }
+};
+
+/**
+ * Transforms a referendum from PalletReferendaReferendumInfoConvictionVotingTally
+ * to a type we want. It must be serializable https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns#passing-props-from-server-to-client-components-serialization
+ * @param param0
+ * @returns
+ */
+export const transformVote = ([storageKey, codec]: [StorageKey<[AccountId32, u16]>, Codec]): VotePolkadot => {
+
+  // Extract data from storageKey
+  const [accountId, voteIndex] = storageKey.args;
+
+  // Cast Codec to the specific type PalletConvictionVotingVoteVoting and extract necessary fields
+  const voteData = codec as PalletConvictionVotingVoteVoting;
+
+  // Now, voteData should have properties defined in PalletConvictionVotingVoteVoting which you can use as needed
+  // For instance, if it has a property named 'exampleField', you can access it as voteData.exampleField
+
+  return {
+    accountId: accountId.toString(), 
+    voteIndex: voteIndex.toNumber(), 
+    voteData,
+  };
 };
 
 export const decorateWithPolkassemblyInfo = async (
