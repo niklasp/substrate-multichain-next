@@ -10,6 +10,10 @@ import { Spinner } from "@nextui-org/spinner";
 import { InlineLoader } from "@/components/inline-loader";
 
 export default function TestRewards() {
+  const [formStep, setFormStep] = useState(0);
+  const nextFormStep = () => setFormStep((currentStep) => currentStep + 1);
+  const prevFormStep = () => setFormStep((currentStep) => currentStep - 1);
+
   const {
     data: { referenda: pastReferenda } = {
       referenda: [],
@@ -50,7 +54,7 @@ export default function TestRewards() {
           </Select>
 
           {refIndex !== -1 && (
-            <span className="text-xs flex items-center mt-1 ml-1 min-h-unit-10 align-top">
+            <span className="text-xs flex items-start mt-1 ml-1 min-h-unit-10 align-top">
               You selected Referendum {`${refIndex}`}&nbsp;
               {isReferendumDetailLoading ? (
                 <InlineLoader />

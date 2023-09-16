@@ -49,7 +49,12 @@ export default function ReferendumTracksFilter({
   return (
     <div className="flex flex-col items-start">
       <span className="text-sm">Filter Referenda</span>
-      <ButtonGroup radius="sm" size="sm" className="mt-1" variant="flat">
+      <ButtonGroup
+        radius="sm"
+        size="sm"
+        className="mt-1 flex-wrap justify-start"
+        variant="flat"
+      >
         {moreTracks?.map((track) => {
           const referendaCount = referendaCountPerTrack?.find(
             (item) => item.trackId === track.id.toString()

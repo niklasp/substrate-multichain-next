@@ -268,6 +268,7 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
         <ButtonGroup radius="sm" className="w-full px-4 mb-4">
           <Button
             className={clsx(
+              "border-none",
               "aye vote-button h-10 rounded-none mr-0 w-1/4 bg-gradient-to-r border-y-2 border-l-2 text-black",
               { "scale-125 z-10": voteChoice === VoteChoice.Aye }
             )}
@@ -278,6 +279,7 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
           </Button>
           <Button
             className={clsx(
+              "border-none",
               "nay vote-button h-10 rounded-none mr-0 w-1/4 border-y-2 text-black",
               { "scale-125 z-10": voteChoice === VoteChoice.Nay }
             )}
@@ -288,6 +290,7 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
           </Button>
           <Button
             className={clsx(
+              "border-none",
               "split vote-button h-10 rounded-none mr-0 w-1/4  border-y-2  text-black",
               { "scale-125 z-10": voteChoice === VoteChoice.Split }
             )}
@@ -298,6 +301,7 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
           </Button>
           <Button
             className={clsx(
+              "border-none",
               "abstain bg-gray-300 vote-button h-10 rounded-none mr-0 w-1/4 border-y-2 border-r-2 text-black",
               { "scale-125 z-10": voteChoice === VoteChoice.Abstain }
             )}

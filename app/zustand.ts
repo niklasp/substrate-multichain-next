@@ -11,11 +11,13 @@ import { create } from "zustand";
 import { persist, createJSONStorage, devtools } from "zustand/middleware";
 import { Modal, type ModalProps } from "@nextui-org/modal";
 import { Signer } from "@polkadot/api/types";
+import { defaultReferendumRewardsConfig } from "@/config/default-rewards-config";
 
 interface AppState {
   chain: ChainConfig;
   isChainApiReady: boolean;
   setIsChainApiReady: (isReady: boolean) => void;
+
   user: {
     extensionInjectedPromise?: Promise<InjectedExtension[]>; // promise of injected extension
     extensions: InjectedExtension[]; // injected extension
@@ -26,6 +28,7 @@ interface AppState {
     isExtensionReady: boolean; // is extension ready
     voteStates: any[]; // vote states
   };
+
   modals: {
     isOpen: boolean;
     view: React.ReactNode;
@@ -33,8 +36,10 @@ interface AppState {
   };
   openModal: (view: React.ReactNode, modalProps?: any) => void;
   closeModal: () => void;
+
   setExtensions: (extension: InjectedExtension[]) => void;
   setIsExtensionReady: (isReady: boolean) => void;
+
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setAccountIdx: (idx: number) => void;
   setActingAccountSigner: (signer: Signer) => void;
@@ -43,6 +48,13 @@ interface AppState {
   updateVoteState: (referendumId: string, vote: any) => void;
   removeVoteState: (referendumId: string) => void;
   clearVoteState: () => void;
+
+  rewards: {
+    form: {
+      values: any;
+    };
+  };
+  setRewardFormValues: (values: any) => void;
 }
 
 const emptyUser = {
@@ -64,6 +76,28 @@ export const useAppStore = create<AppState>()(
       isOpen: false,
       view: null,
     },
+    rewards: {
+      form: {
+        values: defaultReferendumRewardsConfig,
+      },
+    },
+
+    setRewardFormValues: (values) => {
+      const { rewards } = get();
+      set({
+        rewards: {
+          ...rewards,
+          form: {
+            ...rewards.form,
+            values: {
+              ...rewards.form.values,
+              ...values,
+            },
+          },
+        },
+      });
+    },
+
     openModal: (view, modalProps) => {
       const { modals } = get();
       set({
