@@ -4,18 +4,27 @@ import { ChainConfig, SubstrateChain } from "@/types";
 import { ApiPromise } from "@polkadot/api";
 import { useQuery } from "react-query";
 
-const getChainDetails = async (api: ApiPromise) => {
+export const getChainDetails = async (api: ApiPromise) => {
   await api.isReady;
-  const [chain, nodeName, nodeVersion, chainType, ss58Prefix, chainProperties] =
-    await Promise.all([
-      api.rpc.system.chain(),
-      api.rpc.system.name(),
-      api.rpc.system.version(),
-      api.rpc.system.chainType(),
-      api.consts.system.ss58Prefix,
-      api.registry.getChainProperties(),
-    ]);
+  const [
+    timestamp,
+    chain,
+    nodeName,
+    nodeVersion,
+    chainType,
+    ss58Prefix,
+    chainProperties,
+  ] = await Promise.all([
+    api.query.timestamp.now(),
+    api.rpc.system.chain(),
+    api.rpc.system.name(),
+    api.rpc.system.version(),
+    api.rpc.system.chainType(),
+    api.consts.system.ss58Prefix,
+    api.registry.getChainProperties(),
+  ]);
   return {
+    timestamp,
     chain,
     nodeName,
     nodeVersion,
