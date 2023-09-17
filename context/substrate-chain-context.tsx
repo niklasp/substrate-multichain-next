@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, createContext } from "react";
 import { ChainConfig, SubstrateChain } from "../types/index";
-import { getChainByName } from "@/config/chains";
 import { useSubstrateChain as useSubstrateChainHook } from "@/hooks/use-substrate-chain";
 
 type SubstrateChainContextType = {

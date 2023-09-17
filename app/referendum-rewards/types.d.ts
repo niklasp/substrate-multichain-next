@@ -188,8 +188,8 @@ export interface Bonuses {
 }
 
 export interface CollectionConfiguration {
-  file: any;
-  id: number;
+  file?: any;
+  id?: number;
   name: string;
   description: string;
   metadataCid?: string | null;

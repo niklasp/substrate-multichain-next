@@ -1,7 +1,4 @@
-import {
-  RewardConfiguration,
-  RewardOption,
-} from "../pages/api/nft_sendout_script/types";
+import { RewardConfiguration } from "@/app/referendum-rewards/types";
 
 export const defaultReferendumRewardsConfig: RewardConfiguration = {
   refIndex: "99",
@@ -11,8 +8,9 @@ export const defaultReferendumRewardsConfig: RewardConfiguration = {
   blockCutOff: null,
   directOnly: false,
   configNFT: {
-    settingsCollectionId:
-      parseInt(process.env.NEXT_PUBLIC_SETTINGS_COLLECTION_ID) || 86,
+    settingsCollectionId: parseInt(
+      process.env.NEXT_PUBLIC_SETTINGS_COLLECTION_ID || "86"
+    ),
     file: undefined,
     imageCid: "ipfs://ipfs/QmZX9JAhur4ozT2mbHBVAWNRFZGfFRQLgkRgd1yyE35eme",
     description:
