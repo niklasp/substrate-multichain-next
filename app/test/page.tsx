@@ -5,6 +5,7 @@ import Link from "next/link";
 import { transformReferendum } from "../vote/util";
 import { ReferendumDetail } from "./referendum-detail-test";
 
+export const dynamic = "force-static";
 export const revalidate = 200;
 
 const getReferenda = cache(async (selectedChain: SubstrateChain) => {
