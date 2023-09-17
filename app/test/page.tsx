@@ -8,7 +8,8 @@ import { ReferendumDetail } from "./referendum-detail-test";
 export const revalidate = 20;
 
 const getReferenda = cache(async (selectedChain: SubstrateChain) => {
-  const chainConfig = await getChainByName(selectedChain as SubstrateChain);
+  const safeChain = (selectedChain as SubstrateChain) || SubstrateChain.Kusama;
+  const chainConfig = await getChainByName(safeChain);
   const { api } = chainConfig;
 
   const openGovRefs = await api?.query.referenda.referendumInfoFor.entries();
@@ -22,7 +23,8 @@ const getReferenda = cache(async (selectedChain: SubstrateChain) => {
 });
 
 const getChainInfo = cache(async (selectedChain: SubstrateChain) => {
-  const chainConfig = await getChainByName(selectedChain as SubstrateChain);
+  const safeChain = (selectedChain as SubstrateChain) || SubstrateChain.Kusama;
+  const chainConfig = await getChainByName(safeChain);
   const { api } = chainConfig;
 
   if (!api) {
