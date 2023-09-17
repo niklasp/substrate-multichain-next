@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getChainByName } from "@/config/chains";
 import { SubstrateChain } from "@/types";
 import Link from "next/link";
@@ -6,7 +7,7 @@ import { ReferendumDetail } from "./referendum-detail-test";
 
 export const revalidate = 20;
 
-async function getReferenda(selectedChain: SubstrateChain) {
+const getReferenda = cache(async (selectedChain: SubstrateChain) => {
   const chainConfig = await getChainByName(selectedChain as SubstrateChain);
   const { api } = chainConfig;
 
@@ -18,9 +19,9 @@ async function getReferenda(selectedChain: SubstrateChain) {
   console.log("Referenda", referenda);
 
   return referenda;
-}
+});
 
-async function getChainInfo(selectedChain: SubstrateChain) {
+const getChainInfo = cache(async (selectedChain: SubstrateChain) => {
   const chainConfig = await getChainByName(selectedChain as SubstrateChain);
   const { api } = chainConfig;
 
@@ -37,7 +38,7 @@ async function getChainInfo(selectedChain: SubstrateChain) {
     timestamp,
     chain,
   };
-}
+});
 
 export default async function Test({
   searchParams,
