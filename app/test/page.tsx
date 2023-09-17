@@ -5,7 +5,7 @@ import Link from "next/link";
 import { transformReferendum } from "../vote/util";
 import { ReferendumDetail } from "./referendum-detail-test";
 
-export const revalidate = 20;
+export const revalidate = 200;
 
 const getReferenda = cache(async (selectedChain: SubstrateChain) => {
   const safeChain = (selectedChain as SubstrateChain) || SubstrateChain.Kusama;
