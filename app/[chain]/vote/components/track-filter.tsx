@@ -1,6 +1,6 @@
 "use client";
 
-import { UIReferendum, UITrack } from "@/app/vote/types";
+import { UIReferendum, UITrack } from "@/app/[chain]/vote/types";
 import { useAppStore } from "@/app/zustand";
 import { titleCase } from "@/components/util";
 import { SubstrateChain } from "@/types";
@@ -54,13 +54,11 @@ export function TrackFilter({
   ];
 
   const handleChange = (key: Key) => {
-    console.log(key);
     setTrackFilter(key as string);
   };
 
   return (
-    <div className="flex flex-col items-start">
-      <span className="text-sm">Filter Referenda</span>
+    <div className="flex flex-col items-center">
       <ButtonGroup
         radius="sm"
         size="sm"
@@ -80,10 +78,12 @@ export function TrackFilter({
               }
               onClick={() => handleChange(track.id)}
             >
+              {/* <Link href={`?trackFilter=${track.id}`}> */}
               {titleCase(track.name)}
-              <span className="text-xs text-gray-500 ml-2">
+              <span className="text-xs text-gray-500 ml-1">
                 {referendaCount}
               </span>
+              {/* </Link> */}
             </Button>
           );
         })}

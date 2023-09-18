@@ -7,8 +7,8 @@ import {
   decorateWithPolkassemblyInfo,
   transformReferendum,
   transformTrack,
-} from "@/app/vote/util";
-import { UIReferendum, UITrack } from "@/app/vote/types";
+} from "@/app/[chain]/vote/util";
+import { UIReferendum, UITrack } from "@/app/[chain]/vote/types";
 
 export async function POST(req: NextRequest) {
   let { chain }: { chain: SubstrateChain; refId: string } = await req.json();

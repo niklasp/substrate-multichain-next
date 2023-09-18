@@ -14,7 +14,7 @@ export function getChainInfo(name: SubstrateChain) {
   const chainSettings = ENABLED_CHAINS[name];
 
   if (!chainSettings) {
-    throw `can not get chain settings of ${name}`;
+    throw `can not get chain info of ${name}`;
   }
 
   return chainSettings;

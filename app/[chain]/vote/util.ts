@@ -20,7 +20,7 @@ import type {
 import { getGovernanceTracks } from "@polkadot/apps-config";
 import { ReferendumPolkassembly, VoteChoice } from "./types";
 import { create } from "zustand";
-import { SubstrateChain } from "../../types/index";
+import { SubstrateChain } from "../../../types/index";
 import {
   BN,
   BN_BILLION,
@@ -310,6 +310,39 @@ export const transformReferendum = ([id, info]: [
         createdAtHash,
       } = refInfo.asOngoing;
 
+      // there are many ongoing statuses
+      const ongoingStatus = !submissionDeposit
+        ? "awaitingSubmissionDeposit"
+        : decisionDeposit.isNone
+        ? "awaitingDecisionDeposit"
+        : deciding.isSome && deciding.unwrap().since
+        ? "deciding"
+        : deciding.isSome && deciding.unwrap().confirming.isSome
+        ? "confirming"
+        : "preparing";
+
+      // : deciding.isSome && deciding.unwrap().confirming.isSome
+      // ? "confirming"
+
+      // ? "awaitingDecisionDeposit"
+      // : submissionDeposit
+      // ? "awaitingSubmissionDeposit"
+      // : "submitted";
+
+      // rejected
+      //   ? "Rejected"
+      //   : approved
+      //   ? "Approved"
+      //   : deciding?.confirming && deciding?.confirming !== null
+      //   ? "Confirming"
+      //   : decisionDeposit === null
+      //   ? "Awaiting Deposit"
+      //   : deciding?.since
+      //   ? "Deciding"
+      //   : submissionDeposit !== null
+      //   ? "Submitted"
+      //   : "Unknown State";
+
       // const decidingValue = deciding.unwrapOrDefault();
       // const endBlock = decidingValue.confirming
       //   ? decidingValue.confirming
@@ -318,6 +351,7 @@ export const transformReferendum = ([id, info]: [
       return {
         index: typeof id === "string" ? id : id.toHuman()?.toString(),
         status,
+        ongoingStatus,
         tally: {
           ayes: ayes.toHuman(),
           nays: nays.toHuman(),

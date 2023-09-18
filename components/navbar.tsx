@@ -39,7 +39,7 @@ export const Navbar = () => {
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo className="mr-1" />
             <p className="hidden sm:flex -mt-1 font-bold text-xl">
-              p̶r̴o̵o̶f ̴o̴f ̶c̵h̵a̴o̵s
+              pRoOf oF chAoS
             </p>
             <p className="sm:hidden -mt-1 font-bold text-xl text-inherit">
               p̶o̴c̵

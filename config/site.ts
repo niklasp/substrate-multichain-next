@@ -14,7 +14,7 @@ export const siteConfig = {
     },
     {
       label: "Vote",
-      href: "/vote/all",
+      href: "/vote",
       chainLink: true,
     },
     {

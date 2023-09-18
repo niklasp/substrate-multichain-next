@@ -1,4 +1,4 @@
-import { getTitleAndContentForRef } from "@/app/vote/util";
+import { getTitleAndContentForRef } from "@/app/[chain]/vote/util";
 import { SubstrateChain } from "@/types";
 import { cache } from "react";
 

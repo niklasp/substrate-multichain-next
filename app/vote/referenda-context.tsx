@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, createContext, useEffect } from "react";
-import { UIReferendum, UITrack, Referendum } from "./types";
+import { UIReferendum, UITrack, Referendum } from "../[chain]/vote/types";
 import { SubstrateChain } from "@/types";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { get } from "lodash";

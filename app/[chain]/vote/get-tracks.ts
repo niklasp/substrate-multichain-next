@@ -1,5 +1,5 @@
-import { UITrack } from "@/app/vote/types";
-import { transformTrack } from "@/app/vote/util";
+import { UITrack } from "@/app/[chain]/vote/types";
+import { transformTrack } from "@/app/[chain]/vote/util";
 import { getChainByName } from "@/config/chains";
 import { SubstrateChain } from "@/types";
 import { cache } from "react";

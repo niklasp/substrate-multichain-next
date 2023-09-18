@@ -2,7 +2,7 @@ import {
   decorateWithPolkassemblyInfo,
   getTitleAndContentForRef,
   transformReferendum,
-} from "@/app/vote/util";
+} from "@/app/[chain]/vote/util";
 import { getChainByName } from "@/config/chains";
 import { SubstrateChain } from "@/types";
 import { cache } from "react";

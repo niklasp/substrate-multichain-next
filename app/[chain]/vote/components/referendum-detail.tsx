@@ -1,3 +1,5 @@
+"use client";
+
 import clsx from "clsx";
 import { bnToBn, formatBalance } from "@polkadot/util";
 import PaperMoney from "@w3f/polkadot-icons/keyline/PaperMoney";
@@ -6,36 +8,39 @@ import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { Skeleton } from "@nextui-org/skeleton";
 import { Chip } from "@nextui-org/chip";
 
-import { ReferendumBadges } from "../../vote/components/referendum-badges";
-import { ReferendumLinks } from "../../vote/components/referendum-links";
-import ReferendumVoteButtons from "../../vote/components/referendum-vote-buttons";
-import { ReferendumUserInfoCard } from "../../vote/components/referendum-user-info";
-import ReferendumCountdownCard from "../../vote/components/referendum-countdown-card";
-import { Referendum, UIReferendum, UITrack } from "../../vote/types";
+import { ReferendumBadges } from "./referendum-badges";
+import { Referendum, UIReferendum, UITrack } from "../types";
 
-import styles from "../../vote/components/style.module.scss";
-import { getReferendumDetail } from "./get-referendum-detail";
+import styles from "./style.module.scss";
 import { SubstrateChain } from "@/types";
 import { InlineLoader } from "@/components/inline-loader";
+import { getChainInfo } from "@/config/chains";
+import { useReferendumDetail } from "@/hooks/vote/use-referendum-detail";
+import { ReferendumLinks } from "./referendum-links";
+import { ReferendumUserInfoCard } from "./referendum-user-info";
+import ReferendumVoteButtons from "./referendum-vote-buttons";
+import ReferendumCountdownCard from "./referendum-countdown-card";
+import { useEndDate } from "@/hooks/vote/use-end-date";
 
 export type ReferendumDetailType = {
   chain: string;
   referendum: UIReferendum;
   track?: UITrack;
   isExpanded: boolean;
-  chainInfo: { symbol: string; decimals: number };
 };
 
 export const ReferendumDetailLoading = ({
+  chain,
   referendum,
   track,
-  tokenSymbol,
 }: {
+  chain: SubstrateChain;
   referendum: UIReferendum;
   track?: UITrack;
-  tokenSymbol: string;
 }) => {
-  const { index } = referendum;
+  const safeChain = chain || SubstrateChain.Kusama;
+  const { symbol: tokenSymbol } = getChainInfo(safeChain);
+  const { index } = referendum ?? {};
   return (
     <div className="referendum-detail relative w-full rounded-sm border border-dashed border-gray-300 p-3 sm:p-4 md:p-6 lg:p-10 xl:p-12 my-4 mb-0 hover:shadow-lg dark:shadow-gray-700 transition-all">
       <div className="w-full flex flex-wrap">
@@ -66,7 +71,7 @@ export const ReferendumDetailLoading = ({
               <div className="w-full h-4 rounded-lg"></div>
             </Skeleton>
           ))}
-          <ReferendumLinks referendumId={referendum.index} />
+          <ReferendumLinks referendumId={index} />
         </div>
         <div className="right text-center w-full sm:w-5/12 md:w-4/12 pt-6 sm:pt-0 sticky self-start top-24 sm:pl-4 md:pl-6">
           <ReferendumBadges
@@ -84,34 +89,39 @@ export const ReferendumDetailLoading = ({
   );
 };
 
-export async function ReferendumDetail({
+export function ReferendumDetail({
   referendum,
   track,
   isExpanded,
   chain,
-  chainInfo,
 }: ReferendumDetailType) {
-  const { index, deciding } = referendum;
-  const { decimals, symbol } = chainInfo;
-  const referendumDetail = await getReferendumDetail(
-    chain as SubstrateChain,
-    index
-  );
+  const { index, deciding, decisionDeposit, submitted } = referendum ?? {};
+  const { decimals, symbol } = getChainInfo(chain as SubstrateChain);
+  const { data: referendumDetail, isLoading: isDetailLoading } =
+    useReferendumDetail(index);
+
+  // await getReferendumDetail(
+  //   chain as SubstrateChain,
+  //   index
+  // );
   // const [isDescriptionExpanded, setIsDescriptionExpanded] =
-  //   useState<boolean>(isExpanded);
+  // useState<boolean>(isExpanded);
 
   // const { name: chainName, decimals, symbol } = activeChain ?? {};
 
-  const referendumEndBlock =
-    deciding === null || deciding === undefined || track === undefined
+  // The block where the current period ends. May either be preparing, deciding, or confirming.
+  const endBlock =
+    decisionDeposit === null && track !== undefined
+      ? bnToBn(submitted).add(bnToBn(track.preparePeriod)).toString()
+      : deciding === null || deciding === undefined || track === undefined
       ? "0"
       : deciding.confirming !== null
       ? bnToBn(deciding.confirming).toString()
       : bnToBn(deciding.since).add(bnToBn(track.decisionPeriod)).toString();
 
   // const { data: endDate, isLoading: isEndDateLoading } = useEndDate(
-  //   chainName,
-  //   referendumEndBlock
+  //   chain as SubstrateChain,
+  //   endBlock
   // );
 
   // const { data: referendumDetail, isLoading: isReferendumDetailLoading } =
@@ -150,21 +160,34 @@ export async function ReferendumDetail({
           <>
             <h3 className="cursor-pointer text-lg mb-4">{title}</h3>
             <div className="flex-1">
-              <ScrollShadow className="w-full h-[350px]">
-                <div
-                  className={clsx(
-                    styles.referendumDescription,
-                    "referendum-description break-words text-sm"
-                    // {
-                    //   [styles.descriptionOverflowHidden]:
-                    //     !isDescriptionExpanded,
-                    // }
-                  )}
-                  dangerouslySetInnerHTML={{ __html: content ?? "" }}
-                ></div>
-              </ScrollShadow>
+              {isDetailLoading ? (
+                <>
+                  <Skeleton className="mb-6">
+                    <div className="w-full h-6 rounded-lg"></div>
+                  </Skeleton>
+                  {[...Array(8)].map((_, i) => (
+                    <Skeleton key={i} className="mb-2">
+                      <div className="w-full h-4 rounded-lg"></div>
+                    </Skeleton>
+                  ))}
+                </>
+              ) : (
+                <ScrollShadow className="w-full h-[350px]">
+                  <div
+                    className={clsx(
+                      styles.referendumDescription,
+                      "referendum-description break-words text-sm"
+                      // {
+                      //   [styles.descriptionOverflowHidden]:
+                      //     !isDescriptionExpanded,
+                      // }
+                    )}
+                    dangerouslySetInnerHTML={{ __html: content ?? "" }}
+                  ></div>
+                </ScrollShadow>
+              )}
             </div>
-            <ReferendumLinks referendumId={referendum.index} />
+            <ReferendumLinks referendumId={index} />
           </>
         </div>
         <div className="right text-center w-full sm:w-5/12 md:w-4/12 pt-6 sm:pt-0 sticky self-start top-24 sm:pl-4 md:pl-6">
@@ -176,7 +199,7 @@ export async function ReferendumDetail({
           />
           <ReferendumCountdownCard
             chain={chain as SubstrateChain}
-            endBlock={referendumEndBlock}
+            endBlock={endBlock}
             referendum={referendum}
           />
           <ReferendumUserInfoCard referendum={referendum} />
@@ -186,8 +209,8 @@ export async function ReferendumDetail({
       {/* <pre className="text-xs">
         <b>trackInfo:</b>
         {JSON.stringify(track, null, 2)}
-      </pre> */}
-      {/* <pre className="text-xs">
+      </pre>
+      <pre className="text-xs">
         <b>refInfo:</b> {JSON.stringify(referendum, null, 2)}
       </pre> */}
     </div>

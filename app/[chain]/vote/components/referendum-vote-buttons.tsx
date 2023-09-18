@@ -23,7 +23,8 @@ export default function ReferendumVoteButtons({
             size: "2xl",
           })
         }
-        className="w-full rounded-sm h-unit-12 mb-2"
+        radius="sm"
+        className="w-full h-unit-12 mb-2"
         color="vivid"
       >
         Vote Now <Vote width={18} height={18} stroke="currentColor" />

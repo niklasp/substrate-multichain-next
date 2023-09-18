@@ -1,6 +1,6 @@
 import { SubstrateChain } from "@/types";
 import { useQuery } from "react-query";
-import { UIReferendum, UITrack } from "@/app/vote/types";
+import { UIReferendum, UITrack } from "@/app/[chain]/vote/types";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { DEFAULT_CHAIN } from "@/config/chains";
 

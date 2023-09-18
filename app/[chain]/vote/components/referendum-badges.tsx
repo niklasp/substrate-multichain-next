@@ -8,12 +8,13 @@ export const ReferendumBadges = ({
   confirmingPercentage,
   decidingPercentage,
 }: {
-  referendum: UIReferendum;
+  referendum?: UIReferendum;
   track: UITrack | undefined;
   confirmingPercentage: number;
   decidingPercentage: number;
 }) => {
-  const { status, deciding, origin } = referendum;
+  const { status, deciding, origin, decisionDeposit, ongoingStatus } =
+    referendum || {};
 
   const isConfirming = status === "ongoing" && deciding?.confirming;
 
@@ -24,6 +25,19 @@ export const ReferendumBadges = ({
     percentage * 100
   }%, ${toColor} ${percentage * 100}%, ${toColor} 100%)`;
 
+  const statusTooltip =
+    status === "ongoing" &&
+    ongoingStatus &&
+    ongoingStatus === "awaitingDecisionDeposit"
+      ? "Awaiting decision deposit to be paid"
+      : ongoingStatus === "awaitingSubmissionDeposit"
+      ? "Awaiting submission deposit to be paid"
+      : ongoingStatus === "confirming"
+      ? `${(percentage * 100).toFixed(2)}% of the confirming period has passed`
+      : ongoingStatus === "deciding"
+      ? `${(percentage * 100).toFixed(2)}% of the deciding period has passed`
+      : status;
+
   return (
     <div className="referendum-badges mb-2 flex transition-none text-black">
       {track && (origin?.origins || track.id === "0") && (
@@ -33,19 +47,19 @@ export const ReferendumBadges = ({
           </div>
         </Tooltip>
       )}
-      <Tooltip
-        content={`${(percentage * 100).toFixed(2)}% of the ${
-          isConfirming ? "confirming" : "deciding"
-        } period has passed`}
-      >
+      <Tooltip content={statusTooltip}>
         <div
           className="text-sm py-1 px-2 rounded-md shadow-sm flex-1 cursor-default flex items-center justify-center"
           style={{ background: statusBadgeBg }}
         >
-          {status === "ongoing"
-            ? isConfirming
-              ? "confirming"
-              : "deciding"
+          {status === "ongoing" &&
+          ongoingStatus &&
+          ["awaitingDecisionDeposit", "awaitingSubmissionDeposit"].includes(
+            ongoingStatus
+          )
+            ? "awaiting deposit"
+            : status === "ongoing"
+            ? ongoingStatus
             : status}
         </div>
       </Tooltip>

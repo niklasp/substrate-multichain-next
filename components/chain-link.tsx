@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import NextLink from "next/link";
+import Link from "next/link";
 import { link as linkStyles } from "@nextui-org/theme";
 import { usePathname } from "next/navigation";
 import { SubstrateChain } from "@/types";
@@ -17,7 +17,7 @@ export function ChainLink(props: LinkProps) {
   const chainLinkHref = `/${name}${href}`;
 
   return (
-    <NextLink
+    <Link
       className={clsx(
         linkStyles({ color: "foreground" }),
         "text-lg data-[active=true]:text-primary data-[active=true]:font-bold"
@@ -26,6 +26,6 @@ export function ChainLink(props: LinkProps) {
       href={chainLinkHref ?? ""}
     >
       {children}
-    </NextLink>
+    </Link>
   );
 }

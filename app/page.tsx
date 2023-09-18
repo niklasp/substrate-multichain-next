@@ -8,6 +8,7 @@ import { formatBalance } from "@polkadot/util";
 import { Button } from "@nextui-org/button";
 import Link from "next/link";
 import { NFTSnippets } from "@/components/nft-snippets";
+import { ChainLink } from "@/components/chain-link";
 
 export default function Home() {
   // const { data: chainDetails, isLoading } = useChainDetails();
@@ -33,11 +34,11 @@ export default function Home() {
           <h2 className={subtitle({ class: "mt-4" })}>
             Send customizable NFTs to OpenGov voters with just a few clicks.
           </h2>
-          <div className="flex gap-2 justify-center mt-10 flex-wrap">
+          <div className="flex gap-4 justify-center mt-10 flex-wrap md:flex-nowrap">
             <Button
               size="lg"
               variant="shadow"
-              className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg hover:-translate-y-0.5 w-full md:w-1/2"
+              className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg hover:-translate-y-0.5 w-full md:w-1/3"
             >
               <Link href="/referendum-rewards">Create Voting Rewards 🎁</Link>
             </Button>
@@ -45,9 +46,9 @@ export default function Home() {
               size="lg"
               color="secondary"
               variant="shadow"
-              className="hover:-translate-y-0.5 w-full md:w-1/2"
+              className="hover:-translate-y-0.5 w-full md:w-1/3"
             >
-              <Link href="/vote">Vote Now →</Link>
+              <ChainLink href="/vote">Vote Now →</ChainLink>
             </Button>
           </div>
         </div>

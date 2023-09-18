@@ -99,9 +99,17 @@ export type ReferendaStatus =
   | "rejected"
   | "timedOut";
 
+export type ReferendaOngoingStatus =
+  | "confirming"
+  | "deciding"
+  | "preparing"
+  | "awaitingSubmissionDeposit"
+  | "awaitingDecisionDeposit";
+
 export interface ReferendumPolkadot {
   index: string;
   status: ReferendaStatus;
+  ongoingStatus: ReferendaOngoingStatus;
   endsAt?: string;
   endedAt?: string;
   track?: string;
