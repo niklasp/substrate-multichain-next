@@ -14,12 +14,12 @@ import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { useEndDate } from "@/hooks/vote/use-end-date";
 
 import styles from "../vote/components/style.module.scss";
-import { ReferendumBadges } from "../vote/components/referendum-badges";
-import { ReferendumLinks } from "../vote/components/referendum-links";
-import ReferendumVoteButtons from "../vote/components/referendum-vote-buttons";
-import { ReferendumUserInfoCard } from "../vote/components/referendum-user-info";
-import ReferendumCountdownCard from "../vote/components/referendum-countdown-card";
-import { UIReferendum, UITrack } from "../vote/types";
+import { ReferendumBadges } from "../../vote/components/referendum-badges";
+import { ReferendumLinks } from "../../vote/components/referendum-links";
+import ReferendumVoteButtons from "../../vote/components/referendum-vote-buttons";
+import { ReferendumUserInfoCard } from "../../vote/components/referendum-user-info";
+import ReferendumCountdownCard from "../../vote/components/referendum-countdown-card";
+import { UIReferendum, UITrack } from "../../vote/types";
 
 export const ReferendumDetailLoading = ({
   isLoaded,

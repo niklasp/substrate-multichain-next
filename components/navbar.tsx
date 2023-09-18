@@ -26,6 +26,8 @@ import {
 import { Logo } from "@/components/icons";
 import { ChainSwitch } from "./chain-switch";
 import { WalletConnect } from "./wallet-connect";
+import { SubstrateChain } from "@/types";
+import { ChainLink } from "./chain-link";
 
 export const Navbar = () => {
   return (
@@ -48,16 +50,29 @@ export const Navbar = () => {
         <ul className="hidden lg:flex gap-4 justify-start ml-2 font-bold">
           {siteConfig.navItems.map((item) => (
             <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "text-lg data-[active=true]:text-primary data-[active=true]:font-bold"
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
+              {item.chainLink ? (
+                <ChainLink
+                  className={clsx(
+                    linkStyles({ color: "foreground" }),
+                    "text-lg data-[active=true]:text-primary data-[active=true]:font-bold"
+                  )}
+                  color="foreground"
+                  href={item.href}
+                >
+                  {item.label}
+                </ChainLink>
+              ) : (
+                <NextLink
+                  className={clsx(
+                    linkStyles({ color: "foreground" }),
+                    "text-lg data-[active=true]:text-primary data-[active=true]:font-bold"
+                  )}
+                  color="foreground"
+                  href={item.href}
+                >
+                  {item.label}
+                </NextLink>
+              )}
             </NavbarItem>
           ))}
         </ul>

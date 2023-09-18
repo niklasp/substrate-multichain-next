@@ -14,12 +14,50 @@ import { Spinner } from "@nextui-org/spinner";
 import { Button } from "@nextui-org/button";
 import { Key, useEffect, useState, useTransition } from "react";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
+import { usePathname, useRouter } from "next/navigation";
+import path from "path";
 
 export const ChainSwitch = ({ className }: { className?: string }) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const { activeChain, setActiveChainName, isConnecting } = useSubstrateChain();
 
-  const handleChange = async (key: Key) => {
-    setActiveChainName(key as SubstrateChain);
+  const pathContainsSubstrateChain = Object.values(SubstrateChain).some(
+    (chain) => pathname.includes(`/${chain}/`)
+  );
+
+  const selectedChain = Object.values(SubstrateChain).find((substrateChain) =>
+    pathname.includes(`/${substrateChain}/`)
+  );
+
+  useEffect(() => {
+    if (selectedChain) {
+      setActiveChainName(selectedChain);
+    }
+  }, [selectedChain]);
+
+  const handleChainChange = (key: Key) => {
+    console.log(
+      "handleChainChange",
+      key,
+      pathname,
+      pathContainsSubstrateChain,
+      selectedChain
+    );
+    const newChain = key as SubstrateChain;
+
+    if (pathContainsSubstrateChain) {
+      // find selected chain from pathname that can contain any SubstrateChain
+
+      if (selectedChain) {
+        const newPathname = pathname.replace(
+          `/${selectedChain}/`,
+          `/${newChain}/`
+        );
+        setActiveChainName(newChain);
+        router.replace(newPathname);
+      }
+    }
   };
 
   return (
@@ -47,7 +85,7 @@ export const ChainSwitch = ({ className }: { className?: string }) => {
             <span className="hidden md:flex">{activeChain?.name}</span>
           </Button>
         </DropdownTrigger>
-        <DropdownMenu onAction={handleChange} aria-label="Select Chain">
+        <DropdownMenu onAction={handleChainChange} aria-label="Select Chain">
           {Object.values(chains).map((chain) => (
             <DropdownItem
               key={chain.name}

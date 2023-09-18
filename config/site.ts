@@ -15,10 +15,12 @@ export const siteConfig = {
     {
       label: "Vote",
       href: "/vote",
+      chainLink: true,
     },
     {
       label: "Rewards",
       href: "/referendum-rewards",
+      chainLink: true,
     },
   ],
   navMenuItems: [

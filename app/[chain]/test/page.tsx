@@ -1,8 +1,8 @@
 import { cache } from "react";
-import { getChainByName } from "@/config/chains";
+import { DEFAULT_CHAIN, getChainByName } from "@/config/chains";
 import { SubstrateChain } from "@/types";
 import Link from "next/link";
-import { transformReferendum } from "../vote/util";
+import { transformReferendum } from "../../vote/util";
 import { ReferendumDetail } from "./referendum-detail-test";
 
 export const dynamic = "force-static";
@@ -18,7 +18,7 @@ const getReferenda = cache(async (selectedChain: SubstrateChain) => {
     ?.map(transformReferendum)
     .filter((ref) => ref?.status === "ongoing");
 
-  console.log("Referenda", referenda);
+  // console.log("Referenda", referenda);
 
   return referenda;
 });
@@ -44,25 +44,34 @@ const getChainInfo = cache(async (selectedChain: SubstrateChain) => {
 });
 
 export default async function Test({
+  params: { chain },
   searchParams,
 }: {
-  searchParams: {
+  params: {
     chain: string;
+  };
+  searchParams: {
     thing: string;
   };
 }) {
   const selectedThing = searchParams.thing || "nothing";
-  const selectedChain = searchParams.chain;
+  const selectedChain = Object.values(SubstrateChain).includes(
+    chain as SubstrateChain
+  )
+    ? (chain as SubstrateChain)
+    : DEFAULT_CHAIN;
 
-  const referenda = await getReferenda(selectedChain as SubstrateChain);
-  const chainInfo = await getChainInfo(selectedChain as SubstrateChain);
+  console.log(`test page ${selectedChain} ${selectedThing}`);
+
+  const referenda = await getReferenda(selectedChain);
+  const chainInfo = await getChainInfo(selectedChain);
 
   return (
     <>
       <h1>Connected to {selectedChain} </h1>
       <pre>{JSON.stringify(searchParams, null, 2)} </pre>
       {Object.values(SubstrateChain).map((chain: SubstrateChain) => (
-        <Link key={chain} href={`?chain=${chain}&thing=${selectedThing}`}>
+        <Link key={chain} href={`/${chain}/test/?thing=${selectedThing}`}>
           {chain}
         </Link>
       ))}

@@ -7,11 +7,11 @@ import { ReactNode, ReactSVGElement, SVGProps } from "react";
 import { Header } from "@polkadot/types/interfaces";
 
 export enum SubstrateChain {
-  Kusama = "Kusama",
-  Polkadot = "Polkadot",
-  Westend = "Westend",
-  Rococo = "Rococo",
-  Local = "Local",
+  Kusama = "kusama",
+  Polkadot = "polkadot",
+  Westend = "westend",
+  Rococo = "rococo",
+  Local = "local",
 }
 
 export type ChainConfig = {
