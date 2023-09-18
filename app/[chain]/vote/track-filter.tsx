@@ -1,20 +1,25 @@
+"use client";
+
 import { UIReferendum, UITrack } from "@/app/vote/types";
+import { useAppStore } from "@/app/zustand";
 import { titleCase } from "@/components/util";
 import { SubstrateChain } from "@/types";
 import { Button, ButtonGroup } from "@nextui-org/button";
 import Link from "next/link";
+import { Key } from "react";
 
 export function TrackFilter({
-  trackFilter,
   tracks,
   referenda,
   chain,
 }: {
-  trackFilter: string;
   referenda?: UIReferendum[];
   tracks?: UITrack[];
   chain?: SubstrateChain;
 }) {
+  const filters = useAppStore((state) => state.filters);
+  const { trackFilter } = filters;
+  const setTrackFilter = useAppStore((state) => state.setTrackFilter);
   const safeChain = chain || SubstrateChain.Kusama;
 
   // get the count of referenda for each track
@@ -28,7 +33,7 @@ export function TrackFilter({
   const totalCount = referenda?.length;
 
   referendaCountPerTrack?.push({
-    trackId: "-1",
+    trackId: "all",
     count: totalCount,
   });
 
@@ -47,6 +52,11 @@ export function TrackFilter({
     { id: "voted", name: "voted", text: "Voted" },
     { id: "unvoted", name: "unvoted", text: "Unvoted" },
   ];
+
+  const handleChange = (key: Key) => {
+    console.log(key);
+    setTrackFilter(key as string);
+  };
 
   return (
     <div className="flex flex-col items-start">
@@ -68,13 +78,12 @@ export function TrackFilter({
               color={
                 trackFilter === track.id.toString() ? "primary" : "default"
               }
+              onClick={() => handleChange(track.id)}
             >
-              <Link href={`/${safeChain}/vote/${track.id}`}>
-                {titleCase(track.name)}
-                <span className="text-xs text-gray-500 ml-2">
-                  {referendaCount}
-                </span>
-              </Link>
+              {titleCase(track.name)}
+              <span className="text-xs text-gray-500 ml-2">
+                {referendaCount}
+              </span>
             </Button>
           );
         })}

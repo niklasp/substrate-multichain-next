@@ -1,16 +1,26 @@
+"use client";
+
 import { Tooltip } from "@nextui-org/tooltip";
 import { Card } from "@nextui-org/card";
 import { ReactNode } from "react";
 import { ReferendaStatus, UIReferendum } from "../types";
 import ReferendumCountdown from "./referendum-countdown";
+import { useEndDate } from "@/hooks/vote/use-end-date";
+import { SubstrateChain } from "@/types";
 export default function ReferendumCountdownCard({
-  endDate,
+  chain,
+  endBlock,
   referendum,
 }: {
-  endDate: Date | undefined;
+  chain: SubstrateChain;
+  endBlock: string;
   referendum: UIReferendum;
 }) {
-  const { status, deciding, origin, index } = referendum;
+  const { status, deciding, index } = referendum;
+  const { data: endDate } = useEndDate(chain, endBlock);
+
+  console.log("endDate", endDate);
+
   const isConfirming = status === "ongoing" && !!deciding?.confirming;
 
   return (

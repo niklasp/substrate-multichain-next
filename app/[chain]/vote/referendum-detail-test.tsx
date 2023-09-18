@@ -174,7 +174,11 @@ export async function ReferendumDetail({
             decidingPercentage={0}
             confirmingPercentage={0}
           />
-          {/* <ReferendumCountdownCard endDate={endDate} referendum={referendum} /> */}
+          <ReferendumCountdownCard
+            chain={chain as SubstrateChain}
+            endBlock={referendumEndBlock}
+            referendum={referendum}
+          />
           <ReferendumUserInfoCard referendum={referendum} />
           <ReferendumVoteButtons referendum={{ ...referendum }} userVote={{}} />
         </div>

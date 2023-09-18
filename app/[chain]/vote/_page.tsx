@@ -50,12 +50,20 @@ export default async function Test({
   const tracks = await getTracks(selectedChain);
   const chainInfo = await getChainInfo(selectedChain);
 
+  const filteredReferenda =
+    selectedTrackFilter === "all"
+      ? referenda
+      : selectedTrackFilter !== "voted" && selectedTrackFilter !== "unvoted"
+      ? referenda?.filter((ref) => ref.track === selectedTrackFilter)
+      : //TODO
+        referenda;
+
   return (
     <>
       <pre>{JSON.stringify(chainInfo, null, 2)}</pre>
       <ReferendumList
         trackFilter={selectedTrackFilter}
-        referenda={referenda}
+        referenda={filteredReferenda}
         tracks={tracks}
         chain={chain as SubstrateChain}
       />

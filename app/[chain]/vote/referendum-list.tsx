@@ -1,3 +1,5 @@
+"use client";
+
 import { UIReferendum, UITrack } from "../../vote/types";
 import { SubstrateChain } from "@/types";
 
@@ -9,7 +11,8 @@ import {
 } from "./referendum-detail-test";
 import { TrackFilter } from "./track-filter";
 import { Suspense } from "react";
-import { getChainInfo } from "./get-chain-info";
+import { useAppStore } from "@/app/zustand";
+import { getChainInfo } from "@/config/chains";
 
 interface Props {
   referenda?: UIReferendum[];
@@ -18,10 +21,12 @@ interface Props {
   chain: SubstrateChain;
 }
 
-export default async function ReferendumList(props: Props) {
-  const { referenda, tracks, trackFilter = "all", chain } = props;
+export default function ReferendumList(props: Props) {
+  const { referenda, tracks, chain } = props;
+  const filters = useAppStore((state) => state.filters);
+  const { trackFilter } = filters;
 
-  const chainInfo = await getChainInfo(chain);
+  const chainInfo = getChainInfo(chain);
   const { symbol, decimals } = chainInfo;
 
   const filteredReferenda =
@@ -34,7 +39,7 @@ export default async function ReferendumList(props: Props) {
 
   return (
     <div className="referendum-list">
-      {referenda && referenda.length > 0 ? (
+      {filteredReferenda && filteredReferenda.length > 0 ? (
         <div>
           {/* <pre>{JSON.stringify(userVotes, null, 2)}</pre> */}
           {/* <AnimatePresence> */}
@@ -51,6 +56,7 @@ export default async function ReferendumList(props: Props) {
               //   transition={{ duration: 0.35 }}
               // >
               <Suspense
+                key={ref.index}
                 fallback={
                   <ReferendumDetailLoading
                     referendum={ref}

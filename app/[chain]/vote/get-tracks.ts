@@ -6,7 +6,7 @@ import { cache } from "react";
 import "server-only";
 
 // revalidate once a day
-export const revalidate = 86400;
+// export const revalidate = 86400;
 
 export const preload = (chain: SubstrateChain) => {
   void getTracks(chain);

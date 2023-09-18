@@ -18,6 +18,11 @@ interface AppState {
   isChainApiReady: boolean;
   setIsChainApiReady: (isReady: boolean) => void;
 
+  filters: {
+    trackFilter: string;
+  };
+  setTrackFilter: (trackFilter: string) => void;
+
   user: {
     extensionInjectedPromise?: Promise<InjectedExtension[]>; // promise of injected extension
     extensions: InjectedExtension[]; // injected extension
@@ -72,6 +77,9 @@ export const useAppStore = create<AppState>()(
     chain: kusama,
     isChainApiReady: false,
     user: emptyUser,
+    filters: {
+      trackFilter: "all",
+    },
     modals: {
       isOpen: false,
       view: null,
@@ -207,6 +215,15 @@ export const useAppStore = create<AppState>()(
       //     voteStates: [],
       //   },
       // }));
+    },
+
+    setTrackFilter: (trackFilter) => {
+      set((state) => ({
+        filters: {
+          ...state.filters,
+          trackFilter,
+        },
+      }));
     },
   }))
 );

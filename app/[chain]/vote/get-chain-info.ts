@@ -6,7 +6,6 @@ import {
 import { getChainByName } from "@/config/chains";
 import { SubstrateChain } from "@/types";
 import { cache } from "react";
-import "server-only";
 
 export const revalidate = 200;
 

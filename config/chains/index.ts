@@ -10,6 +10,16 @@ export const ENABLED_CHAINS = {
 
 export const DEFAULT_CHAIN = SubstrateChain.Kusama;
 
+export function getChainInfo(name: SubstrateChain) {
+  const chainSettings = ENABLED_CHAINS[name];
+
+  if (!chainSettings) {
+    throw `can not get chain settings of ${name}`;
+  }
+
+  return chainSettings;
+}
+
 /**
  * Get chain settings by name and create provider and api if not exists
  * @param name chain name

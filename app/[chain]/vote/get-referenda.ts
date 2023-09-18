@@ -8,8 +8,6 @@ import { SubstrateChain } from "@/types";
 import { cache } from "react";
 import "server-only";
 
-export const revalidate = 200;
-
 export const preload = (chain: SubstrateChain) => {
   void getReferenda(chain);
 };
