@@ -15,7 +15,6 @@ export const useReferendumDetail = (refId: string) => {
     queryFn: async () => {
       const polkassemblyRef = await getTitleAndContentForRef(refId, chainName);
 
-      console.log("referendumDetail", polkassemblyRef);
       const { title, content, requested } = polkassemblyRef;
       return { title, content, requested };
     },

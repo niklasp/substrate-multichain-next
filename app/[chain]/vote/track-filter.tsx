@@ -1,5 +1,6 @@
 import { UIReferendum, UITrack } from "@/app/vote/types";
 import { titleCase } from "@/components/util";
+import { SubstrateChain } from "@/types";
 import { Button, ButtonGroup } from "@nextui-org/button";
 import Link from "next/link";
 
@@ -7,11 +8,15 @@ export function TrackFilter({
   trackFilter,
   tracks,
   referenda,
+  chain,
 }: {
   trackFilter: string;
   referenda?: UIReferendum[];
   tracks?: UITrack[];
+  chain?: SubstrateChain;
 }) {
+  const safeChain = chain || SubstrateChain.Kusama;
+
   // get the count of referenda for each track
   const referendaCountPerTrack = tracks?.map((track) => {
     const count = referenda?.filter(
@@ -64,7 +69,7 @@ export function TrackFilter({
                 trackFilter === track.id.toString() ? "primary" : "default"
               }
             >
-              <Link href={`?trackFilter=${track.id}`}>
+              <Link href={`/${safeChain}/vote/${track.id}`}>
                 {titleCase(track.name)}
                 <span className="text-xs text-gray-500 ml-2">
                   {referendaCount}

@@ -1,10 +1,10 @@
-import { cache } from "react";
+import { Suspense, cache } from "react";
 import { DEFAULT_CHAIN, getChainByName } from "@/config/chains";
 import { SubstrateChain } from "@/types";
-import { transformReferendum } from "../../vote/util";
-import { getReferenda } from "./get-referenda";
-import ReferendumList from "./referendum-list";
-import { getTracks } from "./get-tracks";
+import { getReferenda } from "../get-referenda";
+import { getTracks } from "../get-tracks";
+import ReferendumList from "../referendum-list";
+import { TrackFilter } from "../track-filter";
 
 const getChainInfo = cache(async (selectedChain: SubstrateChain) => {
   const safeChain = (selectedChain as SubstrateChain) || SubstrateChain.Kusama;
@@ -27,17 +27,14 @@ const getChainInfo = cache(async (selectedChain: SubstrateChain) => {
 });
 
 export default async function Test({
-  params: { chain },
-  searchParams,
+  params: { chain, trackFilter },
 }: {
   params: {
     chain: string;
-  };
-  searchParams: {
     trackFilter: string;
   };
 }) {
-  const selectedTrackFilter = searchParams.trackFilter || "";
+  const selectedTrackFilter = trackFilter || "";
   const selectedChain = Object.values(SubstrateChain).includes(
     chain as SubstrateChain
   )
@@ -48,15 +45,22 @@ export default async function Test({
 
   const referenda = await getReferenda(selectedChain);
   const tracks = await getTracks(selectedChain);
-  const chainInfo = await getChainInfo(selectedChain);
+  // const chainInfo = await getChainInfo(selectedChain);
 
   return (
     <>
-      <pre>{JSON.stringify(chainInfo, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(chainInfo, null, 2)}</pre> */}
+      <TrackFilter
+        tracks={tracks}
+        referenda={referenda}
+        trackFilter={trackFilter}
+        chain={chain as SubstrateChain}
+      />
       <ReferendumList
         trackFilter={selectedTrackFilter}
         referenda={referenda}
         tracks={tracks}
+        chain={chain as SubstrateChain}
       />
     </>
   );
