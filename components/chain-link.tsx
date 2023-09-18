@@ -18,10 +18,7 @@ export function ChainLink(props: LinkProps) {
 
   return (
     <Link
-      className={clsx(
-        linkStyles({ color: "foreground" }),
-        "text-lg data-[active=true]:text-primary data-[active=true]:font-bold"
-      )}
+      className={clsx(linkStyles({ color: "foreground" }))}
       color="foreground"
       href={chainLinkHref ?? ""}
     >

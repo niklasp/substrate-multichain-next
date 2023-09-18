@@ -14,6 +14,8 @@ import { getVoteTx } from "../util";
 import { sendAndFinalize } from "@/components/util-client";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 import { vividButtonClasses } from "@/components/primitives";
+import { kusama } from "@/config/chains/kusama";
+import { InlineLoader } from "@/components/inline-loader";
 
 const VOTE_LOCK_OPTIONS = [
   {
@@ -94,7 +96,8 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
   //   const { voteOnRef } = useVoteManager(queryClient);
   const closeModal = useAppStore((state) => state.closeModal);
   const { activeChain } = useSubstrateChain();
-  const { decimals, symbol, api } = activeChain || {};
+  const { decimals, symbol, api } = activeChain || kusama;
+  const voteInChainDecimalsMultiplier = bnToBn(10).pow(bnToBn(decimals));
   const user = useAppStore((state) => state.user);
   const {
     accounts,
@@ -119,9 +122,9 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
       <span className="text-xs font-normal flex items-center">
         available balance:{" "}
         {isBalanceLoading ? (
-          <Spinner size="sm" className="ml-2" />
+          <InlineLoader className="ml-2" />
         ) : (
-          `${availableBalance}`
+          `${availableBalance} ${symbol}`
         )}
       </span>
     </>
@@ -144,8 +147,6 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
     // );
 
     const conviction = sliderValue.value;
-
-    const voteInChainDecimalsMultiplier = bnToBn(10).pow(bnToBn(decimals));
 
     const voteBalances = {
       aye: bnToBn(watchAyeVoteAmount.toString()).mul(
@@ -204,49 +205,37 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      "vote-amount-aye": "1",
-      "vote-amount-nay": "0",
-      "vote-amount-abstain": "0",
+      "vote-amount-aye": 1.0,
+      "vote-amount-nay": 0.0,
+      "vote-amount-abstain": 0.0,
     },
   });
 
-  const watchAyeVoteAmount = watch<"vote-amount-aye">("vote-amount-aye", "0");
-  const watchNayVoteAmount = watch<"vote-amount-nay">("vote-amount-nay", "0");
+  const watchAyeVoteAmount = watch<"vote-amount-aye">("vote-amount-aye", 0);
+  const watchNayVoteAmount = watch<"vote-amount-nay">("vote-amount-nay", 0);
   const watchAbstainVoteAmount = watch<"vote-amount-abstain">(
     "vote-amount-abstain",
-    "0"
+    0
   );
 
-  const totalAyeVotes = !isNaN(parseFloat(watchAyeVoteAmount))
+  const totalAyeVotes = !isNaN(watchAyeVoteAmount)
     ? voteChoice === VoteChoice.Aye
-      ? (
-          parseFloat(sliderValue.value.toString()) *
-          parseFloat(watchAyeVoteAmount)
-        )
+      ? (parseFloat(sliderValue.value.toString()) * watchAyeVoteAmount)
           .toFixed(2)
           .replace(/[.,]00$/, "")
-      : parseFloat(watchAyeVoteAmount)
-          .toFixed(2)
-          .replace(/[.,]00$/, "")
+      : watchAyeVoteAmount.toFixed(2).replace(/[.,]00$/, "")
     : "-";
 
-  const totalNayVotes = !isNaN(parseFloat(watchNayVoteAmount))
+  const totalNayVotes = !isNaN(watchNayVoteAmount)
     ? voteChoice === VoteChoice.Nay
-      ? (
-          parseFloat(sliderValue.value.toString()) *
-          parseFloat(watchNayVoteAmount)
-        )
+      ? (parseFloat(sliderValue.value.toString()) * watchNayVoteAmount)
           .toFixed(2)
           .replace(/[.,]00$/, "")
-      : parseFloat(watchNayVoteAmount)
-          .toFixed(2)
-          .replace(/[.,]00$/, "")
+      : watchNayVoteAmount.toFixed(2).replace(/[.,]00$/, "")
     : "-";
 
-  const totalAbstainVotes = !isNaN(parseFloat(watchAbstainVoteAmount))
-    ? parseFloat(watchAbstainVoteAmount)
-        .toFixed(2)
-        .replace(/[.,]00$/, "")
+  const totalAbstainVotes = !isNaN(watchAbstainVoteAmount)
+    ? watchAbstainVoteAmount.toFixed(2).replace(/[.,]00$/, "")
     : "-";
 
   return (
@@ -327,10 +316,12 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
               step={0.01}
               {...register("vote-amount-aye", {
                 validate: {
-                  positiveNumber: (value) => parseFloat(value) >= 0,
+                  positiveNumber: (value) => value >= 0.0,
                   hasEnoughFunds: (value) =>
-                    availableBalance &&
-                    parseFloat(value) <= parseFloat(availableBalance),
+                    accountBalance?.data?.free &&
+                    bnToBn(value)
+                      .mul(voteInChainDecimalsMultiplier)
+                      .lte(bnToBn(accountBalance?.data?.free)),
                 },
               })}
             />
@@ -365,10 +356,9 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
               step={0.01}
               {...register("vote-amount-nay", {
                 validate: {
-                  positiveNumber: (value) => parseFloat(value) >= 0,
+                  positiveNumber: (value) => value >= 0,
                   hasEnoughFunds: (value) =>
-                    availableBalance &&
-                    parseFloat(value) <= parseFloat(availableBalance),
+                    availableBalance && value <= parseFloat(availableBalance),
                 },
               })}
             />
@@ -400,10 +390,9 @@ export function ReferendumVoteForm({ referendumId }: { referendumId: string }) {
               step={0.01}
               {...register("vote-amount-abstain", {
                 validate: {
-                  positiveNumber: (value) => parseFloat(value) >= 0,
+                  positiveNumber: (value) => value >= 0.0,
                   hasEnoughFunds: (value) =>
-                    availableBalance &&
-                    parseFloat(value) <= parseFloat(availableBalance),
+                    availableBalance && value <= parseFloat(availableBalance),
                 },
               })}
             />

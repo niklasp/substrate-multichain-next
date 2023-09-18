@@ -33,34 +33,34 @@ export async function getChainByName(name: SubstrateChain) {
   }
 
   if (!chainSettings.provider) {
-    console.log(`creating provider for ${name}`);
+    // console.log(`creating provider for ${name}`);
     chainSettings.provider = new WsProvider(chainSettings.endpoints[0].url);
   } else {
-    console.log(`provider from cache for ${name}`);
+    // console.log(`provider from cache for ${name}`);
   }
   if (!chainSettings.api) {
-    console.log(`creating api for ${name}`);
+    // console.log(`creating api for ${name}`);
     chainSettings.api = await ApiPromise.create({
       provider: chainSettings.provider,
     });
 
     chainSettings.api.on("disconnected", () => {
-      console.log(`disconnected from ${name}`);
+      // console.log(`disconnected from ${name}`);
     });
 
     chainSettings.api.on("error", () => {
-      console.log(`error from ${name}`);
+      // console.log(`error from ${name}`);
     });
   } else {
-    console.log(`api from cache for ${name}`);
+    // console.log(`api from cache for ${name}`);
   }
 
-  console.log(`waiting for api ready for ${name}`);
+  // console.log(`waiting for api ready for ${name}`);
   await chainSettings.api.isReady;
 
-  console.log(
-    `api ready for ${name}. Connected to ${chainSettings.api.runtimeVersion.specName} spec:${chainSettings.api.runtimeVersion.specVersion} at ${chainSettings.endpoints[0].url}`
-  );
+  // console.log(
+  //   `api ready for ${name}. Connected to ${chainSettings.api.runtimeVersion.specName} spec:${chainSettings.api.runtimeVersion.specVersion} at ${chainSettings.endpoints[0].url}`
+  // );
 
   return chainSettings;
 }
