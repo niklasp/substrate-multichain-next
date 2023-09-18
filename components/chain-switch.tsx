@@ -2,7 +2,6 @@
 
 import { useAppStore } from "@/app/zustand";
 import { ChainConfig, SubstrateChain } from "@/types";
-import { chains } from "@/config/chains";
 import clsx from "clsx";
 import {
   Dropdown,
@@ -16,6 +15,7 @@ import { Key, useEffect, useState, useTransition } from "react";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { usePathname, useRouter } from "next/navigation";
 import path from "path";
+import { ENABLED_CHAINS } from "@/config/chains";
 
 export const ChainSwitch = ({ className }: { className?: string }) => {
   const router = useRouter();
@@ -86,7 +86,7 @@ export const ChainSwitch = ({ className }: { className?: string }) => {
           </Button>
         </DropdownTrigger>
         <DropdownMenu onAction={handleChainChange} aria-label="Select Chain">
-          {Object.values(chains).map((chain) => (
+          {Object.values(ENABLED_CHAINS).map((chain) => (
             <DropdownItem
               key={chain.name}
               value={chain.name}

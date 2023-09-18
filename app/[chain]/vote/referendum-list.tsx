@@ -3,8 +3,13 @@ import { SubstrateChain } from "@/types";
 
 import { AnimatePresence } from "framer-motion";
 // import { motion } from "framer-motion";
-import { ReferendumDetail } from "./referendum-detail-test";
+import {
+  ReferendumDetail,
+  ReferendumDetailLoading,
+} from "./referendum-detail-test";
 import { TrackFilter } from "./track-filter";
+import { Suspense } from "react";
+import { getChainInfo } from "./get-chain-info";
 
 interface Props {
   referenda?: UIReferendum[];
@@ -13,8 +18,11 @@ interface Props {
   chain: SubstrateChain;
 }
 
-export default function ReferendumList(props: Props) {
+export default async function ReferendumList(props: Props) {
   const { referenda, tracks, trackFilter = "all", chain } = props;
+
+  const chainInfo = await getChainInfo(chain);
+  const { symbol, decimals } = chainInfo;
 
   const filteredReferenda =
     trackFilter === "all"
@@ -42,12 +50,24 @@ export default function ReferendumList(props: Props) {
               //   exit={{ opacity: 0 }}
               //   transition={{ duration: 0.35 }}
               // >
-              <ReferendumDetail
-                key={ref.index}
-                referendum={ref}
-                track={track}
-                isExpanded={false}
-              />
+              <Suspense
+                fallback={
+                  <ReferendumDetailLoading
+                    referendum={ref}
+                    track={track}
+                    tokenSymbol={symbol}
+                  />
+                }
+              >
+                <ReferendumDetail
+                  chain={chain}
+                  key={ref.index}
+                  referendum={ref}
+                  track={track}
+                  isExpanded={false}
+                  chainInfo={chainInfo}
+                />
+              </Suspense>
             );
           })}
           {/* </AnimatePresence> */}

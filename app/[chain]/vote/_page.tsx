@@ -1,6 +1,6 @@
 import { cache } from "react";
-import { DEFAULT_CHAIN, getChainByName } from "@/config/chains";
-import { SubstrateChain } from "@/types";
+import { DEFAULT_CHAIN, ENABLED_CHAINS, getChainByName } from "@/config/chains";
+import { ChainConfig, SubstrateChain } from "@/types";
 import { transformReferendum } from "../../vote/util";
 import { getReferenda } from "./get-referenda";
 import ReferendumList from "./referendum-list";

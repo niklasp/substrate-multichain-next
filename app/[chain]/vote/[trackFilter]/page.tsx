@@ -1,30 +1,34 @@
 import { Suspense, cache } from "react";
-import { DEFAULT_CHAIN, getChainByName } from "@/config/chains";
-import { SubstrateChain } from "@/types";
+import { DEFAULT_CHAIN, ENABLED_CHAINS, getChainByName } from "@/config/chains";
+import { ChainConfig, SubstrateChain } from "@/types";
 import { getReferenda } from "../get-referenda";
 import { getTracks } from "../get-tracks";
 import ReferendumList from "../referendum-list";
 import { TrackFilter } from "../track-filter";
 
-const getChainInfo = cache(async (selectedChain: SubstrateChain) => {
-  const safeChain = (selectedChain as SubstrateChain) || SubstrateChain.Kusama;
-  const chainConfig = await getChainByName(safeChain);
-  const { api } = chainConfig;
+export async function generateStaticParams() {
+  const params: { chain: SubstrateChain; trackFilter: string }[] = [];
 
-  if (!api) {
-    return null;
-  }
+  Object.values(ENABLED_CHAINS).forEach((chain: ChainConfig) => {
+    const chainTracks = chain.tracks;
+    const chainParams: { chain: SubstrateChain; trackFilter: string }[] = [];
 
-  await api.isReady;
-  const [timestamp, chain] = await Promise.all([
-    api.query.timestamp.now(),
-    api.rpc.system.chain(),
-  ]);
-  return {
-    timestamp,
-    chain,
-  };
-});
+    chainTracks.forEach((track) => {
+      const trackFilter = track.id.toString();
+      const chainName = chain.name;
+      chainParams.push({
+        chain: chainName,
+        trackFilter,
+      });
+    });
+
+    params.push(...chainParams);
+  });
+
+  console.log("generateStaticParams", params);
+
+  return params;
+}
 
 export default async function Test({
   params: { chain, trackFilter },

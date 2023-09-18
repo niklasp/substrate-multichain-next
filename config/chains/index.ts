@@ -3,7 +3,7 @@ import { kusama } from "./kusama";
 import { SubstrateChain } from "@/types";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
-export const chains = {
+export const ENABLED_CHAINS = {
   [kusama.name]: kusama,
   [polkadot.name]: polkadot,
 };
@@ -16,7 +16,7 @@ export const DEFAULT_CHAIN = SubstrateChain.Kusama;
  * @returns
  */
 export async function getChainByName(name: SubstrateChain) {
-  const chainSettings = chains[name];
+  const chainSettings = ENABLED_CHAINS[name];
 
   if (!chainSettings) {
     throw `can not get chain settings of ${name}`;

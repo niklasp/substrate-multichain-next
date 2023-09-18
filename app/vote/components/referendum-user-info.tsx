@@ -1,3 +1,5 @@
+"use client";
+
 import { useAppStore } from "@/app/zustand";
 import { UIReferendum } from "../types";
 import { formatBalance } from "@polkadot/util";

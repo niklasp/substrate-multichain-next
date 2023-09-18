@@ -1,58 +1,106 @@
-"use client";
-
 import clsx from "clsx";
 import { bnToBn, formatBalance } from "@polkadot/util";
 import PaperMoney from "@w3f/polkadot-icons/keyline/PaperMoney";
-import { useState } from "react";
 
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { Skeleton } from "@nextui-org/skeleton";
 import { Chip } from "@nextui-org/chip";
-
-import { useReferendumDetail } from "@/hooks/vote/use-referendum-detail";
-import { useSubstrateChain } from "@/context/substrate-chain-context";
-import { useEndDate } from "@/hooks/vote/use-end-date";
 
 import { ReferendumBadges } from "../../vote/components/referendum-badges";
 import { ReferendumLinks } from "../../vote/components/referendum-links";
 import ReferendumVoteButtons from "../../vote/components/referendum-vote-buttons";
 import { ReferendumUserInfoCard } from "../../vote/components/referendum-user-info";
 import ReferendumCountdownCard from "../../vote/components/referendum-countdown-card";
-import { UIReferendum, UITrack } from "../../vote/types";
+import { Referendum, UIReferendum, UITrack } from "../../vote/types";
 
 import styles from "../../vote/components/style.module.scss";
+import { getReferendumDetail } from "./get-referendum-detail";
+import { SubstrateChain } from "@/types";
+import { InlineLoader } from "@/components/inline-loader";
+
+export type ReferendumDetailType = {
+  chain: string;
+  referendum: UIReferendum;
+  track?: UITrack;
+  isExpanded: boolean;
+  chainInfo: { symbol: string; decimals: number };
+};
 
 export const ReferendumDetailLoading = ({
-  isLoaded,
+  referendum,
+  track,
+  tokenSymbol,
 }: {
-  isLoaded: boolean;
+  referendum: UIReferendum;
+  track?: UITrack;
+  tokenSymbol: string;
 }) => {
+  const { index } = referendum;
   return (
-    <>
-      <Skeleton
-        isLoaded={isLoaded}
-        className="my-4 border border-dashed border-gray-300"
-      >
-        <div className="my-4 relative w-full h-[450px]"></div>
-      </Skeleton>
-    </>
+    <div className="referendum-detail relative w-full rounded-sm border border-dashed border-gray-300 p-3 sm:p-4 md:p-6 lg:p-10 xl:p-12 my-4 mb-0 hover:shadow-lg dark:shadow-gray-700 transition-all">
+      <div className="w-full flex flex-wrap">
+        <div className="flex flex-col left w-full sm:w-7/12 md:w-8/12 pb-6 sm:pb-0 sm:pr-6 border-dashed sm:border-r border-b sm:border-b-0">
+          <div className="referendum-heading text-2xl mb-3 font-bold flex w-full items-center justify-between">
+            <div>Referendum {index}</div>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              <Chip
+                variant="flat"
+                color="secondary"
+                startContent={
+                  <PaperMoney
+                    stroke="currentColor"
+                    width={18}
+                    className="ml-2"
+                  />
+                }
+              >
+                <InlineLoader /> {tokenSymbol}
+              </Chip>
+            </span>
+          </div>
+          <Skeleton className="mb-6">
+            <div className="w-full h-6 rounded-lg"></div>
+          </Skeleton>
+          {[...Array(8)].map((_, i) => (
+            <Skeleton key={i} className="mb-2">
+              <div className="w-full h-4 rounded-lg"></div>
+            </Skeleton>
+          ))}
+          <ReferendumLinks referendumId={referendum.index} />
+        </div>
+        <div className="right text-center w-full sm:w-5/12 md:w-4/12 pt-6 sm:pt-0 sticky self-start top-24 sm:pl-4 md:pl-6">
+          <ReferendumBadges
+            referendum={referendum}
+            track={track}
+            decidingPercentage={0}
+            confirmingPercentage={0}
+          />
+          {/* <ReferendumCountdownCard endDate={endDate} referendum={referendum} /> */}
+          <ReferendumUserInfoCard referendum={referendum} />
+          <ReferendumVoteButtons referendum={{ ...referendum }} userVote={{}} />
+        </div>
+      </div>
+    </div>
   );
 };
 
-export const ReferendumDetail = ({
+export async function ReferendumDetail({
   referendum,
   track,
   isExpanded,
-}: {
-  referendum: UIReferendum;
-  track: UITrack | undefined;
-  isExpanded: boolean;
-}) => {
+  chain,
+  chainInfo,
+}: ReferendumDetailType) {
   const { index, deciding } = referendum;
-  const [isDescriptionExpanded, setIsDescriptionExpanded] =
-    useState<boolean>(isExpanded);
-  const { activeChain } = useSubstrateChain();
-  const { name: chainName, decimals, symbol } = activeChain ?? {};
+  const { decimals, symbol } = chainInfo;
+  const referendumDetail = await getReferendumDetail(
+    chain as SubstrateChain,
+    index
+  );
+  // const [isDescriptionExpanded, setIsDescriptionExpanded] =
+  //   useState<boolean>(isExpanded);
+
+  // const { name: chainName, decimals, symbol } = activeChain ?? {};
 
   const referendumEndBlock =
     deciding === null || deciding === undefined || track === undefined
@@ -61,13 +109,13 @@ export const ReferendumDetail = ({
       ? bnToBn(deciding.confirming).toString()
       : bnToBn(deciding.since).add(bnToBn(track.decisionPeriod)).toString();
 
-  const { data: endDate, isLoading: isEndDateLoading } = useEndDate(
-    chainName,
-    referendumEndBlock
-  );
+  // const { data: endDate, isLoading: isEndDateLoading } = useEndDate(
+  //   chainName,
+  //   referendumEndBlock
+  // );
 
-  const { data: referendumDetail, isLoading: isReferendumDetailLoading } =
-    useReferendumDetail(index);
+  // const { data: referendumDetail, isLoading: isReferendumDetailLoading } =
+  //   useReferendumDetail(index);
 
   const { title, content, requested } = referendumDetail ?? {};
 
@@ -99,36 +147,25 @@ export const ReferendumDetail = ({
               )}
             </span>
           </div>
-          {isReferendumDetailLoading ? (
-            <>
-              <Skeleton className="mb-4">
-                <div className="w-full h-8 rounded-lg"></div>
-              </Skeleton>
-              <Skeleton>
-                <div className="w-full rounded-lg h-[280px]"></div>
-              </Skeleton>
-            </>
-          ) : (
-            <>
-              <h3 className="cursor-pointer text-lg mb-4">{title}</h3>
-              <div className="flex-1">
-                <ScrollShadow className="w-full h-[350px]">
-                  <div
-                    className={clsx(
-                      styles.referendumDescription,
-                      "referendum-description break-words text-sm",
-                      {
-                        [styles.descriptionOverflowHidden]:
-                          !isDescriptionExpanded,
-                      }
-                    )}
-                    dangerouslySetInnerHTML={{ __html: content ?? "" }}
-                  ></div>
-                </ScrollShadow>
-              </div>
-              <ReferendumLinks referendumId={referendum.index} />
-            </>
-          )}
+          <>
+            <h3 className="cursor-pointer text-lg mb-4">{title}</h3>
+            <div className="flex-1">
+              <ScrollShadow className="w-full h-[350px]">
+                <div
+                  className={clsx(
+                    styles.referendumDescription,
+                    "referendum-description break-words text-sm"
+                    // {
+                    //   [styles.descriptionOverflowHidden]:
+                    //     !isDescriptionExpanded,
+                    // }
+                  )}
+                  dangerouslySetInnerHTML={{ __html: content ?? "" }}
+                ></div>
+              </ScrollShadow>
+            </div>
+            <ReferendumLinks referendumId={referendum.index} />
+          </>
         </div>
         <div className="right text-center w-full sm:w-5/12 md:w-4/12 pt-6 sm:pt-0 sticky self-start top-24 sm:pl-4 md:pl-6">
           <ReferendumBadges
@@ -137,7 +174,7 @@ export const ReferendumDetail = ({
             decidingPercentage={0}
             confirmingPercentage={0}
           />
-          <ReferendumCountdownCard endDate={endDate} referendum={referendum} />
+          {/* <ReferendumCountdownCard endDate={endDate} referendum={referendum} /> */}
           <ReferendumUserInfoCard referendum={referendum} />
           <ReferendumVoteButtons referendum={{ ...referendum }} userVote={{}} />
         </div>
@@ -151,4 +188,4 @@ export const ReferendumDetail = ({
       </pre> */}
     </div>
   );
-};
+}
