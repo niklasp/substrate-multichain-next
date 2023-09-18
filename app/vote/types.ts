@@ -128,6 +128,7 @@ export interface ReferendumPolkassembly {
   proposer?: string;
   requested?: string;
   tags?: string[];
+  post_id?: string;
   proposed_call?: {
     method: string;
     args: any;

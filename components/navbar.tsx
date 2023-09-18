@@ -26,7 +26,6 @@ import {
 import { Logo } from "@/components/icons";
 import { ChainSwitch } from "./chain-switch";
 import { WalletConnect } from "./wallet-connect";
-import { SubstrateChain } from "@/types";
 import { ChainLink } from "./chain-link";
 
 export const Navbar = () => {
