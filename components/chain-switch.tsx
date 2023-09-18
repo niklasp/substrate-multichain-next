@@ -77,7 +77,7 @@ export const ChainSwitch = ({ className }: { className?: string }) => {
             {isConnecting || typeof activeChain === "undefined" ? (
               <span className="text-xs flex items-center">
                 <Spinner size="sm" color="secondary" className="mr-2" />
-                connecting
+                ...
               </span>
             ) : (
               <activeChain.icon />

@@ -1,10 +1,10 @@
 import { cache } from "react";
 import { DEFAULT_CHAIN, getChainByName } from "@/config/chains";
 import { SubstrateChain } from "@/types";
-import Link from "next/link";
 import { transformReferendum } from "../../vote/util";
-import { ReferendumDetail } from "./referendum-detail-test";
 import { getReferenda } from "./get-referenda";
+import ReferendumList from "./referendum-list";
+import { getTracks } from "./get-tracks";
 
 const getChainInfo = cache(async (selectedChain: SubstrateChain) => {
   const safeChain = (selectedChain as SubstrateChain) || SubstrateChain.Kusama;
@@ -34,32 +34,30 @@ export default async function Test({
     chain: string;
   };
   searchParams: {
-    thing: string;
+    trackFilter: string;
   };
 }) {
-  const selectedThing = searchParams.thing || "nothing";
+  const selectedTrackFilter = searchParams.trackFilter || "";
   const selectedChain = Object.values(SubstrateChain).includes(
     chain as SubstrateChain
   )
     ? (chain as SubstrateChain)
     : DEFAULT_CHAIN;
 
-  console.log(`test page ${selectedChain} ${selectedThing}`);
+  console.log(`test page ${selectedChain} ${selectedTrackFilter}`);
 
   const referenda = await getReferenda(selectedChain);
+  const tracks = await getTracks(selectedChain);
   const chainInfo = await getChainInfo(selectedChain);
 
   return (
     <>
       <pre>{JSON.stringify(chainInfo, null, 2)}</pre>
-      {referenda?.map((ref) => (
-        <ReferendumDetail
-          key={ref.index}
-          referendum={ref}
-          track={undefined}
-          isExpanded
-        />
-      ))}
+      <ReferendumList
+        trackFilter={selectedTrackFilter}
+        referenda={referenda}
+        tracks={tracks}
+      />
     </>
   );
 }
