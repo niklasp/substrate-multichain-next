@@ -1,8 +1,10 @@
 import { RewardConfiguration } from "@/app/[chain]/referendum-rewards/types";
+import { SubstrateChain } from "@/types";
 
 export type RewardsConfigType = {
   royaltyAddress: string;
   acceptedNftFormats: string[];
+  maxFileSize: number;
   defaultReferendumRewardsConfig: RewardConfiguration;
 };
 
@@ -23,7 +25,9 @@ export const rewardsConfig: RewardsConfigType = {
     "audio/flac",
     "3d/glb",
   ],
+  maxFileSize: 2 * 1024 * 1024,
   defaultReferendumRewardsConfig: {
+    chain: SubstrateChain.Kusama,
     refIndex: "99",
     criteria: "all",
     min: "1200000000000",

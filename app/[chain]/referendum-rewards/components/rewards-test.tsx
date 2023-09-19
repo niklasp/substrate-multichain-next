@@ -21,7 +21,7 @@ import {
   useForm,
 } from "react-hook-form";
 import { validate } from "graphql";
-import { validateAddress } from "../util";
+import { rewardsSchema, validateAddress } from "../util";
 import { SubstrateChain } from "@/types";
 import { getChainInfo } from "@/config/chains";
 import { watch } from "fs";
@@ -29,42 +29,12 @@ import { titleCase } from "@/components/util";
 import { ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
-
-export const rewardsSchema = (chain: SubstrateChain, ss58Format: number) =>
-  z.object({
-    criteria: z.string().min(1, "Please select reward criteria"),
-    refIndex: z.string().min(1, "Please select a referendum"),
-    royaltyAddress: z.custom<string>(
-      (value) => validateAddress(value as string, ss58Format),
-      `Not a valid ${titleCase(chain)} address`
-    ),
-    options: z.array(
-      z.object({
-        rarity: z.string(),
-        title: z.string().min(1, "Title is required"),
-        description: z.string().optional(),
-        artist: z.string().optional(),
-        file: z
-          .custom<File[]>()
-          .transform((file) => file[0])
-          .refine((file: File) => {
-            console.log("filetype", file?.type, "filesize", file?.size);
-            return file && rewardsConfig.acceptedNftFormats.includes(file.type);
-          }, "File Format not supported")
-          .refine(
-            (file: File) => !file || (!!file && file.size <= 2 * 1024 * 1024),
-            {
-              message: "The medium must be a maximum of 2MB.",
-            }
-          ),
-      })
-    ),
-  });
+import { createRewards } from "../actions";
 
 export default function TestRewards({ chain }: { chain: SubstrateChain }) {
   const { ss58Format, name } = getChainInfo(chain);
 
-  const chainRewardsSchema = rewardsSchema(SubstrateChain.Kusama, 2);
+  const chainRewardsSchema = rewardsSchema(name, ss58Format);
   type TypeRewardsSchema = z.infer<typeof chainRewardsSchema>;
 
   const [formStep, setFormStep] = useState(0);
@@ -81,6 +51,7 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
     reset,
     getValues,
     watch,
+    setError,
   } = formMethods;
   const { activeChain } = useSubstrateChain();
 
@@ -101,8 +72,49 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
     useReferendumDetail(refIndex.toString());
 
   async function onSubmit(data: TypeRewardsSchema) {
-    console.log(data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // const result = await createRewards(data);
+    // console.log("result", result);
+
+    const formData = new FormData();
+    formData.append("rewardConfig", JSON.stringify(data));
+    formData.append("chain", chain);
+    data.options.forEach((option) => {
+      if (!option.imageCid) {
+        console.log("option file", option.file[0]);
+        formData.append(
+          `${option.rarity}File`,
+          option.file[0],
+          option.file[0].name
+        );
+      }
+    });
+    const response = await fetch("/api/rewards", {
+      method: "POST",
+      body: formData,
+    });
+    const responseData = await response.json();
+    console.log("responseData", responseData);
+
+    // if (!response.ok) {
+    //   console.log(responseData);
+    //   return;
+    // }
+    // if (responseData.errors) {
+    //   const errors = responseData.errors;
+    //   if (errors.criteria) {
+    //     setError("criteria", {
+    //       type: "server",
+    //       message: errors.criteria,
+    //     });
+    //   } else if (errors.refIndex) {
+    //     setError("refIndex", {
+    //       type: "server",
+    //       message: errors.refIndex,
+    //     });
+    //   }
+    //   //TODO expand
+    //   console.log("errors form server", errors);
+    // }
   }
 
   return (
@@ -122,7 +134,6 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
               }}
               className="w-full md:w-1/2"
               label="Reward Criteria"
-              value={"all"}
               placeholder={"Select Reward Criteria"}
               disabledKeys={["criteria", "aye", "first", "reputable"]}
               isInvalid={!!errors.criteria}
@@ -278,6 +289,14 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
         >
           Submit {activeChain && <activeChain.icon />} Referendum Rewards
         </Button>
+
+        <Input
+          type="text"
+          className="hidden"
+          value={chain as SubstrateChain}
+          id={`chain`}
+          {...register(`chain`)}
+        />
 
         <pre className="text-xs">{JSON.stringify(watch(), null, 2)}</pre>
       </form>

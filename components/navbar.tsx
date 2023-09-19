@@ -40,7 +40,7 @@ export const Navbar = () => {
           <NextLink className="flex justify-start items-center gap-1" href="/">
             {/* <Logo className="mr-1" /> */}
             <p className="hidden font-bold sm:flex -mt-1 text-3xl bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-purple-500">
-              p̶̪̾r̸̼͋o̷̜͗o̷̩̔f̴͚̋o̸̥̍f̸̝͛c̶͈͒h̷͎͠a̴̱͐o̴̜̓s̷͚̈
+              p̶̝͠r̵̻̈o̴̬͌o̷͇̐f̵̬̒o̷͇͂f̴̢̈́c̴̮͑h̴̰́a̴͓̐o̴̘̽s̴̪̋
             </p>
             {/* p̸̤̈́r̶͖͐ơ̵̳ȯ̵͙f̵͔̔ò̵̝f̴̝̈́ć̶̖h̸̻͒a̶͙̚o̷̩͛s̵̠̏ */}
             <p className="sm:hidden font-bold -mt-1 text-3xl bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-purple-500">

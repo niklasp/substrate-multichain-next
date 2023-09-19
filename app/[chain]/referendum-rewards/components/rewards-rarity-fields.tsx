@@ -12,8 +12,8 @@ import { titleCase } from "@/components/util";
 import { FieldErrors, UseFormRegister, useFormContext } from "react-hook-form";
 import { getChainInfo } from "@/config/chains";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
-import { rewardsSchema } from "./rewards-test";
 import { SubstrateChain } from "@/types";
+import { rewardsSchema } from "../util";
 
 export function RewardsCreationRarityFields({
   rarity,
@@ -89,7 +89,7 @@ export function RewardsCreationRarityFields({
                 />
                 {/* @ts-ignore */}
                 {errors?.options?.[optionIndex]?.file && (
-                  <span className="w-full text-sm text-red-500">
+                  <span className="w-full text-tiny text-danger px-1">
                     {/* @ts-ignore */}
                     <>{errors?.options?.[optionIndex].file?.message}</>
                   </span>

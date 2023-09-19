@@ -6,6 +6,7 @@ export const trimAddress = (address: string, amount: number = 3) => {
 };
 
 export const titleCase = (s: string) =>
+  s &&
   s.replace(/^_*(.)|_+(.)/g, (_, c, d) =>
     c ? c.toUpperCase() : " " + d.toUpperCase()
   );

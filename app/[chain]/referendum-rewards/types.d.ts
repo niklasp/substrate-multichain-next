@@ -1,3 +1,5 @@
+import { SubstrateChain } from "@/types";
+
 export type GenerateRewardsResult = {
   call: string | undefined;
   config: RewardConfiguration;
@@ -205,6 +207,7 @@ export interface ConfigNFT {
 }
 
 export interface RewardConfiguration {
+  chain: SubstrateChain | undefined;
   refIndex: string;
   criteria: "all" | "threshold";
   min: string;

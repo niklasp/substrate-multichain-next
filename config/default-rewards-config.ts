@@ -1,6 +1,7 @@
 import { RewardConfiguration } from "@/app/[chain]/referendum-rewards/types";
 
 export const defaultReferendumRewardsConfig: RewardConfiguration = {
+  chain: undefined,
   refIndex: "99",
   criteria: "all",
   min: "1200000000000",

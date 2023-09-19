@@ -321,33 +321,6 @@ export const transformReferendum = ([id, info]: [
         ? "confirming"
         : "preparing";
 
-      // : deciding.isSome && deciding.unwrap().confirming.isSome
-      // ? "confirming"
-
-      // ? "awaitingDecisionDeposit"
-      // : submissionDeposit
-      // ? "awaitingSubmissionDeposit"
-      // : "submitted";
-
-      // rejected
-      //   ? "Rejected"
-      //   : approved
-      //   ? "Approved"
-      //   : deciding?.confirming && deciding?.confirming !== null
-      //   ? "Confirming"
-      //   : decisionDeposit === null
-      //   ? "Awaiting Deposit"
-      //   : deciding?.since
-      //   ? "Deciding"
-      //   : submissionDeposit !== null
-      //   ? "Submitted"
-      //   : "Unknown State";
-
-      // const decidingValue = deciding.unwrapOrDefault();
-      // const endBlock = decidingValue.confirming
-      //   ? decidingValue.confirming
-      //   : decidingValue.since + track.info.decisionPeriod;
-
       return {
         index: typeof id === "string" ? id : id.toHuman()?.toString(),
         status,
