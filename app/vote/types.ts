@@ -125,7 +125,7 @@ export interface ReferendumPolkadot {
 
 export interface VotePolkadot {
   accountId: string;
-  voteIndex: number;
+  track: number;
   voteData: PalletConvictionVotingVoteVoting;
 }
 

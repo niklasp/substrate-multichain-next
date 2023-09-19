@@ -361,17 +361,16 @@ export const transformReferendum = ([id, info]: [
 export const transformVote = ([storageKey, codec]: [StorageKey<[AccountId32, u16]>, Codec]): VotePolkadot => {
 
   // Extract data from storageKey
-  const [accountId, voteIndex] = storageKey.args;
+  const [accountId, track] = storageKey.args;
 
   // Cast Codec to the specific type PalletConvictionVotingVoteVoting and extract necessary fields
   const voteData = codec as PalletConvictionVotingVoteVoting;
-
+    
   // Now, voteData should have properties defined in PalletConvictionVotingVoteVoting which you can use as needed
-  // For instance, if it has a property named 'exampleField', you can access it as voteData.exampleField
 
   return {
     accountId: accountId.toString(), 
-    voteIndex: voteIndex.toNumber(), 
+    track: track.toNumber(),
     voteData,
   };
 };

@@ -85,7 +85,7 @@ export type ConvictionVote = {
   // Whether the person is voting themselves or delegating
   voteType: string;
   // Who the person is delegating to
-  delegatedTo: string;
+  delegatedTo: string | null;
 };
 
 export type ConvictionDelegation = {
