@@ -37,18 +37,20 @@ export default function Home() {
           <div className="flex gap-4 justify-center mt-10 flex-wrap md:flex-nowrap">
             <Button
               size="lg"
-              variant="shadow"
-              className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg hover:-translate-y-0.5 w-full md:w-1/3"
-            >
-              <Link href="/referendum-rewards">Create Voting Rewards 🎁</Link>
-            </Button>
-            <Button
-              size="lg"
               color="secondary"
               variant="shadow"
               className="hover:-translate-y-0.5 w-full md:w-1/3"
             >
               <ChainLink href="/vote">Vote Now →</ChainLink>
+            </Button>
+            <Button
+              size="lg"
+              variant="shadow"
+              className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg hover:-translate-y-0.5 w-full md:w-1/3"
+            >
+              <ChainLink href="/referendum-rewards">
+                Create Voting Rewards 🎁
+              </ChainLink>
             </Button>
           </div>
         </div>

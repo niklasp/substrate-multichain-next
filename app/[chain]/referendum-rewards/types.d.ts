@@ -206,6 +206,7 @@ export interface ConfigNFT {
 
 export interface RewardConfiguration {
   refIndex: string;
+  criteria: "all" | "threshold";
   min: string;
   max: string;
   first: number | null;

@@ -39,12 +39,12 @@ export const Navbar = () => {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             {/* <Logo className="mr-1" /> */}
-            <p className="hidden font-bold sm:flex -mt-1 text-3xl bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-purple-500">
-              <ChaosLogo />
+            <p className="hidden font-bold sm:flex -mt-1 text-3xl bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-purple-500">
+              p̶̪̾r̸̼͋o̷̜͗o̷̩̔f̴͚̋o̸̥̍f̸̝͛c̶͈͒h̷͎͠a̴̱͐o̴̜̓s̷͚̈
             </p>
             {/* p̸̤̈́r̶͖͐ơ̵̳ȯ̵͙f̵͔̔ò̵̝f̴̝̈́ć̶̖h̸̻͒a̶͙̚o̷̩͛s̵̠̏ */}
-            <p className="sm:hidden -mt-1 font-bold text-xl text-inherit">
-              p̶o̴c̵
+            <p className="sm:hidden font-bold -mt-1 text-3xl bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-purple-500">
+              p̸̤̈́ò̵̝ć̶̖
             </p>
           </NextLink>
         </NavbarBrand>

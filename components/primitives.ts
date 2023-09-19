@@ -1,7 +1,7 @@
 import { tv } from "tailwind-variants";
 
 export const vividButtonClasses =
-  "text-white bg-gradient-to-r from-blue-400 to-purple-400";
+  "text-white bg-gradient-to-r from-sky-500 to-purple-400";
 
 export const title = tv({
   base: "tracking-tight inline font-semibold",

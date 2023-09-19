@@ -2,7 +2,7 @@ import { Link } from "@nextui-org/link";
 
 export function Footer() {
   return (
-    <footer className="bg-gray-50 dark:bg-gray-900 body-font">
+    <footer className="bg-gray-50 dark:bg-gray-900 body-font mt-8">
       <div className="container mx-auto max-w-7xl pt-16 px-2 sm:px-4 md:px-6 flex-grow">
         <div className="flex flex-row flex-wrap flex-1 content-center md:content-start">
           <p className="w-full sm:w-auto text-center sm:ml-4 text-sm text-gray-500 sm:pl-4 sm:border-l sm:border-gray-200">

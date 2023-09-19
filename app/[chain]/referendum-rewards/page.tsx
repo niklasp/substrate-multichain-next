@@ -40,7 +40,7 @@ export default async function PageRewards({
           to get it added.
         </p>
       ) : (
-        <TestRewards />
+        <TestRewards chain={selectedChain} />
       )}
     </div>
   );

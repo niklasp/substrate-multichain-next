@@ -49,6 +49,7 @@ export function Logo({ text = "proofofchaos" }: { text?: string }) {
       className=""
       onMouseOver={reset}
       onTouchStart={reset}
+      onClick={reset}
     >
       {chaosText}
     </span>
