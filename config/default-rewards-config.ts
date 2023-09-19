@@ -1,4 +1,4 @@
-import { RewardConfiguration } from "@/app/referendum-rewards/types";
+import { RewardConfiguration } from "@/app/[chain]/referendum-rewards/types";
 
 export const defaultReferendumRewardsConfig: RewardConfiguration = {
   refIndex: "99",

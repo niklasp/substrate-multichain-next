@@ -1992,6 +1992,11 @@
   resolved "https://registry.yarnpkg.com/@nextui-org/react-rsc-utils/-/react-rsc-utils-2.0.8.tgz#f21244204434d0de7fee36fc51a4a83049c057b8"
   integrity sha512-x/yjFrAJX7Ev+OEHEjTEeX7CcdN1xNASFLYj0rtjly9kYf3zjG4lhMGPNXrhtoIsZbMEBJBOc58tk62cFZAUew==
 
+"@nextui-org/react-rsc-utils@2.0.9":
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/@nextui-org/react-rsc-utils/-/react-rsc-utils-2.0.9.tgz#2646cc38440f7879b7a566e2a05c4dc5eb532d4c"
+  integrity sha512-RrA6LzLPj6y9LJIILeqJ5JKmXUFZDbTRZDTTz0rd8qv3yyt5zNgOI07dkG6P43+q5cLNnG9j+P11+Nr0W81cDg==
+
 "@nextui-org/react-utils@2.0.7":
   version "2.0.7"
   resolved "https://registry.yarnpkg.com/@nextui-org/react-utils/-/react-utils-2.0.7.tgz#53cdfdbe0ed18d7fdda3e63ef355c0f358b8c56b"
@@ -2006,6 +2011,14 @@
   integrity sha512-oqOYomtCue5Sg39r2xy7eJlcxDnhtC7/7lDRNDbAQjf0vDQ7mm2hhmo26CZqb9WFQ45hLHgzdzaan5cVW94NDg==
   dependencies:
     "@nextui-org/react-rsc-utils" "2.0.8"
+    "@nextui-org/shared-utils" "2.0.3"
+
+"@nextui-org/react-utils@2.0.9":
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/@nextui-org/react-utils/-/react-utils-2.0.9.tgz#b68d5bb3d0fc6661930f9ec5f60fdd56ae6805e3"
+  integrity sha512-UK4/9uy7A6A2vMnbIWprJo7b/8+N/zg4D5Hf36pI6xR0mkt4RY9OGuo24I/ZBwoU0k5kjaod/hTW6nCQwCPtvg==
+  dependencies:
+    "@nextui-org/react-rsc-utils" "2.0.9"
     "@nextui-org/shared-utils" "2.0.3"
 
 "@nextui-org/ripple@2.0.15":
@@ -2138,22 +2151,22 @@
     "@nextui-org/system-rsc" "2.0.4"
     "@nextui-org/theme" "2.1.6"
 
-"@nextui-org/switch@2.0.15":
-  version "2.0.15"
-  resolved "https://registry.yarnpkg.com/@nextui-org/switch/-/switch-2.0.15.tgz#c697ffe53fd2fae9c5d94bba03a36b27a044ec7c"
-  integrity sha512-29AC4Qc8skmzmtKPDQuS46/s7wpAGGhftl3ruJLfHBmR69ZyHMUNjwDEpyn9tiGOlINP1JWDGvF5/H69bnLdbA==
+"@nextui-org/switch@^2.0.21":
+  version "2.0.21"
+  resolved "https://registry.yarnpkg.com/@nextui-org/switch/-/switch-2.0.21.tgz#00ca0e307cd726ac33bfbf767984fe577012a8ed"
+  integrity sha512-FrbSUcHY7RtJHtB5Ddsso2MDo58HgmwWbyHTi1E/zVTawONosBmkdV/v3Y2rKAFcqSz1VK973hrtYztYWUzkTA==
   dependencies:
-    "@nextui-org/react-utils" "2.0.7"
-    "@nextui-org/shared-utils" "2.0.2"
-    "@nextui-org/system" "2.0.5"
-    "@nextui-org/theme" "2.1.3"
-    "@react-aria/focus" "^3.14.0"
-    "@react-aria/interactions" "^3.17.0"
-    "@react-aria/switch" "^3.5.3"
-    "@react-aria/utils" "^3.19.0"
-    "@react-aria/visually-hidden" "^3.8.3"
-    "@react-stately/toggle" "^3.6.1"
-    "@react-types/shared" "^3.19.0"
+    "@nextui-org/react-utils" "2.0.9"
+    "@nextui-org/shared-utils" "2.0.3"
+    "@nextui-org/system" "2.0.10"
+    "@nextui-org/theme" "2.1.9"
+    "@react-aria/focus" "^3.14.1"
+    "@react-aria/interactions" "^3.18.0"
+    "@react-aria/switch" "^3.5.4"
+    "@react-aria/utils" "^3.20.0"
+    "@react-aria/visually-hidden" "^3.8.4"
+    "@react-stately/toggle" "^3.6.2"
+    "@react-types/shared" "^3.20.0"
 
 "@nextui-org/system-rsc@2.0.3":
   version "2.0.3"
@@ -2178,6 +2191,23 @@
   dependencies:
     clsx "^1.2.1"
     tailwind-variants "^0.1.14"
+
+"@nextui-org/system-rsc@2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@nextui-org/system-rsc/-/system-rsc-2.0.6.tgz#ed799146c2bf1ae3b4f0bfdd88a9ef79a145204c"
+  integrity sha512-Q3ojwiFggjLONG8Lyv1xuP8AhrVk7ShuiHkJ08dpNnJ7HQTYaKlwoFR3CFSWvgJbGsK6YkLLFSFFPTFvTuNpUg==
+  dependencies:
+    clsx "^1.2.1"
+    tailwind-variants "^0.1.14"
+
+"@nextui-org/system@2.0.10":
+  version "2.0.10"
+  resolved "https://registry.yarnpkg.com/@nextui-org/system/-/system-2.0.10.tgz#70eb3f0435013234bcc5257c3331d194fe88d867"
+  integrity sha512-5F6739zMOYSYR5CM/N8FQsRlQn8yCKiU5VNNPFkk022P5cA2NZXrhZ08mQSmFw2BU7OWxa/ieLivjDptKcRozQ==
+  dependencies:
+    "@nextui-org/system-rsc" "2.0.6"
+    "@react-aria/i18n" "^3.8.2"
+    "@react-aria/overlays" "^3.17.0"
 
 "@nextui-org/system@2.0.5":
   version "2.0.5"
@@ -2258,6 +2288,30 @@
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/@nextui-org/theme/-/theme-2.1.8.tgz#10ee9174710b4f1a4e32addb582a6ad2729b1157"
   integrity sha512-OP3RVKpONxAYva2mM9EH1KTNBO9kYSuOoZQbUXgvxkb0j5mnJNPgiLQq1CnSjcmLR2SLhxzJdbmUlU7HYuDGdA==
+  dependencies:
+    "@types/color" "^3.0.3"
+    "@types/flat" "^5.0.2"
+    "@types/lodash.foreach" "^4.5.7"
+    "@types/lodash.get" "^4.4.7"
+    "@types/lodash.kebabcase" "^4.1.7"
+    "@types/lodash.mapkeys" "^4.6.7"
+    "@types/lodash.omit" "^4.5.7"
+    color "^4.2.3"
+    color2k "^2.0.2"
+    deepmerge "4.3.1"
+    flat "^5.0.2"
+    lodash.foreach "^4.5.0"
+    lodash.get "^4.4.2"
+    lodash.kebabcase "^4.1.1"
+    lodash.mapkeys "^4.6.0"
+    lodash.omit "^4.5.0"
+    tailwind-variants "^0.1.14"
+    tailwindcss "^3.2.7"
+
+"@nextui-org/theme@2.1.9":
+  version "2.1.9"
+  resolved "https://registry.yarnpkg.com/@nextui-org/theme/-/theme-2.1.9.tgz#509da2e47bff35fafc974e675a3210caae7deab7"
+  integrity sha512-DmSv6yWb8zp3dQ4ic5XDWGc1rNjEOPphrfc5E4tzUZqgsLisNjr2Gm3bMzM51Kquepv8OzYojoaB2nO2zmI6mw==
   dependencies:
     "@types/color" "^3.0.3"
     "@types/flat" "^5.0.2"
@@ -4114,14 +4168,14 @@
   dependencies:
     "@swc/helpers" "^0.5.0"
 
-"@react-aria/switch@^3.5.3":
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/@react-aria/switch/-/switch-3.5.3.tgz#5420273447a112d66a1b09d721079ab60a142402"
-  integrity sha512-3sV78Oa12/aU+M9P7BqUDdp/zm2zZA2QvtLLdxykrH04AJp0hLNBnmaTDXJVaGPPiU0umOB0LWDquA3apkBiBA==
+"@react-aria/switch@^3.5.4":
+  version "3.5.4"
+  resolved "https://registry.yarnpkg.com/@react-aria/switch/-/switch-3.5.4.tgz#edcd70bd19d54b3021e645a39fc5255ac5bf70e8"
+  integrity sha512-u5nkxLuToz7qsRoH8qiZSe4rdKJ7LJK5AoEVQzlqlw2oLTcaitRpnYYNfGJuMasAAnmdIx6SJ60gb3vly+5SMQ==
   dependencies:
-    "@react-aria/toggle" "^3.7.0"
-    "@react-stately/toggle" "^3.6.1"
-    "@react-types/switch" "^3.4.0"
+    "@react-aria/toggle" "^3.8.0"
+    "@react-stately/toggle" "^3.6.2"
+    "@react-types/switch" "^3.4.1"
     "@swc/helpers" "^0.5.0"
 
 "@react-aria/textfield@^3.11.0":
@@ -4136,18 +4190,18 @@
     "@react-types/textfield" "^3.7.3"
     "@swc/helpers" "^0.5.0"
 
-"@react-aria/toggle@^3.7.0":
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/@react-aria/toggle/-/toggle-3.7.0.tgz#2c680a521789418ae3924dab6376ae9361b1c5f4"
-  integrity sha512-8Rpqolm8dxesyHi03RSmX2MjfHO/YwdhyEpAMMO0nsajjdtZneGzIOXzyjdWCPWwwzahcpwRHOA4qfMiRz+axA==
+"@react-aria/toggle@^3.8.0":
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/@react-aria/toggle/-/toggle-3.8.0.tgz#15449d06d7a90fbabab12926297648918d95adb6"
+  integrity sha512-HQgx8rBEwGsVyJKU47GTZcWWn3Kv0DgZfUY/lXkdhMFf14/NWTRpJEuKRfEut+/wVFbcNcv9WDT7fEe7yTvGWg==
   dependencies:
-    "@react-aria/focus" "^3.14.0"
-    "@react-aria/interactions" "^3.17.0"
-    "@react-aria/utils" "^3.19.0"
-    "@react-stately/toggle" "^3.6.1"
-    "@react-types/checkbox" "^3.5.0"
-    "@react-types/shared" "^3.19.0"
-    "@react-types/switch" "^3.4.0"
+    "@react-aria/focus" "^3.14.1"
+    "@react-aria/interactions" "^3.18.0"
+    "@react-aria/utils" "^3.20.0"
+    "@react-stately/toggle" "^3.6.2"
+    "@react-types/checkbox" "^3.5.1"
+    "@react-types/shared" "^3.20.0"
+    "@react-types/switch" "^3.4.1"
     "@swc/helpers" "^0.5.0"
 
 "@react-aria/tooltip@^3.6.1":
@@ -4473,13 +4527,13 @@
   resolved "https://registry.yarnpkg.com/@react-types/shared/-/shared-3.20.0.tgz#15f0cbe3978831589f083c8e316810669b4fa606"
   integrity sha512-lgTO/S/EMIZKU1EKTg8wT0qYP5x/lZTK2Xw6BZZk5c4nn36JYhGCRb/OoR/jBCIeRb2x9yNbwERO6NYVkoQMSw==
 
-"@react-types/switch@^3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@react-types/switch/-/switch-3.4.0.tgz#10647eef6f89a78769e820c579de433596e041ef"
-  integrity sha512-vUA4Etm7ZiThYN3IotPXl99gHYZNJlc/f9o/SgAUSxtk5pBv5unOSmXLdrvk01Kd6TJ/MjL42IxRShygyr8mTQ==
+"@react-types/switch@^3.4.1":
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/@react-types/switch/-/switch-3.4.1.tgz#3475ee497cb0bba491c47d0594cf9a62df823c70"
+  integrity sha512-2XfPsu2Yiap+pthO2rvCNlLjzo9mDejrYY3rsYMw/jLzCHvuR8Xe2/l01svHcq3pVuNIMElqZR4vTq9OvGNBnQ==
   dependencies:
-    "@react-types/checkbox" "^3.5.0"
-    "@react-types/shared" "^3.19.0"
+    "@react-types/checkbox" "^3.5.1"
+    "@react-types/shared" "^3.20.0"
 
 "@react-types/textfield@^3.7.3":
   version "3.7.3"
@@ -6869,6 +6923,11 @@ lru-cache@^6.0.0:
   integrity sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
   dependencies:
     yallist "^4.0.0"
+
+lunicode@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/lunicode/-/lunicode-2.0.1.tgz#192f0955cf1956edc3bf5e8fefd9acd2be64b801"
+  integrity sha512-tFXPCYVUH9NENfyAfsyj477g2oN/W0aJumjODy0QbIZ4c68dLoGzCc6Ovr46QpF+rMuHa8Qgku6nrMjK78WeDw==
 
 make-dir@^2.1.0:
   version "2.1.0"

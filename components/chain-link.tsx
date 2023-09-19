@@ -9,19 +9,15 @@ import { LinkProps } from "@nextui-org/link";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { DEFAULT_CHAIN } from "@/config/chains";
 
-export function ChainLink(props: LinkProps) {
-  const { href, children } = props;
+export function ChainLink(props: any) {
+  const { href, children, ...rest } = props;
 
   const { activeChain } = useSubstrateChain();
   const name = activeChain ? activeChain.name : DEFAULT_CHAIN;
   const chainLinkHref = `/${name}${href}`;
 
   return (
-    <Link
-      className={clsx(linkStyles({ color: "foreground" }))}
-      color="foreground"
-      href={chainLinkHref ?? ""}
-    >
+    <Link href={chainLinkHref ?? ""} {...rest}>
       {children}
     </Link>
   );

@@ -23,6 +23,7 @@ import {
   HeartFilledIcon,
 } from "@/components/icons";
 
+import { Logo as ChaosLogo } from "@/components/logo";
 import { Logo } from "@/components/icons";
 import { ChainSwitch } from "./chain-switch";
 import { WalletConnect } from "./wallet-connect";
@@ -37,16 +38,17 @@ export const Navbar = () => {
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo className="mr-1" />
-            <p className="hidden sm:flex -mt-1 font-bold text-xl">
-              pRoOf oF chAoS
+            {/* <Logo className="mr-1" /> */}
+            <p className="hidden font-bold sm:flex -mt-1 text-3xl bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-purple-500">
+              <ChaosLogo />
             </p>
+            {/* p̸̤̈́r̶͖͐ơ̵̳ȯ̵͙f̵͔̔ò̵̝f̴̝̈́ć̶̖h̸̻͒a̶͙̚o̷̩͛s̵̠̏ */}
             <p className="sm:hidden -mt-1 font-bold text-xl text-inherit">
               p̶o̴c̵
             </p>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2 font-bold">
+        <ul className="hidden lg:flex gap-4 justify-start ml-4 font-bold">
           {siteConfig.navItems.map((item) => (
             <NavbarItem key={item.href}>
               {item.chainLink ? (
