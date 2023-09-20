@@ -3,6 +3,16 @@ import { IconSvgProps } from "@/types";
 import Image from "next/image";
 import clsx from "clsx";
 
+export const RococoIcon: React.FC<IconSvgProps> = ({ size = 24 }) => (
+  <Image
+    src="/logos/rococo.svg"
+    alt="Rococo Logo"
+    width={size}
+    height={size}
+    className="max-w-none"
+  />
+);
+
 export const KusamaIcon: React.FC<IconSvgProps> = ({
   size = 24,
   width,

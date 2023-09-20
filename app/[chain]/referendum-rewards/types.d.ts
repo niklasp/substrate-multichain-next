@@ -192,10 +192,10 @@ export interface Bonuses {
 export interface CollectionConfiguration {
   file?: any;
   id?: number;
-  name: string;
-  description: string;
+  name?: string;
+  description?: string;
   metadataCid?: string | null;
-  isNew: boolean;
+  isNew?: boolean;
 }
 
 export interface ConfigNFT {

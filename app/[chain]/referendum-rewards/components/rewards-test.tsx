@@ -30,13 +30,17 @@ import { ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { createRewards } from "../actions";
+import { useAppStore } from "@/app/zustand";
+import CreateNFTCollectionModal from "./modal-new-collection";
 
 export default function TestRewards({ chain }: { chain: SubstrateChain }) {
   const { ss58Format, name } = getChainInfo(chain);
-
   const chainRewardsSchema = rewardsSchema(name, ss58Format);
   type TypeRewardsSchema = z.infer<typeof chainRewardsSchema>;
 
+  const openModal = useAppStore((state) => state.openModal);
+
+  const [isNewCollectionLoading, setIsNewCollectionLoading] = useState(false);
   const [formStep, setFormStep] = useState(0);
   const nextFormStep = () => setFormStep((currentStep) => currentStep + 1);
   const prevFormStep = () => setFormStep((currentStep) => currentStep - 1);
@@ -50,10 +54,13 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
     formState: { errors, isSubmitting },
     reset,
     getValues,
+    setValue,
     watch,
     setError,
   } = formMethods;
   const { activeChain } = useSubstrateChain();
+
+  const watchFormFields = watch();
 
   useEffect(() => {
     console.log(errors);
@@ -71,6 +78,24 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
   const { data: referendumDetail, isLoading: isReferendumDetailLoading } =
     useReferendumDetail(refIndex.toString());
 
+  // function is passed to the modal in order to change the state of the form fields
+  function setCollectionConfig(collectionConfig: CollectionConfiguration) {
+    setValue("collectionConfig", {
+      ...watchFormFields.collectionConfig,
+      ...collectionConfig,
+    });
+  }
+
+  async function createNewCollection() {
+    openModal(
+      <CreateNFTCollectionModal
+        setCollectionConfig={setCollectionConfig}
+        setIsNewCollectionLoading={setIsNewCollectionLoading}
+      />,
+      {}
+    );
+  }
+
   async function onSubmit(data: TypeRewardsSchema) {
     // const result = await createRewards(data);
     // console.log("result", result);
@@ -78,7 +103,7 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
     const formData = new FormData();
     formData.append("rewardConfig", JSON.stringify(data));
     formData.append("chain", chain);
-    data.options.forEach((option) => {
+    data.options?.forEach((option) => {
       if (!option.imageCid) {
         console.log("option file", option.file[0]);
         formData.append(
@@ -217,6 +242,7 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
               description="Where trading royalties should go to (Kusama / Asset Hub).
                   80% will go to the entered address, 20% to the Proof of Chaos multisig."
               isInvalid={!!errors.royaltyAddress}
+              color={!!errors.royaltyAddress ? "danger" : "default"}
               errorMessage={
                 !!errors.royaltyAddress && `${errors.royaltyAddress?.message}`
               }
@@ -236,29 +262,26 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
               label="Collection Id"
               placeholder="The id of your existing collection"
               type="number"
+              step="1"
               classNames={{
                 label: "after:content-['*'] after:text-danger after:ml-0.5",
               }}
-              // errorMessage={errors.collectionConfig?.id?.message}
               description="Select a collection that you are the owner of. NFTs will be minted to this collection."
-              // disabled={isNewCollectionLoading}
-              // validationState={errors.collectionConfig?.id ? "invalid" : "valid"}
-              // {...formMethods.register("collectionConfig.id", {
-              //   validate: {
-              //     isNumber: (value) => !isNaN(value) || "Not a valid number",
-              //     isNotCollectionOwner: () =>
-              //       collectionOwnerIsWallet ||
-              //       "You are not the owner of the collection",
-              //   },
-              // })}
+              isInvalid={!!errors.collectionConfig?.id}
+              color={!!errors.collectionConfig?.id ? "danger" : "default"}
+              errorMessage={
+                !!errors.collectionConfig?.id &&
+                `${errors.collectionConfig.id?.message}`
+              }
+              {...register("collectionConfig.id")}
             />
             {/* <p>{errors?.["collectionConfig.id"]?.message}</p> */}
             <div className="flex h-100">or</div>
             <Button
               className="w-full"
-              // onClick={createNewCollection}
+              onClick={createNewCollection}
               color="secondary"
-              // isLoading={isNewCollectionLoading}
+              isLoading={isNewCollectionLoading}
               variant="bordered"
             >
               {/* {isNewCollectionLoading

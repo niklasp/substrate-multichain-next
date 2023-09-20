@@ -3,10 +3,11 @@
 import { SendAndFinalizeResult, ToastType } from "@/types";
 import { Signer, SubmittableExtrinsic } from "@polkadot/api/types";
 import { toast as hotToast, Toast, ToastOptions } from "react-hot-toast";
-import { Header } from "@polkadot/types/interfaces";
+import { Header, RuntimeDispatchInfo } from "@polkadot/types/interfaces";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { useAppStore } from "@/app/zustand";
 import { ApiPromise } from "@polkadot/api";
+import { Observable } from "rxjs";
 
 export const defaultToastMessages = [
   `(1/3) Awaiting your signature`,
@@ -16,11 +17,51 @@ export const defaultToastMessages = [
   `Transaction failed`,
 ];
 
-type TxTypes =
+export type TxTypes =
   | string
   | SubmittableExtrinsic<any>[]
   | SubmittableExtrinsic<any>
   | undefined;
+
+export const getTxCost = async (
+  api: ApiPromise | undefined,
+  tx: TxTypes,
+  address: string | undefined
+): Promise<RuntimeDispatchInfo | Observable<RuntimeDispatchInfo>> => {
+  if (!api || typeof api === "undefined") {
+    throw "api is not ready";
+  }
+
+  if (!tx) {
+    throw "invalid tx";
+  }
+
+  if (!address) {
+    throw "invalid address";
+  }
+
+  await api.isReady;
+
+  // if someone passes a hex encoded tx we need to decode it
+  const maybeHexTxToSubmittable = (tx: SubmittableExtrinsic<any> | string) => {
+    if (typeof tx === "string") {
+      return api?.tx(tx);
+    }
+    return tx;
+  };
+
+  let call;
+
+  if (Array.isArray(tx)) {
+    const txs = tx.map(maybeHexTxToSubmittable) as SubmittableExtrinsic<any>[];
+    call = api.tx.utility.batchAll(txs).paymentInfo(address);
+  } else {
+    call = maybeHexTxToSubmittable(tx).paymentInfo(address);
+  }
+
+  const fees = await call;
+  return fees;
+};
 
 /**
  * @see https://polkadot.js.org/docs/api/cookbook/tx
@@ -39,7 +80,7 @@ export const sendAndFinalize = async (
     title: "Processing Transaction",
     messages: defaultToastMessages,
   }
-): Promise<SendAndFinalizeResult | unknown> => {
+): Promise<SendAndFinalizeResult> => {
   let toastId: string | undefined = undefined;
 
   let toastMessages =
@@ -55,7 +96,7 @@ export const sendAndFinalize = async (
     });
   }
 
-  return new Promise(async (resolve, reject) => {
+  return new Promise<SendAndFinalizeResult>(async (resolve, reject) => {
     let success = false;
     let included = [];
     let blockHeader: Header | undefined;

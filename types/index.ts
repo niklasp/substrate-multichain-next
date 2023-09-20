@@ -21,10 +21,13 @@ export type ChainConfig = {
   ss58Format: number;
   blockTime: number;
   endpoints: Endpoint[];
+  assetHubEndpoints: Endpoint[];
   tracks: any[];
   icon: React.FC<IconSvgProps>;
   provider?: WsProvider;
+  assetHubProvider?: WsProvider;
   api?: ApiPromise;
+  assetHubApi?: ApiPromise;
 };
 
 export type PolkadotExtensionType = {

@@ -12,8 +12,6 @@ export const useAccountBalance = () => {
   const { address } = user?.accounts?.[user.actingAccountIdx] || {};
   const userAddress = address && encodeAddress(address, ss58Format);
 
-  console.log("useAccountBalance", activeChain?.name, address, userAddress);
-
   return useQuery({
     queryKey: [activeChain?.name, address, "accountBalance"],
     enabled: !!activeChain && !!address,

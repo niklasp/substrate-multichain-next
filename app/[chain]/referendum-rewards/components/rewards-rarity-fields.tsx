@@ -62,7 +62,7 @@ export function RewardsCreationRarityFields({
             {titleCase(rarity)} NFT
           </h3>
         </CardHeader>
-        <CardBody className="flex gap-3 bg-background/80">
+        <CardBody className="flex gap-3 bg-background">
           <div className="text-sm flex justify-start items-center">
             <span className="mr-2">upload file</span>
             <Switch
@@ -102,9 +102,7 @@ export function RewardsCreationRarityFields({
                   label={`IPFS Image CID of ${rarity} NFT`}
                   placeholder={`Enter Image CID of ${rarity} NFT`}
                   type="text"
-                  // {...register(`options[${optionIndex}].imageCid`, {
-                  //   validate: {},
-                  // })}
+                  {...register(`options.${optionIndex}.imageCid`, {})}
                 />
               </>
             )}
@@ -125,6 +123,9 @@ export function RewardsCreationRarityFields({
             }}
             //@ts-ignore
             isInvalid={!!errors?.options?.[optionIndex]?.title}
+            color={
+              !!errors?.options?.[optionIndex]?.title ? "danger" : "default"
+            }
             errorMessage={
               //@ts-ignore
               !!errors?.options?.[optionIndex]?.title &&

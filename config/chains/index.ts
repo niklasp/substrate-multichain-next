@@ -1,16 +1,18 @@
 import { polkadot } from "./polkadot";
 import { kusama } from "./kusama";
-import { SubstrateChain } from "@/types";
+import { ChainConfig, SubstrateChain } from "@/types";
 import { ApiPromise, WsProvider } from "@polkadot/api";
+import { rococo } from "./rococo";
 
 export const ENABLED_CHAINS = {
   [kusama.name]: kusama,
   [polkadot.name]: polkadot,
+  [rococo.name]: rococo,
 };
 
 export const DEFAULT_CHAIN = SubstrateChain.Kusama;
 
-export function getChainInfo(name: SubstrateChain) {
+export function getChainInfo(name: SubstrateChain): ChainConfig {
   const chainSettings = ENABLED_CHAINS[name];
 
   if (!chainSettings) {
@@ -38,6 +40,11 @@ export async function getChainByName(name: SubstrateChain) {
   } else {
     // console.log(`provider from cache for ${name}`);
   }
+  if (!chainSettings.assetHubProvider) {
+    chainSettings.assetHubProvider = new WsProvider(
+      chainSettings.assetHubEndpoints[0].url
+    );
+  }
   if (!chainSettings.api) {
     // console.log(`creating api for ${name}`);
     chainSettings.api = await ApiPromise.create({
@@ -54,9 +61,15 @@ export async function getChainByName(name: SubstrateChain) {
   } else {
     // console.log(`api from cache for ${name}`);
   }
+  if (!chainSettings.assetHubApi) {
+    chainSettings.assetHubApi = await ApiPromise.create({
+      provider: chainSettings.assetHubProvider,
+    });
+  }
 
   // console.log(`waiting for api ready for ${name}`);
   await chainSettings.api.isReady;
+  await chainSettings.assetHubApi.isReady;
 
   // console.log(
   //   `api ready for ${name}. Connected to ${chainSettings.api.runtimeVersion.specName} spec:${chainSettings.api.runtimeVersion.specVersion} at ${chainSettings.endpoints[0].url}`

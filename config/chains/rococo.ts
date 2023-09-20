@@ -1,8 +1,8 @@
 import { ChainConfig, SubstrateChain } from "@/types";
-import { KusamaIcon, PolkadotIcon } from "@/components/icons";
+import { KusamaIcon, PolkadotIcon, RococoIcon } from "@/components/icons";
 import { BN, formatBalance } from "@polkadot/util";
 
-const kusamaConfig = {
+const rococoConfig = {
   symbol: "KSM",
   decimals: 12,
   ss58Format: 2,
@@ -11,10 +11,10 @@ const kusamaConfig = {
 
 const formatSpend = (mul: number, value: BN): string =>
   `${formatBalance(value.muln(mul), {
-    decimals: kusamaConfig.decimals,
+    decimals: rococoConfig.decimals,
     forceUnit: "-",
     withSi: true,
-    withUnit: kusamaConfig.symbol,
+    withUnit: rococoConfig.symbol,
   })}`;
 
 // https://github.com/paritytech/polkadot/blob/6e3f2c5b4b6e6927915de2f784e1d831717760fa/runtime/kusama/constants/src/lib.rs#L28-L32
@@ -35,51 +35,12 @@ const SPEND_LIMITS = {
 const endpoints = [
   {
     name: "Parity",
-    url: "wss://kusama-rpc.polkadot.io",
-  },
-  {
-    name: "OnFinality",
-    url: "wss://kusama.api.onfinality.io/public-ws",
-  },
-  {
-    name: "Dwellir",
-    url: "wss://kusama-rpc.dwellir.com",
-  },
-  {
-    name: "Dwellir Tunisia",
-    url: "wss://kusama-rpc-tn.dwellir.com",
-  },
-  {
-    name: "Automata 1RPC",
-    url: "wss://1rpc.io/ksm",
-  },
-  {
-    name: "IBP-GeoDNS1",
-    url: "wss://rpc.ibp.network/kusama",
-  },
-  {
-    name: "IBP-GeoDNS2",
-    url: "wss://rpc.dotters.network/kusama",
-  },
-  {
-    name: "RadiumBlock",
-    url: "wss://kusama.public.curie.radiumblock.co/ws",
+    url: "wss://rococo-rpc.polkadot.io",
   },
 ];
 
 const assetHubEndpoints = [
-  { name: "Dwellir", url: "wss://statemine-rpc.dwellir.com" },
-  { name: "Dwellir Tunisia", url: "wss://statemine-rpc-tn.dwellir.com" },
-  { name: "IBP-GeoDNS1", url: "wss://sys.ibp.network/statemine" },
-  { name: "IBP-GeoDNS2", url: "wss://sys.dotters.network/statemine" },
-  { name: "LuckyFriday", url: "wss://rpc-asset-hub-kusama.luckyfriday.io" },
-  // { name: // OnFinality, url:'wss://statemine.api.onfinality.io/public-ws'},
-  { name: "Parity", url: "wss://kusama-asset-hub-rpc.polkadot.io" },
-  {
-    name: "RadiumBlock",
-    url: "wss://statemine.public.curie.radiumblock.co/ws",
-  },
-  { name: "Stakeworld", url: "wss://ksm-rpc.stakeworld.io/assethub" },
+  { name: "Parity", url: "wss://rococo-asset-hub-rpc.polkadot.io" },
 ];
 
 const tracks = [
@@ -175,11 +136,11 @@ const tracks = [
   },
 ];
 
-export const kusama: ChainConfig = {
-  name: SubstrateChain.Kusama,
+export const rococo: ChainConfig = {
+  name: SubstrateChain.Rococo,
   endpoints,
   assetHubEndpoints,
-  icon: KusamaIcon,
+  icon: RococoIcon,
   tracks,
-  ...kusamaConfig,
+  ...rococoConfig,
 };
