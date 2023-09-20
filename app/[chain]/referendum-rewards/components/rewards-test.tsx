@@ -4,32 +4,20 @@ import { useReferenda } from "@/hooks/vote/use-referenda";
 import { Input } from "@nextui-org/input";
 import { Select, SelectItem, SelectSection } from "@nextui-org/select";
 import { useEffect, useState } from "react";
-import { ReferendumDetail } from "../../vote/components/referendum-detail";
 import { useReferendumDetail } from "@/hooks/vote/use-referendum-detail";
-import { Spinner } from "@nextui-org/spinner";
 import { InlineLoader } from "@/components/inline-loader";
 import { Button } from "@nextui-org/button";
 import { RewardsCreationRarityFields } from "./rewards-rarity-fields";
 import { rewardsConfig } from "@/config/rewards";
-import { defaultReferendumRewardsConfig } from "../../../../config/default-rewards-config";
 import { vividButtonClasses } from "@/components/primitives";
 import clsx from "clsx";
-import {
-  FieldValue,
-  FieldValues,
-  FormProvider,
-  useForm,
-} from "react-hook-form";
-import { validate } from "graphql";
+import { FormProvider, useForm } from "react-hook-form";
 import { rewardsSchema, validateAddress } from "../util";
 import { SubstrateChain } from "@/types";
 import { getChainInfo } from "@/config/chains";
-import { watch } from "fs";
-import { titleCase } from "@/components/util";
 import { ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
-import { createRewards } from "../actions";
 import { useAppStore } from "@/app/zustand";
 import CreateNFTCollectionModal from "./modal-new-collection";
 
@@ -160,7 +148,13 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
               className="w-full md:w-1/2"
               label="Reward Criteria"
               placeholder={"Select Reward Criteria"}
-              disabledKeys={["criteria", "aye", "first", "reputable"]}
+              disabledKeys={[
+                "criteria",
+                "aye",
+                "first",
+                "reputable",
+                "extrinsic",
+              ]}
               isInvalid={!!errors.criteria}
               errorMessage={!!errors.criteria && `${errors.criteria?.message}`}
               {...register("criteria", {
@@ -174,7 +168,7 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
               </SelectSection>
               <SelectSection title="Coming Soon?">
                 <SelectItem key="criteria" value="criteria">
-                  Votes meeting threshold (e.g. &gt; 5 KSM, locked x3)
+                  Votes meeting threshold (e.g. &gt; 5 KSM)
                 </SelectItem>
                 <SelectItem key="first" value="first">
                   First N Voters
@@ -184,6 +178,9 @@ export default function TestRewards({ chain }: { chain: SubstrateChain }) {
                 </SelectItem>
                 <SelectItem key="aye" value="aye">
                   All Aye Voters
+                </SelectItem>
+                <SelectItem key="extrinsic" value="aye">
+                  Any Aritrary Extrinsic Caller
                 </SelectItem>
               </SelectSection>
             </Select>

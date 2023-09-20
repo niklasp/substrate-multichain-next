@@ -4,9 +4,10 @@ import { useAppStore } from "@/app/zustand";
 import { TxTypes, getTxCost } from "@/components/util-client";
 import { DEFAULT_CHAIN, getChainByName } from "@/config/chains";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
-import { ChainConfig, SubstrateChain } from "@/types";
+import { ChainConfig, ChainType, SubstrateChain } from "@/types";
 import { useQuery } from "react-query";
 import { Observable } from "rxjs";
+import { ApiPromise } from "@polkadot/api";
 
 export enum Deposit {
   Collection = "collectionDeposit",
@@ -22,13 +23,19 @@ export interface UseDepositsType extends Record<Deposit, string | undefined> {
   attributeDeposit: string | undefined;
 }
 
-export const useDeposits = () => {
+export const useDeposits = (
+  chainType: ChainType | undefined = ChainType.Relay
+) => {
   const { activeChain } = useSubstrateChain();
   const chainName = activeChain?.name || DEFAULT_CHAIN;
-  const { assetHubApi } = activeChain || {};
+
+  const api =
+    chainType === ChainType.AssetHub
+      ? activeChain?.assetHubApi
+      : activeChain?.api;
 
   return useQuery<UseDepositsType, Error>({
-    queryKey: ["deposits", chainName],
+    queryKey: ["deposits", chainName, chainType],
     queryFn: async () => {
       const [
         collectionDeposit,
@@ -36,10 +43,10 @@ export const useDeposits = () => {
         metadataDeposit,
         attributeDeposit,
       ] = await Promise.all([
-        assetHubApi?.consts.nfts?.collectionDeposit.toString(),
-        assetHubApi?.consts.nfts?.itemDeposit.toString(),
-        assetHubApi?.consts.nfts?.metadataDepositBase.toString(),
-        assetHubApi?.consts.nfts?.attributeDepositBase.toString(),
+        api?.consts.nfts?.collectionDeposit.toString(),
+        api?.consts.nfts?.itemDeposit.toString(),
+        api?.consts.nfts?.metadataDepositBase.toString(),
+        api?.consts.nfts?.attributeDepositBase.toString(),
       ]);
 
       return {

@@ -4,18 +4,16 @@ import { CollectionConfiguration } from "../types";
 import { useState } from "react";
 import { TxTypes, sendAndFinalize } from "@/components/util-client";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
-import { SendAndFinalizeResult } from "@/types";
+import { ChainType, SendAndFinalizeResult } from "@/types";
 import { ModalBody, ModalFooter, ModalHeader } from "@nextui-org/modal";
-import { Tooltip } from "@nextui-org/tooltip";
-import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { rewardsConfig } from "@/config/rewards";
-import { useAccountBalance } from "@/hooks/use-account-balance";
 import { TxButton } from "@/components/TxButton";
-import { getTxCollectionCreate } from "@/config/txs";
-import { Deposit, DepositKey } from "../../../../hooks/use-deposit";
 import Check from "@w3f/polkadot-icons/keyline/Check";
 import { titleCase } from "@/components/util";
+import { chain } from "lodash";
+import { Button } from "@nextui-org/button";
+import { Deposit } from "@/hooks/use-deposit";
 
 type PropType = {
   setCollectionConfig: (config: CollectionConfiguration) => void;
@@ -26,6 +24,10 @@ export default function CreateNFTCollectionModal({
   setCollectionConfig,
   setIsNewCollectionLoading,
 }: PropType) {
+  const [error, setError] = useState({
+    message: "",
+    name: "",
+  });
   const closeModal = useAppStore((state) => state.closeModal);
   const { activeChain } = useSubstrateChain();
 
@@ -46,14 +48,6 @@ export default function CreateNFTCollectionModal({
 
   const watchFormFields = watch();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const [error, setError] = useState({
-    message: "",
-    name: "",
-  });
-
   const onCancel = () => {
     setCollectionConfig({
       file: watchFormFields.imageFile,
@@ -64,21 +58,8 @@ export default function CreateNFTCollectionModal({
   };
 
   const onSubmit = async (data: {}) => {
-    return new Promise((resolve) => {
-      setIsLoading(true);
-      setIsSuccess(false);
-      setTimeout(resolve, 2000);
-    })
-      .then(() => {
-        setIsSuccess(true);
-        setTimeout(() => {
-          setIsSuccess(false);
-        }, 3000);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-
+    const res = await new Promise((resolve) => setTimeout(resolve, 2000));
+    return res;
     // console.table(data);
     // const formData = new FormData();
     // formData.append(
@@ -229,19 +210,20 @@ export default function CreateNFTCollectionModal({
           Cancel
         </Button>
         <TxButton
-          onClick={formMethods.handleSubmit(onSubmit)}
+          chainType={ChainType.AssetHub}
+          promise={onSubmit}
           color="secondary"
           className="w-full"
-          startContent={<>{isSuccess && <Check stroke="lime" />}</>}
-          isLoading={isLoading}
+          successText="Collection created!"
           extrinsic={[]}
+          loadingText="Creating collection..."
           deposits={[
             {
               type: Deposit.Collection,
             },
           ]}
         >
-          {isLoading ? "Creating collection..." : "Create collection"}
+          Create Collection
         </TxButton>
       </ModalFooter>
     </div>

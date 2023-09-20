@@ -1,11 +1,12 @@
 import { ChainConfig, SubstrateChain } from "@/types";
 import { KusamaIcon, PolkadotIcon, RococoIcon } from "@/components/icons";
 import { BN, formatBalance } from "@polkadot/util";
+import { kusama } from "./kusama";
 
 const rococoConfig = {
-  symbol: "KSM",
+  symbol: "ROC",
+  ss58Format: 42,
   decimals: 12,
-  ss58Format: 2,
   blockTime: 6000,
 };
 
@@ -32,12 +33,8 @@ const SPEND_LIMITS = {
   Treasurer: formatSpend(10_000, GRAND),
 };
 
-const endpoints = [
-  {
-    name: "Parity",
-    url: "wss://rococo-rpc.polkadot.io",
-  },
-];
+// We are using the relay chain of kusama to get the referenda, all user txs however will be made on the asset hub (see below)
+const endpoints = kusama.endpoints;
 
 const assetHubEndpoints = [
   { name: "Parity", url: "wss://rococo-asset-hub-rpc.polkadot.io" },

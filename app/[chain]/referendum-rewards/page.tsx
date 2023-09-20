@@ -31,7 +31,7 @@ export default async function PageRewards({
           beta
         </span>
       </h1>
-      {selectedChain === SubstrateChain.Polkadot ? (
+      {/* {selectedChain === SubstrateChain.Polkadot ? (
         <p className="text-center w-full">
           Polkadot (Asset Hub) is not yet supported.{" "}
           <a href="#" className="text-secondary-500">
@@ -39,9 +39,9 @@ export default async function PageRewards({
           </a>{" "}
           to get it added.
         </p>
-      ) : (
-        <TestRewards chain={selectedChain} />
-      )}
+      ) : ( */}
+      <TestRewards chain={selectedChain} />
+      {/* )} */}
     </div>
   );
 }

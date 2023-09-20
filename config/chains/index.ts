@@ -4,7 +4,7 @@ import { ChainConfig, SubstrateChain } from "@/types";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { rococo } from "./rococo";
 
-export const ENABLED_CHAINS = {
+export const CHAINS_ENABLED = {
   [kusama.name]: kusama,
   [polkadot.name]: polkadot,
   [rococo.name]: rococo,
@@ -13,7 +13,7 @@ export const ENABLED_CHAINS = {
 export const DEFAULT_CHAIN = SubstrateChain.Kusama;
 
 export function getChainInfo(name: SubstrateChain): ChainConfig {
-  const chainSettings = ENABLED_CHAINS[name];
+  const chainSettings = CHAINS_ENABLED[name];
 
   if (!chainSettings) {
     throw `can not get chain info of ${name}`;
@@ -28,7 +28,7 @@ export function getChainInfo(name: SubstrateChain): ChainConfig {
  * @returns
  */
 export async function getChainByName(name: SubstrateChain) {
-  const chainSettings = ENABLED_CHAINS[name];
+  const chainSettings = CHAINS_ENABLED[name];
 
   if (!chainSettings) {
     throw `can not get chain settings of ${name}`;

@@ -14,6 +14,12 @@ export enum SubstrateChain {
   Local = "local",
 }
 
+export enum ChainType {
+  Relay = "relay",
+  AssetHub = "assethub",
+  BridgeHub = "bridgehub",
+}
+
 export type ChainConfig = {
   name: SubstrateChain;
   symbol: string;

@@ -5,7 +5,7 @@ import { DEFAULT_CHAIN, getChainInfo } from "@/config/chains";
 import { kusama } from "@/config/chains/kusama";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { useAccountBalance } from "@/hooks/use-account-balance";
-import { SubstrateChain } from "@/types";
+import { ChainType, SubstrateChain } from "@/types";
 import { Button, ButtonProps } from "@nextui-org/button";
 import {
   BN,
@@ -18,11 +18,14 @@ import { InlineLoader } from "./inline-loader";
 import { TxTypes, getTxCost } from "./util-client";
 import { format } from "path";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import { useTxCost } from "@/hooks/use-tx-cost";
 import { Deposit, useDeposits } from "@/hooks/use-deposit";
 import { UseDepositsType } from "../hooks/use-deposit";
 import { Tooltip } from "@nextui-org/tooltip";
+import { ApiPromise } from "@polkadot/api";
+import { set } from "lodash";
+import Check from "@w3f/polkadot-icons/keyline/Check";
 
 type DepositCountType = {
   type: Deposit;
@@ -33,22 +36,50 @@ type TxButtonProps = ButtonProps & {
   extrinsic: TxTypes;
   requiredBalance?: string;
   deposits?: DepositCountType[];
+  chainType?: ChainType;
+  loadingText?: React.ReactNode;
+  successText?: React.ReactNode;
+  error?: { name: string; message: string };
+  setError?: (error: { name: string; message: string }) => void;
+  promise: (...args: any[]) => Promise<unknown>;
 };
 
 export function TxButton(props: TxButtonProps) {
-  const { requiredBalance, extrinsic, deposits, children, ...rest } = props;
+  const {
+    requiredBalance,
+    extrinsic,
+    deposits,
+    children,
+    chainType,
+    successText,
+    loadingText,
+    promise,
+    error: errorProp,
+    setError: setErrorProp,
+    ...rest
+  } = props;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState({
+    message: "",
+    name: "",
+  });
+
   const user = useAppStore((state) => state.user);
   const { actingAccount } = user;
   const { data: accountBalance, isLoading: isAccountBalanceLoading } =
-    useAccountBalance();
+    useAccountBalance(chainType);
 
   const { activeChain } = useSubstrateChain();
   const { symbol, decimals } = getChainInfo(activeChain?.name || DEFAULT_CHAIN);
 
-  const { data: txCost, isLoading: isTxCostLoading } = useTxCost(extrinsic);
-  const { data: depositCosts, isLoading: isDepositCostLoading } = useDeposits();
-
-  console.log("depositCosts", depositCosts);
+  const { data: txCost, isLoading: isTxCostLoading } = useTxCost(
+    extrinsic,
+    chainType
+  );
+  const { data: depositCosts, isLoading: isDepositCostLoading } =
+    useDeposits(chainType);
 
   const totalDeposit = deposits
     ?.map((deposit) =>
@@ -56,7 +87,7 @@ export function TxButton(props: TxButtonProps) {
     )
     .reduce((a, b) => a.add(b), BN_ZERO);
 
-  const isLoading =
+  const isLoadingProp =
     props.isLoading || isAccountBalanceLoading || isDepositCostLoading;
 
   const requiredBalanceCalculated = requiredBalance
@@ -81,9 +112,6 @@ export function TxButton(props: TxButtonProps) {
       withSi: true,
     }) || `0 ${symbol}`;
 
-  const requiredBalanceBn = requiredBalance
-    ? bnToBn(requiredBalance)
-    : BN_MAX_INTEGER;
   const availableBalanceBn = accountBalance?.data?.free
     ? bnToBn(accountBalance?.data?.free)
     : BN_ZERO;
@@ -92,11 +120,50 @@ export function TxButton(props: TxButtonProps) {
       ? false
       : availableBalanceBn.gte(bnToBn(requiredBalanceCalculated));
 
+  const onSubmit = async (e: any) => {
+    try {
+      console.log("clicked button, awaiting propmise");
+
+      if (promise) {
+        setIsLoading(true);
+        setIsSuccess(false);
+        console.log("awaiting props.onClick");
+        const res = await promise();
+        console.log("after submit", res);
+        setIsSuccess(true);
+      }
+    } catch (e: any) {
+      setError({
+        name: e.name,
+        message: e.message,
+      });
+      setErrorProp?.({
+        name: e.name,
+        message: e.message,
+      });
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => {
+        setIsSuccess(false);
+      }, 3000);
+    }
+  };
+
   return (
     <div className="flex flex-col text-tiny w-full">
       {hasEnough ? (
-        <Button {...rest} isLoading={isLoading}>
-          {children}
+        <Button
+          {...rest}
+          isLoading={isLoading}
+          onClick={onSubmit}
+          startContent={<>{isSuccess && <Check stroke="lime" />}</>}
+          isDisabled={isSuccess}
+        >
+          {isLoading && loadingText
+            ? loadingText
+            : isSuccess && successText
+            ? successText
+            : children}
         </Button>
       ) : (
         <Tooltip content="Not enough funds to send tx">

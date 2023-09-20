@@ -14,6 +14,7 @@ export const getChainDetails = async (api: ApiPromise) => {
     chainType,
     ss58Prefix,
     chainProperties,
+    blockTime,
   ] = await Promise.all([
     api.query.timestamp.now(),
     api.rpc.system.chain(),
@@ -22,6 +23,7 @@ export const getChainDetails = async (api: ApiPromise) => {
     api.rpc.system.chainType(),
     api.consts.system.ss58Prefix,
     api.registry.getChainProperties(),
+    api.consts.babe?.expectedBlockTime,
   ]);
   return {
     timestamp,
@@ -36,6 +38,7 @@ export const getChainDetails = async (api: ApiPromise) => {
         chainProperties?.tokenDecimals.unwrap()[0].toNumber() ?? 10,
       tokenSymbol: chainProperties?.tokenSymbol.unwrap()[0].toString() ?? "DOT",
     },
+    blockTime,
   };
 };
 

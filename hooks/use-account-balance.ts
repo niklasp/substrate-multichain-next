@@ -4,8 +4,11 @@ import { InjectedExtension } from "@polkadot/extension-inject/types";
 import { useQuery } from "react-query";
 import { encodeAddress } from "@polkadot/keyring";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
+import { ChainType } from "@/types";
 
-export const useAccountBalance = () => {
+export const useAccountBalance = (
+  chainType: ChainType | undefined = ChainType.Relay
+) => {
   const { activeChain } = useSubstrateChain();
   const { ss58Format } = activeChain || {};
   const user = useAppStore((state) => state.user);
@@ -21,6 +24,7 @@ export const useAccountBalance = () => {
         body: JSON.stringify({
           chain: activeChain?.name,
           address: userAddress,
+          chainType,
         }),
       });
       const { balance } = await res.json();

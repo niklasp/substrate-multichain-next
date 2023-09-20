@@ -15,7 +15,7 @@ import { Key, useEffect, useState, useTransition } from "react";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { usePathname, useRouter } from "next/navigation";
 import path from "path";
-import { ENABLED_CHAINS } from "@/config/chains";
+import { CHAINS_ENABLED } from "@/config/chains";
 
 export const ChainSwitch = ({ className }: { className?: string }) => {
   const router = useRouter();
@@ -86,7 +86,7 @@ export const ChainSwitch = ({ className }: { className?: string }) => {
           </Button>
         </DropdownTrigger>
         <DropdownMenu onAction={handleChainChange} aria-label="Select Chain">
-          {Object.values(ENABLED_CHAINS).map((chain) => (
+          {Object.values(CHAINS_ENABLED).map((chain) => (
             <DropdownItem
               key={chain.name}
               value={chain.name}

@@ -1,4 +1,4 @@
-import { DEFAULT_CHAIN, ENABLED_CHAINS, getChainByName } from "@/config/chains";
+import { DEFAULT_CHAIN, CHAINS_ENABLED, getChainByName } from "@/config/chains";
 import { ChainConfig, SubstrateChain } from "@/types";
 import { getReferenda } from "./get-referenda";
 import { getTracks } from "./get-tracks";
@@ -7,7 +7,7 @@ import ReferendumList from "./components/referendum-list";
 export async function generateStaticParams() {
   const params: { chain: SubstrateChain }[] = [];
 
-  Object.values(ENABLED_CHAINS).forEach((chain: ChainConfig) => {
+  Object.values(CHAINS_ENABLED).forEach((chain: ChainConfig) => {
     params.push({ chain: chain.name as SubstrateChain });
   });
 
