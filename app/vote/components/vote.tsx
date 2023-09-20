@@ -42,15 +42,15 @@ export default function Votes() {
 
     return (
         <div className="votes-list">
-            {votes && votes.length > 0 ? (
+            {/* {votes && votes.ongoingVotes && votes.ongoingVotes.length > 0 ? (
                 
                 <div>
                     <div>no votes</div>
-                    {<pre>{JSON.stringify(votes, null, 2)}</pre>}
+                    {<pre>{JSON.stringify(votes.ongoingVotes, null, 2)}</pre>}
                 </div>
             ) : (
                 <div>no votes</div>
-            )}
+            )} */}
         </div>
     );
 }

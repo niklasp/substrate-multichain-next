@@ -5,7 +5,11 @@ import { DEFAULT_CHAIN } from "@/config/chains";
 import { VotePolkadot } from "@/app/vote/types";
 
 type UseVotesType = {
-  votes: VotePolkadot[];
+  votes: {
+    ongoingVotes: VotePolkadot[],
+    finishedVotes: VotePolkadot[],
+    delegations: VotePolkadot[]
+  }
 };
 
 export const useVotes = () => {
