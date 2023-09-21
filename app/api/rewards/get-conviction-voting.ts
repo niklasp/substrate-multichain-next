@@ -1,3 +1,8 @@
+import {
+  PalletConvictionVotingVoteCasting,
+  PalletConvictionVotingVoteVoting,
+  PalletReferendaReferendumInfoConvictionVotingTally,
+} from "@polkadot/types/lookup";
 import { ConvictionDelegation, ConvictionVote } from "@/types";
 import { ApiPromise } from "@polkadot/api";
 import { getApiAt, getDenom } from "./util";
@@ -22,9 +27,17 @@ export const getConvictionVoting = async (
   // for (const [finishedRefIndex, referendum] of finishedReferenda.entries()) {
   const apiAt = await getApiAt(api, referendum?.confirmationBlockNumber);
 
-  const votingForAtEnd = await apiAt.query.convictionVoting.votingFor.entries();
+  const votingForAtEnd =
+    await apiAt?.query.convictionVoting.votingFor.entries();
+  const totalIssuance =
+    (await apiAt?.query.balances.totalIssuance()) || {}.toString();
 
-  const totalIssuance = (await apiAt.query.balances.totalIssuance()).toString();
+  if (!votingForAtEnd) {
+    throw new Error("votingForAtEnd is undefined");
+  }
+
+  console.log("votingForAtEnd", votingForAtEnd?.length);
+  console.log("totalIssuance", totalIssuance);
 
   const delegationsAt = [];
   const nestedDelegations = [];
@@ -38,7 +51,7 @@ export const getConvictionVoting = async (
     if (entry.isCasting) {
       // For each given track, these are the invididual votes for that track,
       //     as well as the total delegation amounts for that particular track
-      // @ts-ignore
+
       const { votes, delegations } = entry.asCasting;
 
       // The total delegation amounts.
@@ -168,6 +181,9 @@ export const getConvictionVoting = async (
               };
             }
           }
+
+          console.log("vote", v?.address);
+
           if (v) {
             referendaVotes.push(v);
             refVotes.push(v);

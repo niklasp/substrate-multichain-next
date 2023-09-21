@@ -590,7 +590,8 @@ const decorateWithChances = (
 export const getApiAt = async (
   api: ApiPromise | undefined,
   blockNumber: number | undefined | null
-): Promise<any> => {
+): Promise<ApiDecoration<"promise">> => {
+  if (!api) throw new Error("Api is not defined");
   if (!blockNumber) return api;
   const blockHash =
     (await api?.rpc.chain.getBlockHash(blockNumber)) || {}.toString();
@@ -807,8 +808,6 @@ const getRefParams = (
 export const getDenom = async (
   api: ApiPromise | undefined
 ): Promise<number> => {
-  console.log(api, "in getdenom");
-
   const base = new BN(10);
   const exponent = api?.registry.chainDecimals || 1;
   const denom = base.pow(new BN(exponent)).toNumber();

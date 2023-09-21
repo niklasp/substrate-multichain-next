@@ -38,6 +38,7 @@ export default function RewardsCreationForm({
   const { ss58Format, name } = getChainInfo(chain);
   const chainRewardsSchema = rewardsSchema(name, ss58Format);
   type TypeRewardsSchema = z.infer<typeof chainRewardsSchema>;
+  const { defaultReferendumRewardsConfig } = rewardsConfig;
 
   // const openModal = useAppStore((state) => state.openModal);
 
@@ -50,6 +51,7 @@ export default function RewardsCreationForm({
 
   const formMethods = useForm<TypeRewardsSchema>({
     resolver: zodResolver(chainRewardsSchema),
+    defaultValues: defaultReferendumRewardsConfig,
   });
   const {
     register,
@@ -69,7 +71,6 @@ export default function RewardsCreationForm({
     console.log("errors", errors);
   }, [errors]);
 
-  const { defaultReferendumRewardsConfig } = rewardsConfig;
   const {
     data: { referenda: pastReferenda } = {
       referenda: [],

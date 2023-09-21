@@ -1,3 +1,8 @@
+import {
+  PalletConvictionVotingVoteCasting,
+  PalletConvictionVotingVoteVoting,
+  PalletReferendaReferendumInfoConvictionVotingTally,
+} from "@polkadot/types/lookup";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import {
   InjectedAccountWithMeta,
@@ -82,9 +87,9 @@ export type ConvictionVote = {
   conviction: string;
   // The balance they are voting with themselves, sans delegated balance
   balance: {
-    aye: number;
-    nay: number;
-    abstain: number;
+    aye: string;
+    nay: string;
+    abstain: string;
   };
   // The total amount of tokens that were delegated to them (including conviction)
   delegatedConvictionBalance: number;
@@ -160,3 +165,9 @@ export type ConvictionDelegation = {
   delegatedBalance: number;
   prior: any;
 };
+
+export interface VotePolkadot {
+  accountId: string;
+  track: number;
+  voteData: PalletConvictionVotingVoteVoting;
+}

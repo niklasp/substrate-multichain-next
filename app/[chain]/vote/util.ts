@@ -494,3 +494,28 @@ export function getVoteTx(
 
   return api?.tx.convictionVoting.vote(ref, vote);
 }
+
+/**
+ * Transforms a referendum from PalletReferendaReferendumInfoConvictionVotingTally
+ * to a type we want. It must be serializable https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns#passing-props-from-server-to-client-components-serialization
+ * @param param0
+ * @returns
+ */
+export const transformVote = ([storageKey, codec]: [
+  StorageKey<[AccountId32, u16]>,
+  Codec
+]): VotePolkadot => {
+  // Extract data from storageKey
+  const [accountId, track] = storageKey.args;
+
+  // Cast Codec to the specific type PalletConvictionVotingVoteVoting and extract necessary fields
+  const voteData = codec as PalletConvictionVotingVoteVoting;
+
+  // Now, voteData should have properties defined in PalletConvictionVotingVoteVoting which you can use as needed
+
+  return {
+    accountId: accountId.toString(),
+    track: track.toNumber(),
+    voteData,
+  };
+};
