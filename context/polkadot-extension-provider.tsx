@@ -9,6 +9,7 @@ import { useAppStore } from "@/app/zustand";
 
 const PolkadotExtensionContext = createContext<UsePolkadotExtensionReturnType>({
   extensionSetup: () => {},
+  isExtensionReady: false,
 });
 
 export const usePolkadotExtensionWithContext = () =>
@@ -19,18 +20,12 @@ export const PolkadotExtensionContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const { extensionSetup } = usePolkadotExtension();
-  const isExtensionReady = useAppStore((state) => state.user?.isExtensionReady);
-
-  useEffect(() => {
-    if (!isExtensionReady) {
-      console.log("initializing the polkadot extension ", isExtensionReady);
-      extensionSetup();
-    }
-  }, [isExtensionReady]);
+  const { extensionSetup, isExtensionReady } = usePolkadotExtension();
 
   return (
-    <PolkadotExtensionContext.Provider value={{ extensionSetup }}>
+    <PolkadotExtensionContext.Provider
+      value={{ extensionSetup, isExtensionReady }}
+    >
       {children}
     </PolkadotExtensionContext.Provider>
   );

@@ -1,8 +1,9 @@
 import { title } from "@/components/primitives";
 import { Metadata } from "next";
-import TestRewards from "./components/rewards-test";
+import TestRewards from "./components/rewards-creation-form";
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { SubstrateChain } from "@/types";
+import RewardsCreationForm from "./components/rewards-creation-form";
 
 export const metadata: Metadata = {
   title: "Rewards",
@@ -40,7 +41,7 @@ export default async function PageRewards({
           to get it added.
         </p>
       ) : ( */}
-      <TestRewards chain={selectedChain} />
+      <RewardsCreationForm chain={selectedChain} />
       {/* )} */}
     </div>
   );

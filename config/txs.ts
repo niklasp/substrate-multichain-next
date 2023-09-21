@@ -6,7 +6,7 @@ import { ApiPromise } from "@polkadot/api";
  * @param rewardConfig
  * @returns
  */
-export const getTxCollectionCreate = async (
+export const getTxCollectionCreate = (
   apiWithNFTsPallet: ApiPromise | undefined,
   address: string | undefined
 ) => {

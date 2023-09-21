@@ -14,13 +14,13 @@ import { Button } from "@nextui-org/button";
 import { Key, useEffect, useState, useTransition } from "react";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { usePathname, useRouter } from "next/navigation";
-import path from "path";
 import { CHAINS_ENABLED } from "@/config/chains";
 
 export const ChainSwitch = ({ className }: { className?: string }) => {
   const router = useRouter();
   const pathname = usePathname();
   const { activeChain, setActiveChainName, isConnecting } = useSubstrateChain();
+  const setUserWantsConnection = useAppStore((s) => s.setUserWantsConnection);
 
   const pathContainsSubstrateChain = Object.values(SubstrateChain).some(
     (chain) => pathname.includes(`/${chain}/`)
@@ -37,17 +37,12 @@ export const ChainSwitch = ({ className }: { className?: string }) => {
   }, [selectedChain]);
 
   const handleChainChange = (key: Key) => {
-    console.log(
-      "handleChainChange",
-      key,
-      pathname,
-      pathContainsSubstrateChain,
-      selectedChain
-    );
+    setUserWantsConnection(true);
     const newChain = key as SubstrateChain;
 
     if (pathContainsSubstrateChain) {
       // find selected chain from pathname that can contain any SubstrateChain
+      // and replace the path in case we are on a route with a chain in it
 
       if (selectedChain) {
         const newPathname = pathname.replace(
@@ -57,6 +52,8 @@ export const ChainSwitch = ({ className }: { className?: string }) => {
         setActiveChainName(newChain);
         router.replace(newPathname);
       }
+    } else {
+      setActiveChainName(newChain);
     }
   };
 

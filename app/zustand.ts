@@ -32,6 +32,7 @@ interface AppState {
     actingAccountSigner?: Signer;
     isExtensionReady: boolean; // is extension ready
     voteStates: any[]; // vote states
+    wantsConnection: boolean; // wants connection
   };
 
   modals: {
@@ -39,11 +40,12 @@ interface AppState {
     view: React.ReactNode;
     modalProps?: ModalProps;
   };
-  openModal: (view: React.ReactNode, modalProps?: any) => void;
+  openModal: (view: React.ReactNode, modalProps?: ModalProps) => void;
   closeModal: () => void;
 
   setExtensions: (extension: InjectedExtension[]) => void;
   setIsExtensionReady: (isReady: boolean) => void;
+  setUserWantsConnection: (wantsConnection: boolean) => void;
 
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setAccountIdx: (idx: number) => void;
@@ -70,6 +72,7 @@ const emptyUser = {
   actingAccountSigner: undefined,
   isExtensionReady: false,
   voteStates: [],
+  wantsConnection: false,
 };
 
 export const useAppStore = create<AppState>()(
@@ -141,6 +144,15 @@ export const useAppStore = create<AppState>()(
         user: {
           ...user,
           isExtensionReady: isReady,
+        },
+      });
+    },
+    setUserWantsConnection: (wantsConnection) => {
+      const { user } = get();
+      set({
+        user: {
+          ...user,
+          wantsConnection,
         },
       });
     },

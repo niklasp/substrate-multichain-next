@@ -5,7 +5,7 @@ import { DEFAULT_CHAIN, getChainInfo } from "@/config/chains";
 import { kusama } from "@/config/chains/kusama";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { useAccountBalance } from "@/hooks/use-account-balance";
-import { ChainType, SubstrateChain } from "@/types";
+import { ChainType, SendAndFinalizeResult, SubstrateChain } from "@/types";
 import { Button, ButtonProps } from "@nextui-org/button";
 import {
   BN,
@@ -15,7 +15,7 @@ import {
   formatBalance,
 } from "@polkadot/util";
 import { InlineLoader } from "./inline-loader";
-import { TxTypes, getTxCost } from "./util-client";
+import { TxTypes, getTxCost, sendAndFinalize } from "./util-client";
 import { format } from "path";
 import clsx from "clsx";
 import React, { MouseEventHandler, useEffect, useState } from "react";
@@ -24,7 +24,7 @@ import { Deposit, useDeposits } from "@/hooks/use-deposit";
 import { UseDepositsType } from "../hooks/use-deposit";
 import { Tooltip } from "@nextui-org/tooltip";
 import { ApiPromise } from "@polkadot/api";
-import { set } from "lodash";
+import { chain, set } from "lodash";
 import Check from "@w3f/polkadot-icons/keyline/Check";
 
 type DepositCountType = {
@@ -33,7 +33,7 @@ type DepositCountType = {
 };
 
 type TxButtonProps = ButtonProps & {
-  extrinsic: TxTypes;
+  extrinsic?: TxTypes;
   requiredBalance?: string;
   deposits?: DepositCountType[];
   chainType?: ChainType;
@@ -41,19 +41,25 @@ type TxButtonProps = ButtonProps & {
   successText?: React.ReactNode;
   error?: { name: string; message: string };
   setError?: (error: { name: string; message: string }) => void;
-  promise: (...args: any[]) => Promise<unknown>;
+  onFinished?: (res: SendAndFinalizeResult) => void;
+  onPendingChange?: (isPending: boolean) => void;
 };
 
+/**
+ * Button that sends txs or promises and checks if a sufficient balance is available in case of a tx
+ * @param props
+ * @returns
+ */
 export function TxButton(props: TxButtonProps) {
   const {
     requiredBalance,
     extrinsic,
     deposits,
     children,
-    chainType,
+    chainType = ChainType.AssetHub,
     successText,
     loadingText,
-    promise,
+    onPendingChange,
     error: errorProp,
     setError: setErrorProp,
     ...rest
@@ -67,11 +73,14 @@ export function TxButton(props: TxButtonProps) {
   });
 
   const user = useAppStore((state) => state.user);
-  const { actingAccount } = user;
+  const { actingAccount, actingAccountSigner } = user;
   const { data: accountBalance, isLoading: isAccountBalanceLoading } =
     useAccountBalance(chainType);
-
   const { activeChain } = useSubstrateChain();
+
+  const api =
+    chainType === ChainType.Relay ? activeChain?.api : activeChain?.assetHubApi;
+
   const { symbol, decimals } = getChainInfo(activeChain?.name || DEFAULT_CHAIN);
 
   const { data: txCost, isLoading: isTxCostLoading } = useTxCost(
@@ -124,11 +133,20 @@ export function TxButton(props: TxButtonProps) {
     try {
       console.log("clicked button, awaiting propmise");
 
-      if (promise) {
+      if (extrinsic) {
+        // let res: SendAndFinalizeResult;
         setIsLoading(true);
         setIsSuccess(false);
-        console.log("awaiting props.onClick");
-        const res = await promise();
+        props.onPendingChange?.(true);
+
+        const res = await sendAndFinalize(
+          api,
+          extrinsic,
+          actingAccountSigner,
+          actingAccount?.address
+        );
+        props.onFinished?.(res);
+
         console.log("after submit", res);
         setIsSuccess(true);
       }
@@ -143,6 +161,7 @@ export function TxButton(props: TxButtonProps) {
       });
     } finally {
       setIsLoading(false);
+      props.onPendingChange?.(false);
       setTimeout(() => {
         setIsSuccess(false);
       }, 3000);
@@ -184,7 +203,7 @@ export function TxButton(props: TxButtonProps) {
       >
         available:{" "}
         {isAccountBalanceLoading ? (
-          <InlineLoader afterContent=" KSM" />
+          <InlineLoader afterContent={` ${symbol}`} />
         ) : (
           humanBalance
         )}

@@ -1,637 +1,363 @@
-// import "@polkadot/rpc-augment";
-// import "@polkadot/api-augment/kusama";
-// import { useEffect, useState } from "react";
-// import { useForm, FormProvider, useFormContext } from "react-hook-form";
-// import debounce from "lodash.debounce";
+"use client";
 
-// import { defaultReferendumRewardsConfig } from "../../../data/default-referendum-rewards-config";
-// import useAppStore from "../../../zustand";
+import { useReferenda } from "@/hooks/vote/use-referenda";
+import { Input } from "@nextui-org/input";
+import { Select, SelectItem, SelectSection } from "@nextui-org/select";
+import { useEffect, useState } from "react";
+import { useReferendumDetail } from "@/hooks/vote/use-referendum-detail";
+import { InlineLoader } from "@/components/inline-loader";
+import { Button } from "@nextui-org/button";
+import { RewardsCreationRarityFields } from "./rewards-rarity-fields";
+import { rewardsConfig } from "@/config/rewards";
+import { vividButtonClasses } from "@/components/primitives";
+import clsx from "clsx";
+import { FormProvider, useForm } from "react-hook-form";
+import { rewardsSchema, validateAddress } from "../util";
+import { SubstrateChain } from "@/types";
+import { getChainInfo } from "@/config/chains";
+import { ZodType, z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useSubstrateChain } from "@/context/substrate-chain-context";
+import { useAppStore } from "@/app/zustand";
+import CreateNFTCollectionModal from "./modal-new-collection";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@nextui-org/modal";
+import ModalCreateNFTCollection from "./modal-new-collection";
 
-// import style from "./rewards-creation-form.module.scss";
+export default function RewardsCreationForm({
+  chain,
+}: {
+  chain: SubstrateChain;
+}) {
+  const { ss58Format, name } = getChainInfo(chain);
+  const chainRewardsSchema = rewardsSchema(name, ss58Format);
+  type TypeRewardsSchema = z.infer<typeof chainRewardsSchema>;
 
-// import { usePastReferendaIndices } from "../../../hooks/use-gov2";
-// import { useIsMounted } from "../../../hooks/use-is-mounted";
-// import { bnToBn, formatBalance } from "@polkadot/util";
+  // const openModal = useAppStore((state) => state.openModal);
 
-// import {
-//   Input,
-//   Select,
-//   SelectItem,
-//   Button as UIButton,
-//   Skeleton,
-//   Textarea,
-//   useDisclosure,
-// } from "@nextui-org/react";
-// import { websiteConfig } from "../../../data/website-config";
-// import {
-//   executeAsyncFunctionsInSequence,
-//   mapPromises,
-// } from "../../../utils/utils";
-// import { RewardsCreationRarityFields } from "./rewards-creation-rarity-field";
-// import { useCollectionData } from "../../../hooks/use-collection-data";
-// import { useNftCollection } from "../../../hooks/use-chain-config";
-// import { u32 } from "@polkadot/types-codec";
-// import {
-//   getAccountBalanceAssetHubKusama,
-//   useAccountBalance,
-// } from "../../../hooks/use-account-balance";
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
-// export function RewardsCreationForm() {
-//   const { openModal, closeModal } = useModal();
-//   const { onOpen } = useDisclosure();
-//   const connectedAccountIndex = useAppStore(
-//     (state) => state.user.connectedAccount
-//   );
-//   const connectedAccount = useAppStore(
-//     (state) => state.user.connectedAccounts?.[connectedAccountIndex]
-//   );
-//   const ksmAddress = connectedAccount?.ksmAddress;
-//   const walletAddress = connectedAccount?.address;
-//   const wallet = getWalletBySource(connectedAccount?.source);
+  const [isNewCollectionLoading, setIsNewCollectionLoading] = useState(false);
+  // const [formStep, setFormStep] = useState(0);
+  // const nextFormStep = () => setFormStep((currentStep) => currentStep + 1);
+  // const prevFormStep = () => setFormStep((currentStep) => currentStep - 1);
 
-//   const [isMoreInfo, setIsMoreInfo] = useState(false);
-//   const [callData, setCallData] = useState<GenerateRewardsResult>();
-//   const [isCallDataLoading, setIsCallDataLoading] = useState(false);
+  const formMethods = useForm<TypeRewardsSchema>({
+    resolver: zodResolver(chainRewardsSchema),
+  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    getValues,
+    setValue,
+    watch,
+    setError,
+  } = formMethods;
+  const { activeChain } = useSubstrateChain();
 
-//   const [isNewCollectionLoading, setIsNewCollectionLoading] = useState(false);
-//   const [error, setError] = useState({
-//     message: "",
-//     name: "",
-//   });
-//   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
-//   const [isComplete, setIsComplete] = useState(false);
-//   const [collectionOwnerIsWallet, setCollectionOwnerIsWallet] = useState(false);
-//   const [accountBalanceAssetHubKusama, setAccountBalanceAssetHubKusama] =
-//     useState(undefined);
+  const watchFormFields = watch();
 
-//   const isMounted = useIsMounted();
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
-//   const formMethods = useForm({
-//     defaultValues: defaultReferendumRewardsConfig,
-//   });
+  const { defaultReferendumRewardsConfig } = rewardsConfig;
+  const {
+    data: { referenda: pastReferenda } = {
+      referenda: [],
+    },
+    isLoading: isPastReferendaLoading,
+  } = useReferenda("past", false);
 
-//   const { data: pastReferendaIndices, isLoading: isPastRefIndicesLoading } =
-//     usePastReferendaIndices();
+  const [refIndex, setRefIndex] = useState<number>(-1);
+  const { data: referendumDetail, isLoading: isReferendumDetailLoading } =
+    useReferendumDetail(refIndex.toString());
 
-//   const {
-//     watch,
-//     setValue,
-//     setError: setFormError,
-//     clearErrors,
-//     formState: { errors, isSubmitting, isDirty, isValid },
-//   } = formMethods;
+  // function is passed to the modal in order to change the state of the form fields
+  function setCollectionConfig(collectionConfig: CollectionConfiguration) {
+    setValue("collectionConfig", {
+      ...watchFormFields.collectionConfig,
+      ...collectionConfig,
+    });
+  }
 
-//   //calculate the maximum natural number < nft_batch_size_max that is a multiple of txsPerVote
-//   const maxTxsPerBatch =
-//     Math.floor(
-//       websiteConfig.nft_batch_size_max / callData?.txsCount?.txsPerVote
-//     ) * callData?.txsCount?.txsPerVote;
+  function onModalOpenChange(isOpen: boolean) {
+    console.log("modalOpenChange", isOpen);
+    onOpenChange(isOpen);
+  }
 
-//   // group the kusamaAssetHubTxs in batches of max size maxTxsPerbatch making sure that txs belonging together (multiples of 13) are never split to different batches
-//   const kusamaAssetHubTxsBatches = callData?.kusamaAssetHubTxs?.reduce(
-//     (acc, tx, index) => {
-//       const batchIndex = Math.floor(index / maxTxsPerBatch);
-//       if (!acc[batchIndex]) {
-//         acc[batchIndex] = [];
-//       }
-//       acc[batchIndex].push(tx);
-//       return acc;
-//     },
-//     []
-//   );
+  // function onModalClose(): void {
+  //   console.log("modalClosed");
+  //   setIsNewCollectionLoading(false);
+  //   onClose();
+  // }
 
-//   // useEffect(() => {
-//   //   if (pastReferendaIndices?.length)
-//   //     setValue("refIndex", pastReferendaIndices[0]);
-//   // }, [pastReferendaIndices]);
+  async function createNewCollection() {
+    setIsNewCollectionLoading(true);
+    onOpen();
+    // openModal(
+    //   <CreateNFTCollectionModal
+    //     setCollectionConfig={setCollectionConfig}
+    //     setIsNewCollectionLoading={setIsNewCollectionLoading}
+    //   />,
+    //   {
 
-//   const watchFormFields = watch();
+    //     children: <></>,
+    //   }
+    // );
+  }
 
-//   useEffect(() => {
-//     const checkAccountBalance = async () => {
-//       if (!ksmAddress) return;
-//       const { data } = await getAccountBalanceAssetHubKusama(ksmAddress);
+  async function onSubmit(data: TypeRewardsSchema) {
+    // const result = await createRewards(data);
+    // console.log("result", result);
 
-//       setAccountBalanceAssetHubKusama(data?.free);
-//     };
+    const formData = new FormData();
+    formData.append("rewardConfig", JSON.stringify(data));
+    formData.append("chain", chain);
+    data.options?.forEach((option) => {
+      if (!option.imageCid) {
+        console.log("option file", option.file[0]);
+        formData.append(
+          `${option.rarity}File`,
+          option.file[0],
+          option.file[0].name
+        );
+      }
+    });
+    const response = await fetch("/api/rewards", {
+      method: "POST",
+      body: formData,
+    });
+    const responseData = await response.json();
+    console.log("responseData", responseData);
 
-//     checkAccountBalance();
-//   }, [ksmAddress]);
+    // if (!response.ok) {
+    //   console.log(responseData);
+    //   return;
+    // }
+    // if (responseData.errors) {
+    //   const errors = responseData.errors;
+    //   if (errors.criteria) {
+    //     setError("criteria", {
+    //       type: "server",
+    //       message: errors.criteria,
+    //     });
+    //   } else if (errors.refIndex) {
+    //     setError("refIndex", {
+    //       type: "server",
+    //       message: errors.refIndex,
+    //     });
+    //   }
+    //   //TODO expand
+    //   console.log("errors form server", errors);
+    // }
+  }
 
-//   useEffect(() => {
-//     const checkCollectionOwner = debounce(async () => {
-//       if (!watchFormFields?.collectionConfig?.id) {
-//         clearErrors("collectionConfig.id");
-//         return;
-//       }
-//       const apiKusamaAssetHub = await getApiKusamaAssetHub();
-//       try {
-//         const collectionData = await apiKusamaAssetHub.query.nfts.collection(
-//           watchFormFields.collectionConfig.id
-//         );
-//         const ownsCollection =
-//           (collectionData?.toJSON() as any).owner === ksmAddress;
+  return (
+    <FormProvider {...formMethods}>
+      <form onSubmit={handleSubmit(onSubmit)} className="test">
+        <h3 className="mb-4 text-lg">What should be rewarded?</h3>
+        <div className="flex mb-4 min-h-[100px]">
+          <div className="hidden md:flex md:w-1/3 text-xs pr-8">
+            At the moment we support rewarding participation in OpenGov
+            Referenda. All participants of your selected referendum will receive
+            1 of the NFTs you set below.
+          </div>
+          <div className="w-full md:w-2/3 flex gap-4 flex-wrap md:flex-nowrap">
+            <Select
+              classNames={{
+                label: "after:content-['*'] after:text-danger after:ml-0.5",
+              }}
+              className="w-full md:w-1/2"
+              label="Reward Criteria"
+              placeholder={"Select Reward Criteria"}
+              disabledKeys={[
+                "criteria",
+                "aye",
+                "first",
+                "reputable",
+                "extrinsic",
+              ]}
+              isInvalid={!!errors.criteria}
+              errorMessage={!!errors.criteria && `${errors.criteria?.message}`}
+              {...register("criteria", {
+                required: "Reward Criteria is required",
+              })}
+            >
+              <SelectSection showDivider title="Available">
+                <SelectItem key="all" value="all">
+                  All Referendum Participants
+                </SelectItem>
+              </SelectSection>
+              <SelectSection title="Coming Soon?">
+                <SelectItem key="criteria" value="criteria">
+                  Votes meeting threshold (e.g. &gt; 5 KSM)
+                </SelectItem>
+                <SelectItem key="first" value="first">
+                  First N Voters
+                </SelectItem>
+                <SelectItem key="reputable" value="reputable">
+                  Reputable Voters
+                </SelectItem>
+                <SelectItem key="aye" value="aye">
+                  All Aye Voters
+                </SelectItem>
+                <SelectItem key="extrinsic" value="aye">
+                  Any Aritrary Extrinsic Caller
+                </SelectItem>
+              </SelectSection>
+            </Select>
+            <div className="w-full md:w-1/2">
+              <Select
+                label="Referendum Index"
+                classNames={{
+                  label: "after:content-['*'] after:text-danger after:ml-0.5",
+                }}
+                value={refIndex}
+                isLoading={isPastReferendaLoading}
+                placeholder={"Select any past referendum"}
+                isInvalid={!!errors.refIndex}
+                errorMessage={
+                  !!errors.refIndex && `${errors.refIndex?.message}`
+                }
+                {...register("refIndex", {
+                  required: "Please select a referendum",
+                })}
+              >
+                {pastReferenda?.map(({ index }) => (
+                  <SelectItem key={index} value={index}>
+                    {index}
+                  </SelectItem>
+                ))}
+              </Select>
 
-//         setCollectionOwnerIsWallet(ownsCollection);
+              {refIndex !== -1 && (
+                <span className="text-xs flex items-start mt-1 ml-1 min-h-unit-10 align-top">
+                  You selected Referendum {`${refIndex}`}&nbsp;
+                  {isReferendumDetailLoading ? (
+                    <InlineLoader />
+                  ) : (
+                    `: ${referendumDetail?.title}`
+                  )}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
 
-//         if (!ownsCollection) {
-//           console.log("not owner");
-//           setFormError("collectionConfig.id", {
-//             type: "invalid",
-//             message: "You are not the owner of this collection",
-//           });
-//         } else {
-//           clearErrors("collectionConfig.id");
-//         }
-//       } catch (error) {
-//         console.log("invalid input");
-//       }
-//     }, 500);
-//     checkCollectionOwner();
-//   }, [watchFormFields.collectionConfig.id]);
+        <h3 className="mb-4 text-lg">Where should royalties go?</h3>
+        <div className="flex mb-4 min-h-[100px]">
+          <div className="hidden md:flex md:w-1/3 text-xs pr-8">
+            Trading NFTs Asset Hub will generate royalties for arbitrary
+            parties. Select, who those royalties should go to.
+          </div>
+          <div className="w-full md:w-2/3">
+            <Input
+              label="Royalty Address"
+              classNames={{
+                label: "after:content-['*'] after:text-danger after:ml-0.5",
+              }}
+              type="text"
+              placeholder="Enter the address of the royalty receiver"
+              description="Where trading royalties should go to (Kusama / Asset Hub).
+                  80% will go to the entered address, 20% to the Proof of Chaos multisig."
+              isInvalid={!!errors.royaltyAddress}
+              color={!!errors.royaltyAddress ? "danger" : "default"}
+              errorMessage={
+                !!errors.royaltyAddress && `${errors.royaltyAddress?.message}`
+              }
+              {...register("royaltyAddress")}
+            />
+          </div>
+        </div>
 
-//   //TODO type
-//   async function generatePreimage(formData) {
-//     console.log("Form data is", JSON.stringify(formData, null, 2));
-//     if (!walletAddress) {
-//       setError({
-//         message: "Please connect your wallet to continue.",
-//         name: "Wallet not connected",
-//       });
-//       return;
-//     }
+        <h3 className="mb-4 text-lg">Where should NFTs be collected?</h3>
+        <div className="flex mb-4 min-h-[100px]">
+          <div className="hidden md:flex md:w-1/3 text-xs pr-8">
+            You can either choose any existing collection, that you have the
+            rights to mint NFTs into, or create a new collection.
+          </div>
+          <div className="w-full md:w-2/3 flex gap-4 items-center flex-wrap md:flex-nowrap justify-center">
+            <Input
+              label="Collection Id"
+              placeholder="The id of your existing collection"
+              type="number"
+              step="1"
+              classNames={{
+                label: "after:content-['*'] after:text-danger after:ml-0.5",
+              }}
+              description="Select a collection that you are the owner of. NFTs will be minted to this collection."
+              isInvalid={!!errors.collectionConfig?.id}
+              isDisabled={isNewCollectionLoading}
+              color={!!errors.collectionConfig?.id ? "danger" : "default"}
+              errorMessage={
+                !!errors.collectionConfig?.id &&
+                `${errors.collectionConfig.id?.message}`
+              }
+              {...register("collectionConfig.id")}
+            />
+            {/* <p>{errors?.["collectionConfig.id"]?.message}</p> */}
+            <div className="flex h-100">or</div>
+            <Button
+              className="w-full"
+              onClick={createNewCollection}
+              color="secondary"
+              isLoading={isNewCollectionLoading}
+              variant="bordered"
+            >
+              {/* {isNewCollectionLoading
+              ? "Creating a new collection ..."
+              : "Create A New Collection"} */}
+              Create New Collection
+            </Button>
+          </div>
+        </div>
 
-//     setIsCallDataLoading(true);
-//     setIsOverlayVisible(true);
+        <h3 className="mb-4 text-lg">What are the rewards / NFTs?</h3>
+        <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-2">
+          {["common", "rare", "epic"].map((rarity) => (
+            <RewardsCreationRarityFields
+              key={rarity}
+              rarity={rarity}
+              rewardConfig={defaultReferendumRewardsConfig}
+            />
+          ))}
+        </div>
 
-//     try {
-//       setError({ message: "", name: "" });
+        <Button
+          type="submit"
+          variant="shadow"
+          isDisabled={isSubmitting}
+          isLoading={isSubmitting}
+          className={clsx("w-full mt-4 h-20", vividButtonClasses)}
+        >
+          Submit {activeChain && <activeChain.icon />} Referendum Rewards
+        </Button>
 
-//       const res = await fetch("/api/create-rewards-calls", {
-//         method: "POST",
-//         body: formData,
-//       });
+        <Input
+          type="text"
+          className="hidden"
+          value={chain as SubstrateChain}
+          id={`chain`}
+          {...register(`chain`)}
+        />
 
-//       const jsonRes = await res.json();
-//       console.info("result from api ", jsonRes);
-
-//       if (jsonRes.name === "Error") {
-//         console.info(" frontend", jsonRes);
-//         setError(jsonRes);
-//       } else {
-//         setCallData(jsonRes);
-//       }
-
-//       setIsCallDataLoading(false);
-//     } catch (error) {
-//       console.info(" frontend", error);
-//       setError(error);
-//       setIsCallDataLoading(false);
-//     }
-//   }
-
-//   async function signAndSend() {
-//     await wallet?.enable("Proof of Chaos");
-//     const signer = wallet.signer;
-
-//     const apiKusamaAssetHub = await getApiKusamaAssetHub();
-
-//     console.log("kusamaAssetHubTxsBatches", kusamaAssetHubTxsBatches);
-
-//     // execute sendAndFinalize for each batch and record the results
-//     const userSignatureRequests = kusamaAssetHubTxsBatches.map((batch) => {
-//       return async () =>
-//         sendAndFinalize(apiKusamaAssetHub, batch, signer, walletAddress);
-//     });
-
-//     try {
-//       const allSignatureResults = await executeAsyncFunctionsInSequence(
-//         userSignatureRequests
-//       );
-//       console.log("allSignatureResults", allSignatureResults);
-
-//       if (allSignatureResults.every((res) => res.status === "success")) {
-//         setIsComplete(true);
-//         const configReqBody = {
-//           ...callData.config,
-//           blockNumbers: allSignatureResults.map((res) =>
-//             res.blockHeader.number.toNumber()
-//           ),
-//           txHashes: allSignatureResults.map((res) => res.txHash),
-//         };
-
-//         const createConfigRes = await fetch("/api/create-config-nft", {
-//           method: "POST",
-//           body: JSON.stringify(configReqBody),
-//         });
-//         console.log("create Config NFT result", createConfigRes);
-//       }
-//     } catch {
-//       console.info("error sending tx", error);
-//       setError(error);
-//     }
-//     // try {
-//     //   const { status, blockHeader, txHash } = await sendAndFinalize(
-//     //     apiKusamaAssetHub,
-//     //     //TODO is this still needed? does sendAndFinalize do it?
-//     //     callData.kusamaAssetHubTxs.map((tx) => apiKusamaAssetHub.tx(tx)),
-//     //     signer,
-//     //     walletAddress
-//     //   );
-
-//     //   if (status === "success") {
-//     //     setIsComplete(true);
-
-//     //     const configReqBody = {
-//     //       ...callData.config,
-//     //       blockNumber: blockHeader.number.toNumber(),
-//     //       txHash,
-//     //     };
-
-//     //     const createConfigRes = await fetch("/api/create-config-nft", {
-//     //       method: "POST",
-//     //       body: JSON.stringify(configReqBody),
-//     //     });
-//     //     console.log("create Config NFT result", createConfigRes);
-//     //   }
-//     // } catch (error) {
-//     //   console.info("error sending tx", error);
-//     //   setError(error);
-//     // }
-//   }
-
-//   function onCancel() {
-//     setIsOverlayVisible(false);
-//     setIsComplete(false);
-//   }
-
-//   async function onSubmit(data) {
-//     console.log("submit formErrors", errors);
-//     console.table(data);
-
-//     setCallData(undefined);
-
-//     // we use form data because we are also transmitting files
-//     const formData = new FormData();
-
-//     formData.append(
-//       "data",
-//       JSON.stringify({
-//         ...data,
-//         sender: walletAddress,
-//       })
-//     );
-
-//     // that are appended to the form data in respective key value pairs
-//     // e.g. commonFile => FileObject
-//     data.options.forEach((option) => {
-//       if (!option.imageCid) {
-//         formData.append(
-//           `${option.rarity}File`,
-//           option.file[0],
-//           option.file[0].name
-//         );
-//       }
-//     });
-
-//     if (data.collectionConfig.isNew) {
-//       formData.append(
-//         "collectionImage",
-//         data.collectionConfig.file[0],
-//         data.collectionConfig.file[0].name
-//       );
-//     }
-
-//     generatePreimage(formData);
-//   }
-
-//   // function is passed to the modal in order to change the state of the form fields
-//   function setCollectionConfig(collectionConfig: CollectionConfiguration) {
-//     setValue("collectionConfig", {
-//       ...watchFormFields.collectionConfig,
-//       ...collectionConfig,
-//     });
-//   }
-
-//   async function createNewCollection() {
-//     console.log("creating new collection");
-//     openModal("NEW_NFT_COLLECTION", {
-//       config: watchFormFields,
-//       sender: walletAddress,
-//       setCollectionConfig,
-//       setIsNewCollectionLoading,
-//     });
-//   }
-
-//   const isEnoughBalance =
-//     accountBalanceAssetHubKusama &&
-//     bnToBn(accountBalanceAssetHubKusama).gt(bnToBn(callData?.fees?.deposit));
-
-//   return (
-//     <div className={style.formWrapper}>
-//       {isMounted && (
-//         <FormProvider {...formMethods}>
-//           {!walletAddress ? (
-//             <div>Please connect your wallet to proceed</div>
-//           ) : (
-//             <form
-//               onSubmit={formMethods.handleSubmit(onSubmit)}
-//               onError={console.log}
-//               className={style.form}
-//             >
-//               <h1 className="text-2xl relative">
-//                 Create Rewards for a Referendum
-//                 <span className="pl-2 text-base text-sky-600 translate-y-6">
-//                   beta
-//                 </span>
-//               </h1>
-
-//               <p className="text-xs mb-4">
-//                 Here you can create signable transactions for sending out NFTs
-//                 to users who voted on a referendum. <br></br>If you find any 🪲,
-//                 or want a new feature, please{" "}
-//                 <a href="https://github.com/Proof-Of-Chaos/website/issues">
-//                   file a github issue here
-//                 </a>
-//               </p>
-
-//               <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-//                 <Select
-//                   isRequired
-//                   label="Referendum Index"
-//                   isLoading={isPastRefIndicesLoading}
-//                   placeholder={"Select any past referendum"}
-//                   description={
-//                     "Select any past referendum to prepare the NFT sendouts for"
-//                   }
-//                   {...formMethods.register("refIndex", {
-//                     validate: {},
-//                   })}
-//                 >
-//                   {pastReferendaIndices?.map((refIdx) => (
-//                     <SelectItem key={refIdx} value={refIdx}>
-//                       {refIdx}
-//                     </SelectItem>
-//                   ))}
-//                 </Select>
-
-//                 <Input
-//                   isRequired
-//                   label="Royalty Address"
-//                   type="text"
-//                   placeholder="Enter the address of the royalty receiver"
-//                   description="Where trading royalties should go to (Kusama / Asset Hub).
-//                   80% will go to the entered address, 20% to the Proof of Chaos multisig: Go8NpTvzdpfpK1rprXW1tE4TFTHtd2NDJCqZLw5V77GR8r4."
-//                   {...formMethods.register("royaltyAddress", {
-//                     validate: {},
-//                   })}
-//                 />
-//               </div>
-
-//               <>
-//                 <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4 items-center">
-//                   <Input
-//                     isRequired
-//                     label="Collection Id"
-//                     placeholder="The id of your existing collection"
-//                     type="text"
-//                     errorMessage={errors.collectionConfig?.id?.message}
-//                     description="Select a collection that you are the owner of. NFTs will be minted to this collection."
-//                     disabled={isNewCollectionLoading}
-//                     validationState={
-//                       errors.collectionConfig?.id ? "invalid" : "valid"
-//                     }
-//                     {...formMethods.register("collectionConfig.id", {
-//                       validate: {
-//                         isNumber: (value) =>
-//                           !isNaN(value) || "Not a valid number",
-//                         isNotCollectionOwner: () =>
-//                           collectionOwnerIsWallet ||
-//                           "You are not the owner of the collection",
-//                       },
-//                     })}
-//                   />
-//                   <p>{errors?.["collectionConfig.id"]?.message}</p>
-//                   <div className="flex h-100">or</div>
-//                   <UIButton
-//                     className="w-full"
-//                     onClick={createNewCollection}
-//                     color="secondary"
-//                     isLoading={isNewCollectionLoading}
-//                     variant="bordered"
-//                   >
-//                     {isNewCollectionLoading
-//                       ? "Creating a new collection ..."
-//                       : "Create A New Collection"}
-//                   </UIButton>
-//                 </div>
-//               </>
-
-//               <label className="mt-4 form-label block text-sm font-bold tracking-wider text-gray-900 dark:text-white">
-//                 NFTs
-//               </label>
-//               <p className="form-helper">
-//                 You can create 3 different types of NFTs, each with varying
-//                 rarity, by uploading an image and providing metadata. The
-//                 mapping of voter -&gt; rarity is performed by the POC algorithm,
-//                 which takes several metrics into account and introduces an
-//                 element of randomness.
-//               </p>
-//               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-4 w-full">
-//                 {["common", "rare", "epic"].map((rarity, index) => {
-//                   // const fields = watchFormFields.options[index];
-//                   return (
-//                     <RewardsCreationRarityFields
-//                       key={rarity}
-//                       rarity={rarity}
-//                       refConfig={watchFormFields}
-//                       register={formMethods.register}
-//                       errors={errors}
-//                     />
-//                   );
-//                 })}
-//               </div>
-
-//               {errors["refIndex"] &&
-//                 errors["refIndex"].type === "positiveNumber" && (
-//                   <p className="form-error">
-//                     Your vote amount must be a positive number
-//                   </p>
-//                 )}
-//               {errors["refIndex"] &&
-//                 errors["refIndex"].type === "hasEnoughFunds" && (
-//                   <p className="form-error">
-//                     You do not have enough available KSM
-//                   </p>
-//                 )}
-//               <p className="form-helper pt-2 text-center">
-//                 Hitting &quot;Submit&quot; will generate the required
-//                 transactions for sending NFTs to all voters. You can then sign
-//                 these transactions in the subsequent step to record them on the
-//                 blockchain.
-//               </p>
-//               <Button
-//                 type="submit"
-//                 variant="primary"
-//                 className="w-full mt-4"
-//                 disabled={isCallDataLoading}
-//               >
-//                 Submit Referendum Rewards
-//               </Button>
-//             </form>
-//           )}
-//         </FormProvider>
-//       )}
-//       {isOverlayVisible && (
-//         <div className={style.overlay}>
-//           {isCallDataLoading && (
-//             <>
-//               <Loader
-//                 className="w-12 h-12"
-//                 text="Creating transactions for reward distribution"
-//               />
-//               <p className="text-xs"></p>
-//               <ul className="text-xs">
-//                 <li>Pinning your images and NFT metadata to IPFS ...</li>
-//                 <li>
-//                   Generating all required transactions to distribute the rewards
-//                   to all voters of the selected referendum ...
-//                 </li>
-//               </ul>
-//               <p className="text-xs mt-5">
-//                 Please stand by this may take a while ...
-//               </p>
-//             </>
-//           )}
-//           {!isCallDataLoading && (
-//             <>
-//               {callData && !isComplete && (
-//                 <>
-//                   <h3 className="text-lg">
-//                     🎉🛠️ Your transactions were successfully created ⛓️🎉
-//                   </h3>
-//                   {/* <Button
-//                     className="mt-2"
-//                     size="mini"
-//                     variant="secondary"
-//                     onClick={() => setIsMoreInfo(!isMoreInfo)}
-//                   >
-//                     {isMoreInfo ? "⬆️ Less Info" : "💡 More Info"}
-//                   </Button> */}
-//                 </>
-//               )}
-//               {error.message !== "" && (
-//                 <div>
-//                   <h3 className="text-lg">
-//                     ⚠️ Error generating your calls, please try again.
-//                   </h3>
-//                   <p className="text-red-500">{error.message}</p>
-//                 </div>
-//               )}
-//               {callData && callData.distribution && !isComplete && (
-//                 <div className="text-sm">
-//                   <p className="mt-8">
-//                     The txs you sign will mint{" "}
-//                     <b>{callData.voters?.length} NFTs</b> (
-//                     {callData?.distribution?.common} common,{" "}
-//                     {callData?.distribution?.rare} rare,{" "}
-//                     {callData?.distribution?.epic} epic) to{" "}
-//                     <b>collection {watchFormFields.collectionConfig.id}</b>
-//                   </p>
-//                   <p className="mt-2">
-//                     Fees (Kusama Asset Hub):{" "}
-//                     {formatBalance(callData?.fees?.nfts, {
-//                       decimals: 12,
-//                       forceUnit: "-",
-//                       withSi: true,
-//                       withUnit: "KSM",
-//                     })}{" "}
-//                     KSM
-//                   </p>
-//                   <p className="">
-//                     Locked Deposit (Kusama Asset Hub):{" "}
-//                     {callData?.fees?.deposit &&
-//                       formatBalance(callData?.fees?.deposit, {
-//                         decimals: 12,
-//                         forceUnit: "-",
-//                         withSi: true,
-//                         withUnit: "KSM",
-//                       })}
-//                     KSM
-//                   </p>
-//                   <p>Transaction Count: {callData.txsCount.nfts}</p>
-//                   <h2>
-//                     your account balance is{" "}
-//                     {formatBalance(accountBalanceAssetHubKusama, {
-//                       decimals: 12,
-//                       forceUnit: "-",
-//                       withSi: true,
-//                       withUnit: "KSM",
-//                     })}
-//                   </h2>
-//                   <p className="mt-2 text-lg">
-//                     You will be asked to{" "}
-//                     <b>
-//                       sign {kusamaAssetHubTxsBatches.length} transactions in
-//                       sequence
-//                     </b>
-//                     . For a complete sendout, you will have to sign all of them.{" "}
-//                   </p>
-//                 </div>
-//               )}
-//               {callData && isComplete && (
-//                 <div>
-//                   <h3 className="text-2xl">
-//                     🚀 The txs you signed minted{" "}
-//                     <b>{callData.voters?.length} NFTs</b> 🚀
-//                   </h3>
-//                 </div>
-//               )}
-//               <div className="button-wrap pt-8">
-//                 <Button className="mr-4" onClick={onCancel} variant="cancel">
-//                   {isComplete || !callData ? "Close" : "Cancel"}
-//                 </Button>
-//                 {!isComplete && callData && (
-//                   <>
-//                     {/* {JSON.stringify(bnToBn(accountBalanceAssetHubKusama))}
-//                     {JSON.stringify(bnToBn(callData.fees?.deposit))} */}
-//                     {!isEnoughBalance ? (
-//                       <p className="text-red-500">
-//                         You do not have enough KSM to pay the fees. Please top
-//                         up your account.
-//                       </p>
-//                     ) : (
-//                       <Button onClick={signAndSend} variant="primary">
-//                         🔏 Sign and Send 📤
-//                       </Button>
-//                     )}
-//                   </>
-//                 )}
-//                 {isComplete && (
-//                   <a
-//                     href={`https://kodadot.xyz/stmn/collection/${watchFormFields.collectionConfig.id}`}
-//                     target="_blank"
-//                   >
-//                     <Button variant="primary">🎉 View on Kodadot</Button>
-//                   </a>
-//                 )}
-//               </div>
-//             </>
-//           )}
-//         </div>
-//       )}
-//       {/* <pre className="text-[0.5rem]">
-//         file: {JSON.stringify(watchFormFields.options[0]?.file?.[0], null, 2)}
-//         form fields: {JSON.stringify(watchFormFields, null, 2)}
-//       </pre> */}
-//       {/* <pre className="text-[0.5rem]">
-//         call config:
-//         {JSON.stringify(callData?.config, null, 2)}
-//       </pre> */}
-//       {/* <pre className="text-[0.5rem] break-spaces">
-//         preimage hex:
-//         {callData?.preimage}
-//       </pre> */}
-//     </div>
-//   );
-// }
+        <pre className="text-xs">{JSON.stringify(watch(), null, 2)}</pre>
+      </form>
+      <ModalCreateNFTCollection
+        setCollectionConfig={setCollectionConfig}
+        setIsNewCollectionLoading={setIsNewCollectionLoading}
+        onOpenChange={onModalOpenChange}
+        isOpen={isOpen}
+      />
+    </FormProvider>
+  );
+}
