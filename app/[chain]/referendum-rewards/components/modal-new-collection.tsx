@@ -83,7 +83,7 @@ export default function ModalCreateNFTCollection({
       );
 
       setCollectionConfig({
-        id: newCollectionId.toPrimitive(),
+        id: newCollectionId.toString(),
         name: watchFormFields.name,
         description: watchFormFields.description,
         file: watchFormFields.imageFile,

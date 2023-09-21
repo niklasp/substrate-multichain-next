@@ -66,7 +66,7 @@ export default function RewardsCreationForm({
   const watchFormFields = watch();
 
   useEffect(() => {
-    console.log(errors);
+    console.log("errors", errors);
   }, [errors]);
 
   const { defaultReferendumRewardsConfig } = rewardsConfig;

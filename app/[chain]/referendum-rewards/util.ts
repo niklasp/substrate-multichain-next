@@ -20,26 +20,32 @@ const fileUpload =
     ? z
         .any()
         .refine((file) => file, "Image is required.")
+        .optional()
         .refine(
           (file) => file?.size <= 2 * 1024 * 1024,
           `Max file size is 2MB.`
         )
+        .optional()
         .refine(
           (file) => rewardsConfig.acceptedNftFormats.includes(file?.type),
           "File Format not supported"
         )
+        .optional()
     : z
         .any()
         .refine((files) => files?.length == 1, "Image is required.")
+        .optional()
         .refine(
           (files) => files?.[0]?.size <= 2 * 1024 * 1024,
           `Max file size is 2MB.`
         )
+        .optional()
         .refine(
           (files) =>
             rewardsConfig.acceptedNftFormats.includes(files?.[0]?.type),
           "File Format not supported"
-        );
+        )
+        .optional();
 
 export const zodSchemaObject = (chain: SubstrateChain, ss58Format: number) => {
   return {
@@ -52,12 +58,15 @@ export const zodSchemaObject = (chain: SubstrateChain, ss58Format: number) => {
     ),
     collectionConfig: z.object({
       id: z
-        .string()
+        .any()
         .transform((id) => parseInt(id) || -1)
         .refine((id) => id >= 0, "Id must be a positive number"),
-      name: z.string().min(1, "Name is required"),
-      description: z.string().min(1, "Description is required"),
-      isNew: z.boolean(),
+      name: z.string().optional(),
+      description: z.string().optional(),
+      // TODO
+      // name: z.string().min(1, "Name is required"),
+      // description: z.string().min(1, "Description is required"),
+      isNew: z.boolean().default(false),
       file: fileUpload,
     }),
     options: z.array(

@@ -85,10 +85,10 @@ export interface TrackInfoExt extends TrackInfo {
 }
 
 export interface Lock {
-  classId: BN;
+  classId?: BN;
   endBlock: BN;
-  locked: string;
-  refId: BN;
+  locked?: string;
+  refId?: BN;
   total: BN;
 }
 

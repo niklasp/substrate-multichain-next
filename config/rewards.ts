@@ -6,9 +6,14 @@ export type RewardsConfigType = {
   acceptedNftFormats: string[];
   maxFileSize: number;
   defaultReferendumRewardsConfig: RewardConfiguration;
+  rewardsFilter: string[];
 };
 
 export const rewardsConfig: RewardsConfigType = {
+  //for tetsing, only consider the following addresses for the sendout
+  rewardsFilter: process.env.REWARDS_FILTER_ADDRESSES
+    ? process.env.REWARDS_FILTER_ADDRESSES.split(",")
+    : [],
   royaltyAddress:
     process.env.NEXT_PUBLIC_ROYALTY_ADDRESS ||
     "Go8NpTvzdpfpK1rprXW1tE4TFTHtd2NDJCqZLw5V77GR8r4",
