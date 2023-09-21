@@ -95,8 +95,11 @@ export async function POST(req: NextRequest) {
     const file: File | null = (await formData?.get(
       `${option.rarity}File`
     )) as File;
-    const bytes = await file?.arrayBuffer();
-    option.file = Buffer.from(bytes);
+
+    if (file) {
+      const bytes = await file?.arrayBuffer();
+      option.file = Buffer.from(bytes);
+    }
   });
 
   try {

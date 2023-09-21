@@ -249,7 +249,7 @@ export interface RewardOption {
   transferable: boolean;
   artist: string;
   rarity: string;
-  itemName: string;
+  title: string;
   royalty: number;
   metadataCidDirect?: string;
   metadataCidDelegated?: string;

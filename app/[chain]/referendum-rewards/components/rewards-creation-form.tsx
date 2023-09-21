@@ -124,7 +124,7 @@ export default function RewardsCreationForm({
     formData.append("rewardConfig", JSON.stringify(data));
     formData.append("chain", chain);
     data.options?.forEach((option) => {
-      if (!option.imageCid) {
+      if (!option.imageCid && option.file?.[0]) {
         console.log("option file", option.file[0]);
         formData.append(
           `${option.rarity}File`,

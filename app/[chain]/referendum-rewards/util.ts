@@ -76,7 +76,9 @@ export const zodSchemaObject = (chain: SubstrateChain, ss58Format: number) => {
         description: z.string().optional(),
         artist: z.string().optional(),
         imageCid: z.string().optional(),
-        file: fileUpload,
+        //TODO
+        // file: fileUpload,
+        file: z.any().optional(),
       })
     ),
   };
