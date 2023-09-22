@@ -406,8 +406,14 @@ export default function RewardsCreationForm({
                 )}
                 <span className="text-4xl">2</span>
                 Start the sendout process. You will be asked to sign{" "}
-                {rewardSendoutData?.txsCount?.nfts ?? "..."}&nbsp;transactions
-                in sequence. Complete all for a full sendout.
+                {rewardSendoutData?.txsCount?.nfts ? (
+                  <span className="text-warning">
+                    {rewardSendoutData?.txsCount?.nfts}
+                  </span>
+                ) : (
+                  "some "
+                )}
+                transactions in sequence. Complete all for a full sendout.
                 {rewardSendoutData && (
                   <Button
                     onClick={onAnalyzeOpenChange}
