@@ -145,26 +145,30 @@ export default function RewardsCreationForm({
     const responseData = await response.json();
     console.log("responseData", responseData);
 
-    // if (!response.ok) {
-    //   console.log(responseData);
-    //   return;
-    // }
-    // if (responseData.errors) {
-    //   const errors = responseData.errors;
-    //   if (errors.criteria) {
-    //     setError("criteria", {
-    //       type: "server",
-    //       message: errors.criteria,
-    //     });
-    //   } else if (errors.refIndex) {
-    //     setError("refIndex", {
-    //       type: "server",
-    //       message: errors.refIndex,
-    //     });
-    //   }
-    //   //TODO expand
-    //   console.log("errors form server", errors);
-    // }
+    if (!response.ok) {
+      console.log(responseData);
+      return;
+    }
+    if (responseData.errors) {
+      const errors = responseData.errors;
+      if (errors.criteria) {
+        setError("criteria", {
+          type: "server",
+          message: errors.criteria,
+        });
+      } else if (errors.refIndex) {
+        setError("refIndex", {
+          type: "server",
+          message: errors.refIndex,
+        });
+      } else {
+        setError("root", {
+          message: errors.form,
+        });
+      }
+      //TODO expand
+      console.log("errors form server", errors);
+    }
   }
 
   return (
@@ -337,6 +341,11 @@ export default function RewardsCreationForm({
           ))}
         </div>
 
+        <div className="text-danger w-full text-center mt-3">
+          {errors &&
+            errors.root &&
+            `Rewards creation failed: ${errors.root.message}`}
+        </div>
         <Button
           type="submit"
           variant="shadow"

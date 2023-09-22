@@ -106,13 +106,13 @@ export async function POST(req: NextRequest) {
     );
 
     // res.status(200).json(callResult);
-  } catch (error) {
+  } catch (error: any) {
     console.trace(error);
     // res.status(400).json({
     //   name: error.name,
     //   message: error.message,
     // });
-    return NextResponse.json({ errors: { form: error } });
+    return NextResponse.json({ errors: { form: error.message } });
   }
 
   // and return here as serializable json (aka strings, numbers, booleans, plain objects, arrays, etc.)
