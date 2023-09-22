@@ -94,9 +94,9 @@ export type ConvictionVote = {
     abstain: string;
   };
   // The total amount of tokens that were delegated to them (including conviction)
-  delegatedConvictionBalance: number;
+  delegatedConvictionBalance: string;
   // the total amount of tokens that were delegated to them (without conviction)
-  delegatedBalance: number;
+  delegatedBalance: string;
   // The vote type, either 'aye', or 'nay'
   voteDirection: string;
   // Either "Standard", "Split", or "SplitAbstain",
@@ -157,14 +157,14 @@ export type ConvictionDelegation = {
   track: number;
   address: string;
   target: string;
-  balance: number;
+  balance: string;
   // The balance times the conviction
-  effectiveBalance: number;
+  effectiveBalance: string;
   conviction: string;
   // The total amount of tokens that were delegated to them (including conviction)
-  delegatedConvictionBalance: number;
+  delegatedConvictionBalance: string;
   // the total amount of tokens that were delegated to them (without conviction)
-  delegatedBalance: number;
+  delegatedBalance: string;
   prior: any;
 };
 
