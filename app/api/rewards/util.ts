@@ -19,7 +19,7 @@ import pinataSDK from "@pinata/sdk";
 import { BN, BN_ZERO } from "@polkadot/util";
 import { getConvictionVoting } from "./get-conviction-voting";
 import { ApiDecoration } from "@polkadot/api/types";
-import { Lock, PalletReferenda, PalletVote } from "@/app/[chain]/vote/types";
+import { Lock, PalletReferenda, PalletVote, ReferendumPolkadot } from "@/app/[chain]/vote/types";
 import { Decorate } from "@polkadot/api/base/Decorate";
 import seedrandom from "seedrandom";
 import { rewardsConfig } from "@/config/rewards";
@@ -61,10 +61,19 @@ export const getDecoratedVotesWithInfo = async (
 }> => {
   console.info(`↪ Getting referendum details and all voting wallets`);
 
-  let { referendum, totalIssuance, votes } = await getConvictionVoting(
+  
+  const convictionVoting = await getConvictionVoting(
     api,
-    parseInt(config.refIndex)
+    config.refIndex
   );
+
+  let votes: ConvictionVote [] = [];
+  let totalIssuance: string | undefined
+  let referendum: ReferendumPolkadot | undefined;
+
+  if (convictionVoting) {
+    ({ referendum, totalIssuance, referendaVotes: votes } = convictionVoting)
+  }
 
   // start decorating the votes with additional information
   // TODO rename all below to decorateWith...
