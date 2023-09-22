@@ -236,7 +236,7 @@ export const sendAndFinalize = async (
     }
     return {
       status: "error",
-      message: error,
+      message: error.toString(),
     };
   });
 };

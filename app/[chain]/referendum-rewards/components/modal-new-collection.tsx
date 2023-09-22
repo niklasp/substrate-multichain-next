@@ -1,7 +1,7 @@
 import { useAppStore } from "@/app/zustand";
 import { useForm } from "react-hook-form";
 import { CollectionConfiguration } from "../types";
-import { useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { TxTypes, sendAndFinalize } from "@/components/util-client";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { ChainType, SendAndFinalizeResult } from "@/types";
@@ -26,15 +26,18 @@ import { getTxCollectionCreate } from "@/config/txs";
 type PropType = Omit<ModalProps, "children"> & {
   setCollectionConfig: (config: CollectionConfiguration) => void;
   setIsNewCollectionLoading: (isLoading: boolean) => void;
+  isTxPending: boolean;
+  setIsTxPending: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function ModalCreateNFTCollection({
   setCollectionConfig,
   setIsNewCollectionLoading,
+  isTxPending,
+  setIsTxPending,
   ...props
 }: PropType) {
   const { isOpen, onOpenChange } = props;
-  const [isTxPending, setIsTxPending] = useState(false);
 
   const [error, setError] = useState({
     message: "",

@@ -36,6 +36,8 @@ export default function RewardsCreationForm({
 }: {
   chain: SubstrateChain;
 }) {
+  const [isCollectionCreatePending, setIsCollectionCreatePending] =
+    useState(false);
   const { ss58Format, name } = getChainInfo(chain);
   const chainRewardsSchema = rewardsSchema(name, ss58Format);
   type TypeRewardsSchema = z.infer<typeof chainRewardsSchema>;
@@ -92,7 +94,9 @@ export default function RewardsCreationForm({
   }
 
   function onModalOpenChange(isOpen: boolean) {
-    console.log("modalOpenChange", isOpen);
+    if (!isCollectionCreatePending) {
+      setIsNewCollectionLoading(false);
+    }
     onOpenChange();
   }
 
@@ -315,10 +319,9 @@ export default function RewardsCreationForm({
               isLoading={isNewCollectionLoading}
               variant="bordered"
             >
-              {/* {isNewCollectionLoading
-              ? "Creating a new collection ..."
-              : "Create A New Collection"} */}
-              Create New Collection
+              {isNewCollectionLoading
+                ? "Creating a new collection ..."
+                : "Create A New Collection"}
             </Button>
           </div>
         </div>
@@ -359,6 +362,8 @@ export default function RewardsCreationForm({
         setIsNewCollectionLoading={setIsNewCollectionLoading}
         onOpenChange={onModalOpenChange}
         isOpen={isOpen}
+        isTxPending={isCollectionCreatePending}
+        setIsTxPending={setIsCollectionCreatePending}
       />
     </FormProvider>
   );

@@ -26,6 +26,7 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { ApiPromise } from "@polkadot/api";
 import { chain, set } from "lodash";
 import Check from "@w3f/polkadot-icons/keyline/Check";
+import Error from "@w3f/polkadot-icons/keyline/Error";
 
 type DepositCountType = {
   type: Deposit;
@@ -145,14 +146,26 @@ export function TxButton(props: TxButtonProps) {
           actingAccountSigner,
           actingAccount?.address
         );
+
         props.onFinished?.(res);
 
-        console.log("after submit", res);
-        setIsSuccess(true);
+        if (res.status !== "error") {
+          console.log("after submit", res);
+          setIsSuccess(true);
+        } else {
+          setError({
+            name: res.message,
+            message: res.message,
+          });
+          setErrorProp?.({
+            name: res.message,
+            message: res.message,
+          });
+        }
       }
     } catch (e: any) {
       setError({
-        name: e.name,
+        name: "",
         message: e.message,
       });
       setErrorProp?.({
@@ -175,18 +188,25 @@ export function TxButton(props: TxButtonProps) {
           {...rest}
           isLoading={isLoading}
           onClick={onSubmit}
-          startContent={<>{isSuccess && <Check stroke="lime" />}</>}
+          startContent={
+            <>
+              {isSuccess && <Check stroke="lime" />}
+              {error.name && <Error stroke="red" />}
+            </>
+          }
           isDisabled={isSuccess}
         >
           {isLoading && loadingText
             ? loadingText
+            : error && error.name
+            ? error.name
             : isSuccess && successText
             ? successText
             : children}
         </Button>
       ) : (
         <Tooltip content="Not enough funds to send tx">
-          <Button {...rest} isLoading={isLoading} isDisabled>
+          <Button {...rest} isLoading={isLoadingProp} isDisabled>
             {children}
           </Button>
         </Tooltip>
