@@ -4,6 +4,8 @@ import TestRewards from "./components/rewards-creation-form";
 import { DEFAULT_CHAIN } from "@/config/chains";
 import { SubstrateChain } from "@/types";
 import RewardsCreationForm from "./components/rewards-creation-form";
+import { RococoInfo } from "./components/rococo-info";
+import { RewardsInfo } from "./components/rewards-info";
 
 export const metadata: Metadata = {
   title: "Rewards",
@@ -32,7 +34,7 @@ export default async function PageRewards({
           beta
         </span>
       </h1>
-      {/* {selectedChain === SubstrateChain.Polkadot ? (
+      {selectedChain === SubstrateChain.Polkadot ? (
         <p className="text-center w-full">
           Polkadot (Asset Hub) is not yet supported.{" "}
           <a href="#" className="text-secondary-500">
@@ -40,9 +42,17 @@ export default async function PageRewards({
           </a>{" "}
           to get it added.
         </p>
-      ) : ( */}
-      <RewardsCreationForm chain={selectedChain} />
-      {/* )} */}
+      ) : (
+        <>
+          {selectedChain === SubstrateChain.Rococo ? (
+            <RococoInfo />
+          ) : (
+            <RewardsInfo />
+          )}
+
+          <RewardsCreationForm chain={selectedChain} />
+        </>
+      )}
     </div>
   );
 }
