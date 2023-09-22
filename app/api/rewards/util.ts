@@ -77,7 +77,9 @@ export const getDecoratedVotesWithInfo = async (
   votes = await retrieveAccountLocks(
     api,
     votes,
+    // @ts-ignore
     referendum.confirmationBlockNumber,
+    // @ts-ignore
     referendum.track
   );
 
@@ -93,8 +95,10 @@ export const getDecoratedVotesWithInfo = async (
   );
 
   // 3. decorate `meetsRequirements` - whether vote > threshold
+  // @ts-ignore
   votes = await checkVotesMeetingRequirements(
     votes,
+    // @ts-ignore
     totalIssuance,
     config,
     chainDecimals
@@ -221,6 +225,7 @@ const getLocks = (
         }
 
         if (total && endBlock) {
+          // @ts-ignore
           locks.push({ classId, endBlock, locked, refId, total });
         }
       }
@@ -337,6 +342,7 @@ export const retrieveAccountLocks = async (
     );
 
     const parsedAccountVotes = accountVotes.toJSON(); //as DelegatingData;
+    // @ts-ignore
     const delegating = parsedAccountVotes?.delegating;
 
     let delegatedLock: Lock;
@@ -362,6 +368,7 @@ export const retrieveAccountLocks = async (
 
     //add the delegationBalanceWithConviction
     const userLocks =
+      // @ts-ignore
       delegatedLock?.endBlock && delegatedLock?.total
         ? [...directLocks, delegatedLock]
         : directLocks;

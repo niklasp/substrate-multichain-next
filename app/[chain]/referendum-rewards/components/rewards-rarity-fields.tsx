@@ -76,24 +76,26 @@ export function RewardsCreationRarityFields({
           <div className="text-xs flex flex-col">
             {isUploadSelected ? (
               <>
-                <label className="block font-medium text-foreground-600 text-tiny cursor-text will-change-auto origin-top-left transition-all !duration-200 !ease-out motion-reduce:transition-none mb-2 pb-0">
-                  Upload {rarity} Image (max 1.5MB)
-                </label>
+                <div className="relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-200 group-data-[focus=true]:bg-default-100 min-h-unit-10 rounded-medium flex-col items-start justify-center gap-0 transition-background motion-reduce:transition-none !duration-150 outline-none group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus group-data-[focus-visible=true]:ring-offset-2 group-data-[focus-visible=true]:ring-offset-background h-16 py-2">
+                  <label className="block font-medium text-foreground-600 text-tiny cursor-text will-change-auto origin-top-left transition-all !duration-200 !ease-out motion-reduce:transition-none mb-1 pb-0">
+                    Upload {rarity} Image (max 1.5MB)
+                  </label>
 
-                <input
-                  id={`file-${rarity}`}
-                  accept={acceptedNftFormats.join(",")}
-                  type="file"
-                  className="mt-0 pb-2"
-                  {...register(`options.${optionIndex}.file`)}
-                />
-                {/* @ts-ignore */}
-                {errors?.options?.[optionIndex]?.file && (
-                  <span className="w-full text-tiny text-danger px-1">
-                    {/* @ts-ignore */}
-                    <>{errors?.options?.[optionIndex].file?.message}</>
-                  </span>
-                )}
+                  <input
+                    id={`file-${rarity}`}
+                    accept={acceptedNftFormats.join(",")}
+                    type="file"
+                    className="mt-0 pb-2"
+                    {...register(`options.${optionIndex}.file`)}
+                  />
+                  {/* @ts-ignore */}
+                  {errors?.options?.[optionIndex]?.file && (
+                    <span className="w-full text-tiny text-danger px-1">
+                      {/* @ts-ignore */}
+                      <>{errors?.options?.[optionIndex].file?.message}</>
+                    </span>
+                  )}
+                </div>
               </>
             ) : (
               <>
@@ -102,6 +104,7 @@ export function RewardsCreationRarityFields({
                   label={`IPFS Image CID of ${rarity} NFT`}
                   placeholder={`Enter Image CID of ${rarity} NFT`}
                   type="text"
+                  className="h-16"
                   {...register(`options.${optionIndex}.imageCid`, {})}
                 />
               </>
@@ -124,7 +127,7 @@ export function RewardsCreationRarityFields({
             //@ts-ignore
             isInvalid={!!errors?.options?.[optionIndex]?.title}
             color={
-              !!errors?.options?.[optionIndex]?.title ? "danger" : "default"
+              !!errors[`options.${optionIndex}].title`] ? "danger" : "default"
             }
             errorMessage={
               //@ts-ignore

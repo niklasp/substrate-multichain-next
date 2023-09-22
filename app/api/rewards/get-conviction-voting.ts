@@ -48,10 +48,11 @@ export const getConvictionVoting = async (
     // Each of these is the votingForAtEnd for an account for a given governance track
     // @ts-ignore
     const [address, track] = key.toHuman();
+    // @ts-ignore
     if (entry.isCasting) {
       // For each given track, these are the invididual votes for that track,
       //     as well as the total delegation amounts for that particular track
-
+      // @ts-ignore
       const { votes, delegations } = entry.asCasting;
 
       // The total delegation amounts.
@@ -82,14 +83,17 @@ export const getConvictionVoting = async (
               conviction: conviction.toString(),
               // The balance they are voting with themselves, sans delegated balance
               balance: {
+                // @ts-ignore
                 aye:
                   voteDirection.toString() == "Aye"
                     ? Number(balance.toJSON()) / denom
                     : 0,
+                // @ts-ignore
                 nay:
                   voteDirection.toString() == "Nay"
                     ? Number(balance.toJSON()) / denom
                     : 0,
+                // @ts-ignore
                 abstain: 0,
               },
               // The total amount of tokens that were delegated to them (including conviction)
@@ -121,8 +125,11 @@ export const getConvictionVoting = async (
               conviction: "Locked1x",
               // The balance they are voting with themselves, sans delegated balance
               balance: {
+                // @ts-ignore
                 aye: Number(aye) / denom,
+                // @ts-ignore
                 nay: Number(nay) / denom,
+                // @ts-ignore
                 abstain: 0,
               },
               // The total amount of tokens that were delegated to them (including conviction)
@@ -156,8 +163,11 @@ export const getConvictionVoting = async (
                 conviction: "Locked1x",
                 // The balance they are voting with themselves, sans delegated balance
                 balance: {
+                  // @ts-ignore
                   aye: Number(aye) / denom,
+                  // @ts-ignore
                   nay: Number(nay) / denom,
+                  // @ts-ignore
                   abstain: Number(abstain) / denom,
                 },
                 // The total amount of tokens that were delegated to them (including conviction)
@@ -294,22 +304,30 @@ export const getConvictionVoting = async (
             balance = {
               aye:
                 Number(delegation.balance) *
+                // @ts-ignore
                 (vote.balance.aye / (vote.balance.aye + vote.balance.nay)),
               nay:
                 Number(delegation.balance) *
+                // @ts-ignore
                 (vote.balance.nay / (vote.balance.aye + vote.balance.nay)),
               abstain: Number(0),
             };
             break;
           case "SplitAbstain":
             const ayePercentage =
+              // @ts-ignore
               vote.balance.aye /
+              // @ts-ignore
               (vote.balance.aye + vote.balance.nay + vote.balance.abstain);
             const nayPercentage =
+              // @ts-ignore
               vote.balance.nay /
+              // @ts-ignore
               (vote.balance.aye + vote.balance.nay + vote.balance.abstain);
             const abstainPercentage =
+              // @ts-ignore
               vote.balance.nay /
+              // @ts-ignore
               (vote.balance.aye + vote.balance.nay + vote.balance.abstain);
             balance = {
               aye: Number(delegation.balance) * ayePercentage,
@@ -335,6 +353,7 @@ export const getConvictionVoting = async (
           // The conviction being voted with, ie `None`, `Locked1x`, `Locked5x`, etc
           conviction: delegation.conviction,
           // The balance they are voting with themselves, sans delegated balance
+          // @ts-ignore
           balance: balance,
           // The total amount of tokens that were delegated to them (including conviction)
           delegatedConvictionBalance: delegation.delegatedConvictionBalance,

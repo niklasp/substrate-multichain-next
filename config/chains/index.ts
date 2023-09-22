@@ -51,12 +51,18 @@ export async function getChainByName(name: SubstrateChain) {
       provider: chainSettings.provider,
     });
 
+    chainSettings.api.on("connected", () => {
+      console.log(
+        `⚡️ ${name} relay api ready. Connected to ${chainSettings.api?.runtimeVersion.specName} spec:${chainSettings.api?.runtimeVersion.specVersion} at ${chainSettings.endpoints[0].url}`
+      );
+    });
+
     chainSettings.api.on("disconnected", () => {
-      // console.log(`disconnected from ${name}`);
+      console.log(`disconnected from ${name} relay`);
     });
 
     chainSettings.api.on("error", () => {
-      // console.log(`error from ${name}`);
+      console.log(`error from ${name} relay`);
     });
   } else {
     // console.log(`api from cache for ${name}`);
@@ -66,6 +72,20 @@ export async function getChainByName(name: SubstrateChain) {
       provider: chainSettings.assetHubProvider,
     });
   }
+
+  chainSettings.assetHubApi?.on("connected", () => {
+    console.log(
+      `⚡️ ${name} assetHub api ready. Connected to ${chainSettings.api?.runtimeVersion.specName} spec:${chainSettings.api?.runtimeVersion.specVersion} at ${chainSettings.endpoints[0].url}`
+    );
+  });
+
+  chainSettings.assetHubApi.on("disconnected", () => {
+    console.log(`disconnected from ${name} assethub`);
+  });
+
+  chainSettings.assetHubApi.on("error", () => {
+    console.log(`error from ${name} assethub`);
+  });
 
   // console.log(`waiting for api ready for ${name}`);
   await chainSettings.api.isReady;

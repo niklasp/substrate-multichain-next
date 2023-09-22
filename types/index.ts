@@ -34,7 +34,9 @@ export type ChainConfig = {
   ss58Format: number;
   blockTime: number;
   endpoints: Endpoint[];
+  selectedEndpoint: number;
   assetHubEndpoints: Endpoint[];
+  selectedAssetHubEndpoint: number;
   tracks: any[];
   icon: React.FC<IconSvgProps>;
   provider?: WsProvider;

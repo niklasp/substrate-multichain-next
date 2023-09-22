@@ -29,6 +29,7 @@ import {
   useDisclosure,
 } from "@nextui-org/modal";
 import ModalCreateNFTCollection from "./modal-new-collection";
+import { CollectionConfiguration } from "../types";
 
 export default function RewardsCreationForm({
   chain,
@@ -92,7 +93,7 @@ export default function RewardsCreationForm({
 
   function onModalOpenChange(isOpen: boolean) {
     console.log("modalOpenChange", isOpen);
-    onOpenChange(isOpen);
+    onOpenChange();
   }
 
   // function onModalClose(): void {

@@ -179,6 +179,8 @@ export const polkadot: ChainConfig = {
   name: SubstrateChain.Polkadot,
   endpoints,
   assetHubEndpoints,
+  selectedAssetHubEndpoint: 0,
+  selectedEndpoint: 0,
   icon: PolkadotIcon,
   tracks,
   ...polkadotConfig,

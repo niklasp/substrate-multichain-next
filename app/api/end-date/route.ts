@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   const { api, blockTime, name } = chainConfig;
 
   if (!api) {
-    return;
+    return NextResponse.json({ error: `can not get api of ${name}` });
   }
 
   await api.isReady;
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     (await api?.rpc.chain.getHeader()) || {};
 
   if (!hash || !latestBlockNumber) {
-    return;
+    return NextResponse.json({ error: "Can not get current block timestamp" });
   }
 
   const endBlockBN = bnToBn(endBlock);
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   )?.query.timestamp.now();
 
   if (!currentBlockTimestamp) {
-    return;
+    return NextResponse.json({ error: "Can not get current block timestamp" });
   }
 
   const endBlockTimestamp = currentBlockTimestamp.add(

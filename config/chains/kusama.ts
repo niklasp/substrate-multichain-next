@@ -179,6 +179,8 @@ export const kusama: ChainConfig = {
   name: SubstrateChain.Kusama,
   endpoints,
   assetHubEndpoints,
+  selectedAssetHubEndpoint: 0,
+  selectedEndpoint: 0,
   icon: KusamaIcon,
   tracks,
   ...kusamaConfig,

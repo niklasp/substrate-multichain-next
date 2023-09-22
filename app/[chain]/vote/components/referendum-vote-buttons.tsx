@@ -15,13 +15,13 @@ export default function ReferendumVoteButtons({
   userVote: any;
 }) {
   const openModal = useAppStore((state) => state.openModal);
+
+  //TODO new modal
   return (
     <div>
       <Button
         onClick={() =>
-          openModal(<ReferendumVoteModal referendum={referendum} />, {
-            size: "2xl",
-          })
+          openModal(<ReferendumVoteModal referendum={referendum} />)
         }
         radius="sm"
         className="w-full h-unit-12 mb-2"

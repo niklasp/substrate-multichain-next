@@ -20,12 +20,6 @@ import { ApiPromise } from "@polkadot/api";
 import PinataClient from "@pinata/sdk";
 import seedrandom from "seedrandom";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export async function POST(req: NextRequest) {
   //   let { rewardsConfig }: { rewardsConfig: unknown } = await req.json();
 
@@ -176,68 +170,69 @@ const generateCalls = async (
 
   // get all transactions that are needed for the distribution
   // TODO --- warning we slice by 10 here
-  let { txsKusamaAssetHub, txsPerVote } = await getTxsReferendumRewards(
-    nftPalletApi,
-    referendaPalletApi,
-    apiPinata,
-    config,
-    decoratedVotes,
-    rarityDistribution,
-    rng
-    // logger
-  );
 
-  const nftCalls = nftPalletApi?.tx.utility
-    .batchAll(txsKusamaAssetHub)
-    .method.toHex();
+  // let { txsKusamaAssetHub, txsPerVote } = await getTxsReferendumRewards(
+  //   nftPalletApi,
+  //   referendaPalletApi,
+  //   apiPinata,
+  //   config,
+  //   decoratedVotes,
+  //   rarityDistribution,
+  //   rng
+  //   // logger
+  // );
 
-  // const kusamaCalls = referendaPalletApi.tx.utility.batchAll(txsKusama).method.toHex();
+  // const nftCalls = nftPalletApi?.tx.utility
+  //   .batchAll(txsKusamaAssetHub)
+  //   .method.toHex();
 
-  console.info(
-    `📊 Generated ${txsKusamaAssetHub.length} txs for minting NFTs on Asset Hub (Kusama)`
-    // ,` and ${txsKusama.length} txs for Kusama XCM calls`
-  );
+  // // const kusamaCalls = referendaPalletApi.tx.utility.batchAll(txsKusama).method.toHex();
 
-  console.info(`💵 Calculating fees for sender ${config.sender}`);
+  // console.info(
+  //   `📊 Generated ${txsKusamaAssetHub.length} txs for minting NFTs on Asset Hub (Kusama)`
+  //   // ,` and ${txsKusama.length} txs for Kusama XCM calls`
+  // );
 
-  // const infoKusamaCalls = await referendaPalletApi.tx.utility
-  //   .batchAll(txsKusama)
+  // console.info(`💵 Calculating fees for sender ${config.sender}`);
+
+  // // const infoKusamaCalls = await referendaPalletApi.tx.utility
+  // //   .batchAll(txsKusama)
+  // //   .paymentInfo(config.sender);
+
+  // const amountOfTxs = txsKusamaAssetHub.length;
+  // const amountOfNFTs = decoratedVotes.length;
+  // const txsPerNFT = amountOfTxs / amountOfNFTs;
+
+  // console.info(`📊 Generated ${amountOfTxs} txs for ${amountOfNFTs} NFTs`);
+  // console.info(`📊 Generated ${txsPerNFT} txs per NFT`);
+
+  // const infoNftCalls = await nftPalletApi.tx.utility
+  //   .batchAll(txsKusamaAssetHub)
   //   .paymentInfo(config.sender);
 
-  const amountOfTxs = txsKusamaAssetHub.length;
-  const amountOfNFTs = decoratedVotes.length;
-  const txsPerNFT = amountOfTxs / amountOfNFTs;
+  // console.info("successfully calculated fees");
 
-  console.info(`📊 Generated ${amountOfTxs} txs for ${amountOfNFTs} NFTs`);
-  console.info(`📊 Generated ${txsPerNFT} txs per NFT`);
+  // const collectionDeposit = await getNFTCollectionDeposit(nftPalletApi);
+  // const itemDeposit = await getNFTItemDeposit(nftPalletApi);
+  // const metadataDepositBase = await getNFTMetadataDeposit(nftPalletApi);
+  // // const attributeDepositBase = await getNFTAttributeDeposit(nftPalletApi);
 
-  const infoNftCalls = await nftPalletApi.tx.utility
-    .batchAll(txsKusamaAssetHub)
-    .paymentInfo(config.sender);
+  // const voters = decoratedVotes.map((vote) => vote.address);
+  // const totalNFTs = voters.length;
 
-  console.info("successfully calculated fees");
+  // let totalDeposit = new BN(itemDeposit)
+  //   .add(new BN(metadataDepositBase))
+  //   .muln(totalNFTs);
 
-  const collectionDeposit = await getNFTCollectionDeposit(nftPalletApi);
-  const itemDeposit = await getNFTItemDeposit(nftPalletApi);
-  const metadataDepositBase = await getNFTMetadataDeposit(nftPalletApi);
-  // const attributeDepositBase = await getNFTAttributeDeposit(nftPalletApi);
+  // if (config.collectionConfig.isNew) {
+  //   totalDeposit.add(new BN(collectionDeposit));
+  // }
 
-  const voters = decoratedVotes.map((vote) => vote.address);
-  const totalNFTs = voters.length;
-
-  let totalDeposit = new BN(itemDeposit)
-    .add(new BN(metadataDepositBase))
-    .muln(totalNFTs);
-
-  if (config.collectionConfig.isNew) {
-    totalDeposit.add(new BN(collectionDeposit));
-  }
-
-  console.info(
-    `📊 Total fees for sender ${
-      config.sender
-    } are ${totalDeposit.toString()} KSM`
-  );
+  // console.info(
+  //   `📊 Total fees for sender ${
+  //     config.sender
+  //   } are ${totalDeposit.toString()} KSM`
+  // );
 
   console.info("🎉 All Done");
 
@@ -300,9 +295,9 @@ const generateCalls = async (
     config,
     // kusamaCall: JSON.stringify(kusamaCalls),
     kusamaCall: "",
-    kusamaAssetHubCall: JSON.stringify(nftCalls),
-    kusamaAssetHubTxs: txsKusamaAssetHub,
-    voters,
+    kusamaAssetHubCall: "",
+    kusamaAssetHubTxs: [],
+    voters: [],
     distribution: rarityDistribution,
     fees: {
       // kusama: formatBalance(infoKusamaCalls.partialFee, {
@@ -310,13 +305,13 @@ const generateCalls = async (
       //   forceUnit: "KSM",
       //   decimals: relayChainDecimals.toNumber(),
       // }),
-      nfts: infoNftCalls.partialFee.toString(),
-      deposit: totalDeposit.toString(),
+      nfts: "",
+      deposit: "",
     },
     txsCount: {
       // kusama: txsKusama.length,
-      nfts: txsKusamaAssetHub.length,
-      txsPerVote,
+      nfts: 10,
+      txsPerVote: 10,
     },
   };
 };

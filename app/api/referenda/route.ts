@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     );
     referenda = [decoratedRef];
   } else {
-    return [];
+    referenda = [];
   }
 
   if (withTracks) {

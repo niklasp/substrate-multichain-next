@@ -100,7 +100,7 @@ export default function ModalCreateNFTCollection({
     }, 1000);
   };
 
-  const onModalClose = (onClose) => {
+  const onModalClose = (onClose: () => void) => {
     if (!isTxPending) {
       setIsNewCollectionLoading(false);
     }
@@ -177,35 +177,35 @@ export default function ModalCreateNFTCollection({
     // setIsNewCollectionLoading(false);
   };
 
-  async function signTx(
-    tx: TxTypes
-  ): Promise<SendAndFinalizeResult | undefined> {
-    const user = useAppStore((state) => state.user);
-    const { actingAccountSigner: signer, actingAccount } = user;
-    const { address } = actingAccount || {};
+  // async function signTx(
+  //   tx: TxTypes
+  // ): Promise<SendAndFinalizeResult | undefined> {
+  //   const user = useAppStore((state) => state.user);
+  //   const { actingAccountSigner: signer, actingAccount } = user;
+  //   const { address } = actingAccount || {};
 
-    if (!address) {
-      setError({
-        message: "Please connect your wallet to continue.",
-        name: "Wallet not connected",
-      });
-      throw new Error("Wallet not connected");
-    }
+  //   if (!address) {
+  //     setError({
+  //       message: "Please connect your wallet to continue.",
+  //       name: "Wallet not connected",
+  //     });
+  //     throw new Error("Wallet not connected");
+  //   }
 
-    // const signatureRes = await sendAndFinalize(
-    //   apiKusamaAssetHub,
-    //   tx,
-    //   signer,
-    //   walletAddress,
-    //   {
-    //     title: "Creating NFT collection",
-    //     messages: defaultToastMessages,
-    //   }
-    // );
+  //   // const signatureRes = await sendAndFinalize(
+  //   //   apiKusamaAssetHub,
+  //   //   tx,
+  //   //   signer,
+  //   //   walletAddress,
+  //   //   {
+  //   //     title: "Creating NFT collection",
+  //   //     messages: defaultToastMessages,
+  //   //   }
+  //   // );
 
-    // return signatureRes;
-    return;
-  }
+  //   // return signatureRes;
+  //   return;
+  // }
 
   return (
     <Modal

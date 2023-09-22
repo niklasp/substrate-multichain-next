@@ -137,6 +137,8 @@ export const rococo: ChainConfig = {
   name: SubstrateChain.Rococo,
   endpoints,
   assetHubEndpoints,
+  selectedAssetHubEndpoint: 0,
+  selectedEndpoint: 0,
   icon: RococoIcon,
   tracks,
   ...rococoConfig,

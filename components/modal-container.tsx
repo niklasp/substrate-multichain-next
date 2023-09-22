@@ -9,8 +9,6 @@ export default function ModalContainer() {
   const closeModal = useAppStore((state) => state.closeModal);
   const { view: modalView, isOpen, modalProps } = modals;
 
-  console.log("modal Container", modalProps);
-
   return (
     <Modal
       isOpen={isOpen}

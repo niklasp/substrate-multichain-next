@@ -1,3 +1,5 @@
+import { AccountId32 } from "@polkadot/types/interfaces";
+import { Codec } from "@polkadot/types/types";
 import type { StorageKey, u16, u32, Option } from "@polkadot/types";
 import type { ApiPromise } from "@polkadot/api";
 import type {
@@ -7,6 +9,7 @@ import type {
   PalletReferendaReferendumInfoConvictionVotingTally,
   PalletReferendaReferendumInfoRankedCollectiveTally,
   PalletReferendaTrackInfo,
+  PalletConvictionVotingVoteVoting,
 } from "@polkadot/types/lookup";
 import type {
   CurveGraph,
@@ -20,7 +23,7 @@ import type {
 import { getGovernanceTracks } from "@polkadot/apps-config";
 import { ReferendumPolkassembly, VoteChoice } from "./types";
 import { create } from "zustand";
-import { SubstrateChain } from "../../../types/index";
+import { SubstrateChain, VotePolkadot } from "../../../types/index";
 import {
   BN,
   BN_BILLION,

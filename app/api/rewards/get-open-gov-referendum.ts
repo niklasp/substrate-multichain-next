@@ -109,13 +109,19 @@ export const getOpenGovReferendum = async (
       tally: { ayes, nays, support },
       inQueue,
       alarm,
+      // @ts-ignore
     } = referendumJSON["ongoing"];
+    // @ts-ignore
     const origin = referendumJSON["ongoing"]?.origin?.origins
-      ? referendumJSON["ongoing"]?.origin?.origins
+      ? // @ts-ignore
+        referendumJSON["ongoing"]?.origin?.origins
       : "root";
+    // @ts-ignore
     const hash = referendumJSON["ongoing"]?.proposal?.lookup
-      ? referendumJSON["ongoing"]?.proposal?.lookup?.hash
-      : referendumJSON["ongoing"]?.proposal?.inline;
+      ? // @ts-ignore
+        referendumJSON["ongoing"]?.proposal?.lookup?.hash
+      : // @ts-ignore
+        referendumJSON["ongoing"]?.proposal?.inline;
     let decisionDepositWho, decisionDepositAmount, since, confirming;
     if (decisionDeposit) {
       const { who: decisionDepositWho, amount: decisionDepositAmount } =
