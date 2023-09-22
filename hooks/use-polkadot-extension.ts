@@ -93,5 +93,9 @@ export const usePolkadotExtension = () => {
     asyncEffect();
   }, [actingAccountIdx, accounts]);
 
+  useEffect(() => {
+    extensionSetup();
+  }, [isExtensionReady]);
+
   return { extensionSetup, isExtensionReady };
 };
