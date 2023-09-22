@@ -99,15 +99,37 @@ export async function POST(req: NextRequest) {
   try {
     const apiPinata = await setupPinata();
 
-    const callResult: GenerateRewardsResult = await generateCalls(
-      apiPinata,
-      selectedChain,
-      rewardConfig
-    );
+    // const callResult: GenerateRewardsResult = await generateCalls(
+    //   apiPinata,
+    //   selectedChain,
+    //   rewardConfig
+    // );
 
     return NextResponse.json({
       status: "success",
-      data: { some: "data" },
+      data: {
+        call: "omitted",
+        // kusamaCall: JSON.stringify(kusamaCalls),
+        kusamaCall: "",
+        kusamaAssetHubCall: "0x123123123...",
+        kusamaAssetHubTxs: [],
+        voters: ["5F11111", "5F222222", "5F33333"],
+        distribution: { common: 122, rare: 43, epic: 12 },
+        fees: {
+          // kusama: formatBalance(infoKusamaCalls.partialFee, {
+          //   withSi: false,
+          //   forceUnit: "KSM",
+          //   decimals: relayChainDecimals.toNumber(),
+          // }),
+          nfts: "",
+          deposit: "",
+        },
+        txsCount: {
+          // kusama: txsKusama.length,
+          nfts: 7,
+          txsPerVote: 4,
+        },
+      },
     });
 
     // res.status(200).json(callResult);
@@ -297,10 +319,10 @@ const generateCalls = async (
     config,
     // kusamaCall: JSON.stringify(kusamaCalls),
     kusamaCall: "",
-    kusamaAssetHubCall: "",
+    kusamaAssetHubCall: "0x123123123...",
     kusamaAssetHubTxs: [],
-    voters: [],
-    distribution: rarityDistribution,
+    voters: ["5F11111", "5F222222", "5F33333"],
+    distribution: { common: 122, rare: 43, epic: 12 },
     fees: {
       // kusama: formatBalance(infoKusamaCalls.partialFee, {
       //   withSi: false,
@@ -312,8 +334,8 @@ const generateCalls = async (
     },
     txsCount: {
       // kusama: txsKusama.length,
-      nfts: 10,
-      txsPerVote: 10,
+      nfts: 7,
+      txsPerVote: 4,
     },
   };
 };

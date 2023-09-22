@@ -29,8 +29,10 @@ import {
   useDisclosure,
 } from "@nextui-org/modal";
 import ModalCreateNFTCollection from "./modal-new-collection";
-import { CollectionConfiguration } from "../types";
+import { CollectionConfiguration, GenerateRewardsResult } from "../types";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Link } from "@nextui-org/link";
+import ModalAnalyzeSendout from "./modal-analyze-sendout";
 
 export default function RewardsCreationForm({
   chain,
@@ -47,8 +49,17 @@ export default function RewardsCreationForm({
   // const openModal = useAppStore((state) => state.openModal);
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const {
+    isOpen: isAnalyzeOpen,
+    onOpen: onAnalzeOpen,
+    onOpenChange: onAnalyzeOpenChange,
+    onClose: onAnalyzeClose,
+  } = useDisclosure();
 
   const [isNewCollectionLoading, setIsNewCollectionLoading] = useState(false);
+
+  const [rewardSendoutData, setRewardSendoutData] =
+    useState<GenerateRewardsResult>(undefined);
 
   const [formStep, setFormStep] = useState(0);
   const nextFormStep = () => setFormStep((currentStep) => currentStep + 1);
@@ -173,6 +184,7 @@ export default function RewardsCreationForm({
     }
 
     if (response.ok && responseData.status === "success") {
+      setRewardSendoutData(responseData.data);
       nextFormStep();
     }
   }
@@ -372,7 +384,6 @@ export default function RewardsCreationForm({
               )}
               <Button
                 type="submit"
-                variant="shadow"
                 isDisabled={isSubmitting || formStep !== 0}
                 isLoading={isSubmitting}
                 className={clsx("w-full h-20", vividButtonClasses)}
@@ -383,26 +394,39 @@ export default function RewardsCreationForm({
             </div>
             <div className="flex items-center flex-wrap gap-2 text-tiny">
               <div
-                className={clsx("flex flex-row gap-4 items-center", {
-                  "text-gray-500": formStep !== 1,
-                })}
+                className={clsx(
+                  "w-full flex flex-row gap-4 items-center flex-wrap",
+                  {
+                    "text-gray-500": formStep !== 1,
+                  }
+                )}
               >
                 {formStep === 1 && (
                   <span className="text-4xl text-secondary">→</span>
                 )}
                 <span className="text-4xl">2</span>
-                Start the sendout process. You will be asked to sign 7
-                transactions in sequence. Complete all for a full sendout.
+                Start the sendout process. You will be asked to sign{" "}
+                {rewardSendoutData?.txsCount?.nfts ?? "..."}&nbsp;transactions
+                in sequence. Complete all for a full sendout.
+                {rewardSendoutData && (
+                  <Button
+                    onClick={onAnalyzeOpenChange}
+                    className="self-end flex-grow"
+                  >
+                    Analyze Sendout
+                  </Button>
+                )}
               </div>
               <Button
                 type="submit"
                 variant="shadow"
                 isDisabled={isSubmitting || formStep !== 1}
                 // isLoading={isSubmitting}
-                className={clsx("w-full h-20", vividButtonClasses)}
+                className={clsx("w-full h-20 border-2", vividButtonClasses)}
               >
                 Start the {activeChain && <activeChain.icon />} rewards sendout
               </Button>
+              {JSON.stringify(rewardSendoutData)}
             </div>
           </CardBody>
         </Card>
@@ -424,6 +448,11 @@ export default function RewardsCreationForm({
         isOpen={isOpen}
         isTxPending={isCollectionCreatePending}
         setIsTxPending={setIsCollectionCreatePending}
+      />
+      <ModalAnalyzeSendout
+        sendoutData={rewardSendoutData}
+        onOpenChange={onAnalyzeOpenChange}
+        isOpen={isAnalyzeOpen}
       />
     </FormProvider>
   );

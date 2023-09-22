@@ -1,24 +1,26 @@
 import { SubstrateChain } from "@/types";
 
-export type GenerateRewardsResult = {
-  call: string | undefined;
-  config: RewardConfiguration;
-  kusamaCall: string | undefined;
-  kusamaAssetHubCall: string | undefined;
-  kusamaAssetHubTxs: string[] | undefined;
-  distribution: RarityDistribution | undefined;
-  voters: string[] | undefined;
-  fees?: {
-    kusama?: string;
-    nfts?: string;
-    deposit?: string;
-  };
-  txsCount?: {
-    kusama?: number;
-    nfts?: number;
-    txsPerVote?: number;
-  };
-};
+export type GenerateRewardsResult =
+  | {
+      call: string | undefined;
+      config: RewardConfiguration;
+      kusamaCall: string | undefined;
+      kusamaAssetHubCall: string | undefined;
+      kusamaAssetHubTxs: string[] | undefined;
+      distribution: RarityDistribution | undefined;
+      voters: string[] | undefined;
+      fees?: {
+        kusama?: string;
+        nfts?: string;
+        deposit?: string;
+      };
+      txsCount?: {
+        kusama?: number;
+        nfts?: number;
+        txsPerVote?: number;
+      };
+    }
+  | undefined;
 
 export type CreateCollectionResult = {
   call: string | undefined;
