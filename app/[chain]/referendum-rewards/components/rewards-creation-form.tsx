@@ -30,6 +30,7 @@ import {
 } from "@nextui-org/modal";
 import ModalCreateNFTCollection from "./modal-new-collection";
 import { CollectionConfiguration } from "../types";
+import { Card, CardBody, CardHeader } from "@nextui-org/card";
 
 export default function RewardsCreationForm({
   chain,
@@ -48,9 +49,10 @@ export default function RewardsCreationForm({
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const [isNewCollectionLoading, setIsNewCollectionLoading] = useState(false);
-  // const [formStep, setFormStep] = useState(0);
-  // const nextFormStep = () => setFormStep((currentStep) => currentStep + 1);
-  // const prevFormStep = () => setFormStep((currentStep) => currentStep - 1);
+
+  const [formStep, setFormStep] = useState(0);
+  const nextFormStep = () => setFormStep((currentStep) => currentStep + 1);
+  const prevFormStep = () => setFormStep((currentStep) => currentStep - 1);
 
   const formMethods = useForm<TypeRewardsSchema>({
     resolver: zodResolver(chainRewardsSchema),
@@ -146,8 +148,10 @@ export default function RewardsCreationForm({
     console.log("responseData", responseData);
 
     if (!response.ok) {
-      console.log(responseData);
-      return;
+      console.error("error getting response from server", responseData);
+      setError("root", {
+        message: "Error reaching server",
+      });
     }
     if (responseData.errors) {
       const errors = responseData.errors;
@@ -166,8 +170,10 @@ export default function RewardsCreationForm({
           message: errors.form,
         });
       }
-      //TODO expand
-      console.log("errors form server", errors);
+    }
+
+    if (response.ok && responseData.status === "success") {
+      nextFormStep();
     }
   }
 
@@ -341,20 +347,65 @@ export default function RewardsCreationForm({
           ))}
         </div>
 
-        <div className="text-danger w-full text-center mt-3">
-          {errors &&
-            errors.root &&
-            `Rewards creation failed: ${errors.root.message}`}
-        </div>
-        <Button
-          type="submit"
-          variant="shadow"
-          isDisabled={isSubmitting}
-          isLoading={isSubmitting}
-          className={clsx("w-full mt-4 h-20", vividButtonClasses)}
-        >
-          Submit {activeChain && <activeChain.icon />} Referendum Rewards
-        </Button>
+        <Card className="mt-4">
+          <CardHeader className="mx-2 mt-2 text-xl">Action</CardHeader>
+          <CardBody className="flex gap-4">
+            <div className="flex items-center flex-wrap gap-2 text-tiny">
+              <div
+                className={clsx("flex flex-row gap-4 items-center", {
+                  "text-gray-500": formStep !== 0,
+                })}
+              >
+                {formStep === 0 && (
+                  <span className="text-4xl text-secondary">→</span>
+                )}
+                <span className="text-4xl">1</span>Create on chain transactions
+                based on your configuration above (i.e. pin files to ipfs,
+                calculate distribution of nfts, mint nft transactions, set nft
+                attributes, ...)
+              </div>
+              {errors && errors.root && (
+                <p className="text-danger w-full text-center mt-3">
+                  <span>Rewards creation failed: {errors.root.message}</span>
+                  <span className="block">Please try again</span>
+                </p>
+              )}
+              <Button
+                type="submit"
+                variant="shadow"
+                isDisabled={isSubmitting || formStep !== 0}
+                isLoading={isSubmitting}
+                className={clsx("w-full h-20", vividButtonClasses)}
+              >
+                Generate {activeChain && <activeChain.icon />}reward
+                transactions
+              </Button>
+            </div>
+            <div className="flex items-center flex-wrap gap-2 text-tiny">
+              <div
+                className={clsx("flex flex-row gap-4 items-center", {
+                  "text-gray-500": formStep !== 1,
+                })}
+              >
+                {formStep === 1 && (
+                  <span className="text-4xl text-secondary">→</span>
+                )}
+                <span className="text-4xl">2</span>
+                Start the sendout process. You will be asked to sign 7
+                transactions in sequence. Complete all for a full sendout.
+              </div>
+              <Button
+                type="submit"
+                variant="shadow"
+                isDisabled={isSubmitting || formStep !== 1}
+                // isLoading={isSubmitting}
+                className={clsx("w-full h-20", vividButtonClasses)}
+              >
+                Start the {activeChain && <activeChain.icon />} rewards sendout
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
 
         <Input
           type="text"

@@ -40,9 +40,9 @@ export async function POST(req: NextRequest) {
 
     console.log("rewardConfig json", rewardConfig);
   } catch (error) {
-    console.log("error parsing form data", error);
+    console.log("Error parsing form data", error);
     return NextResponse.json({
-      errors: { form: "Invalid form data" },
+      errors: { form: "Error parsing form data" },
       success: false,
     });
   }
@@ -105,6 +105,11 @@ export async function POST(req: NextRequest) {
       rewardConfig
     );
 
+    return NextResponse.json({
+      status: "success",
+      data: { some: "data" },
+    });
+
     // res.status(200).json(callResult);
   } catch (error: any) {
     console.trace(error);
@@ -114,9 +119,6 @@ export async function POST(req: NextRequest) {
     // });
     return NextResponse.json({ errors: { form: error.message } });
   }
-
-  // and return here as serializable json (aka strings, numbers, booleans, plain objects, arrays, etc.)
-  return NextResponse.json({ success: true });
 }
 
 const generateCalls = async (
