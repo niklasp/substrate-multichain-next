@@ -169,8 +169,8 @@ export function curveDelay(
       return y.lt(floor)
         ? BN_BILLION
         : y.gt(ceil)
-        ? BN_ZERO
-        : bnMin(
+          ? BN_ZERO
+          : bnMin(
             BN_BILLION,
             bnMax(BN_ZERO, ceil.sub(y).mul(length).div(ceil.sub(floor)))
           );
@@ -185,18 +185,18 @@ export function curveDelay(
       return y.lt(end)
         ? BN_BILLION
         : bnMin(
-            BN_BILLION,
-            bnMax(
-              BN_ZERO,
-              period
-                .mul(
-                  begin
-                    .sub(bnMin(y, begin))
-                    .add(step.isZero() ? step : step.sub(BN_ONE))
-                )
-                .div(step)
-            )
-          );
+          BN_BILLION,
+          bnMax(
+            BN_ZERO,
+            period
+              .mul(
+                begin
+                  .sub(bnMin(y, begin))
+                  .add(step.isZero() ? step : step.sub(BN_ONE))
+              )
+              .div(step)
+          )
+        );
     } else if (curve.asReciprocal) {
       const { factor, xOffset, yOffset } = curve.asReciprocal;
       const div = y.sub(yOffset);
@@ -289,14 +289,14 @@ export const transformReferendum = ([id, info]: [
   const status = refInfo?.isApproved
     ? "approved"
     : refInfo?.isRejected
-    ? "rejected"
-    : refInfo?.isOngoing
-    ? "ongoing"
-    : refInfo?.isCancelled
-    ? "cancelled"
-    : refInfo?.isTimedOut
-    ? "timedOut"
-    : "unknown";
+      ? "rejected"
+      : refInfo?.isOngoing
+        ? "ongoing"
+        : refInfo?.isCancelled
+          ? "cancelled"
+          : refInfo?.isTimedOut
+            ? "timedOut"
+            : "unknown";
 
   try {
     if (refInfo?.isOngoing) {
@@ -317,12 +317,12 @@ export const transformReferendum = ([id, info]: [
       const ongoingStatus = !submissionDeposit
         ? "awaitingSubmissionDeposit"
         : decisionDeposit.isNone
-        ? "awaitingDecisionDeposit"
-        : deciding.isSome && deciding.unwrap().since
-        ? "deciding"
-        : deciding.isSome && deciding.unwrap().confirming.isSome
-        ? "confirming"
-        : "preparing";
+          ? "awaitingDecisionDeposit"
+          : deciding.isSome && deciding.unwrap().since
+            ? "deciding"
+            : deciding.isSome && deciding.unwrap().confirming.isSome
+              ? "confirming"
+              : "preparing";
 
       return {
         index: typeof id === "string" ? id : id.toHuman()?.toString(),
@@ -346,10 +346,15 @@ export const transformReferendum = ([id, info]: [
         // endBlock: endBlock.toNumber(),
       } as ReferendumPolkadot;
     } else {
+      const endedAt = refInfo?.isApproved ?
+        refInfo?.asApproved[0] : refInfo?.isRejected ?
+          refInfo?.asRejected[0] : refInfo?.isCancelled ?
+            refInfo?.asCancelled[0] : refInfo?.isTimedOut ?
+              refInfo?.asTimedOut[0] : undefined
       return {
         index: typeof id === "string" ? id : id.toHuman()?.toString(),
         status,
-        // endedAt,
+        endedAt: endedAt?.toString(),
       } as ReferendumPolkadot;
     }
   } catch (e) {

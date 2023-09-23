@@ -61,13 +61,13 @@ export const getDecoratedVotesWithInfo = async (
 }> => {
   console.info(`↪ Getting referendum details and all voting wallets`);
 
-  
+
   const convictionVoting = await getConvictionVoting(
     api,
     config.refIndex
   );
 
-  let votes: ConvictionVote [] = [];
+  let votes: ConvictionVote[] = [];
   let totalIssuance: string | undefined
   let referendum: ReferendumPolkadot | undefined;
 
@@ -392,12 +392,12 @@ export const retrieveAccountLocks = async (
         const userLockPeriods = userVote.endBlock.eqn(0)
           ? 0
           : Math.floor(
-              userVote.endBlock
-                .sub(endBlockBN)
-                .muln(10)
-                .div(sevenDaysBlocks)
-                .toNumber() / 10
-            );
+            userVote.endBlock
+              .sub(endBlockBN)
+              .muln(10)
+              .div(sevenDaysBlocks)
+              .toNumber() / 10
+          );
         const matchingPeriod = lockPeriods.reduce(
           (acc, curr, index) => (userLockPeriods >= curr ? index : acc),
           0
@@ -408,8 +408,8 @@ export const retrieveAccountLocks = async (
     const maxLockedWithConviction =
       userLockedBalancesWithConviction.length > 0
         ? userLockedBalancesWithConviction.reduce((max, current) =>
-            BN.max(max, current)
-          )
+          BN.max(max, current)
+        )
         : new BN(0);
 
     return { ...vote, lockedWithConviction: maxLockedWithConviction };
@@ -610,7 +610,7 @@ export const getApiAt = async (
   if (!api) throw new Error("Api is not defined");
   if (!blockNumber) return api;
   const blockHash =
-    (await api?.rpc.chain.getBlockHash(blockNumber)) || {}.toString();
+    (await api?.rpc.chain.getBlockHash(blockNumber)).toString() || {}.toString();
   return await api?.at(blockHash);
 };
 
