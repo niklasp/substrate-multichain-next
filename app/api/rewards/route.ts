@@ -19,6 +19,7 @@ import { getDecoratedVotesWithInfo, setupPinata } from "./util";
 import { ApiPromise } from "@polkadot/api";
 import PinataClient from "@pinata/sdk";
 import seedrandom from "seedrandom";
+import { defaultReferendumRewardsConfig } from "@/config/default-rewards-config";
 
 export async function POST(req: NextRequest) {
   //   let { rewardsConfig }: { rewardsConfig: unknown } = await req.json();
@@ -98,12 +99,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const apiPinata = await setupPinata();
-    rewardConfig.min = "1200000000000"
-    rewardConfig.max = "100000000000000000000000000000000000000000"
-    rewardConfig.first = null
-    rewardConfig.blockCutOff = null
-    rewardConfig.directOnly = false
-    rewardConfig.minAmount = 0.2
+    rewardConfig = {...rewardConfig, ...defaultReferendumRewardsConfig}
     const callResult: GenerateRewardsResult = await generateCalls(
       apiPinata,
       selectedChain,
