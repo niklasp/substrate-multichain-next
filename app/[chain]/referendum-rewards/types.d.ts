@@ -235,8 +235,8 @@ export interface RewardConfiguration {
   lowerLimitOfCurve?: number | null;
   upperLimitOfCurve?: number | null;
   medianOfCurve?: number | null;
-  minRequiredLockedWithConvicition?: number | null;
-  maxAllowedLockedWithConvicition?: number | null;
+  minRequiredLockedWithConviction?: number | null;
+  maxAllowedLockedWithConviction?: number | null;
   maxLockedWithConviction?: number | null;
   minLockedWithConviction?: number | null;
   sender?: string;

@@ -10,7 +10,7 @@ import { StorageKey, u32, Option } from "@polkadot/types";
 
 import { BN } from "@polkadot/util";
 import { getApiAt, getDenom } from "./util";
-import { transformReferendum, transformVote } from "@/app/[chain]/vote/util";
+import { transformReferendum, transformVote, transformVoteMulti } from "@/app/[chain]/vote/util";
 import { ReferendumPolkadot } from "@/app/[chain]/vote/types";
 
 type ReferendumInfo = [
@@ -20,25 +20,29 @@ type ReferendumInfo = [
 
 const getOpenGovReferenda = async (api: ApiPromise, referendumIndex?: string) => {
   if (!api) {
-      throw new Error("No API provided.");
+    throw new Error("No API provided.");
   }
 
   const openGovRefs: ReferendumInfo[] = referendumIndex
-      ? [[referendumIndex.toString(), await api.query.referenda.referendumInfoFor(referendumIndex)]]
-      : await api.query.referenda.referendumInfoFor.entries();
+    ? [[referendumIndex.toString(), await api.query.referenda.referendumInfoFor(referendumIndex)]]
+    : await api.query.referenda.referendumInfoFor.entries();
 
   const referenda: ReferendumPolkadot[] = openGovRefs.map(transformReferendum);
   const ongoingReferenda: ReferendumPolkadot[] = [];
   const finishedReferenda: ReferendumPolkadot[] = [];
   let totalIssuance: string | undefined;
 
+  if (referendumIndex) {
+    totalIssuance = (await api.query.balances.totalIssuance()).toString();
+  }
+
   for (const referendum of referenda) {
-      if (isReferendumFinished(referendum)) {
-          const finishedRef = await processFinishedReferendum(api, referendum);
-          finishedReferenda.push(finishedRef);
-      } else {
-          ongoingReferenda.push(referendum);
-      }
+    if (isReferendumFinished(referendum)) {
+      const finishedRef = await processFinishedReferendum(api, referendum);
+      finishedReferenda.push(finishedRef);
+    } else {
+      ongoingReferenda.push(referendum);
+    }
   }
 
   return { ongoingReferenda, finishedReferenda, totalIssuance };
@@ -52,8 +56,8 @@ const isReferendumFinished = (referendum: ReferendumPolkadot): boolean => {
 const processFinishedReferendum = async (api: ApiPromise, referendum: ReferendumPolkadot): Promise<ReferendumPolkadot> => {
   const apiAt = await getApiAt(api, new BN(referendum.endedAt!).subn(1).toNumber());
   const referendumInfo: ReferendumInfo = [
-      referendum.index as StorageKey<[u32]> | string,
-      await apiAt.query.referenda.referendumInfoFor(referendum.index)
+    referendum.index as StorageKey<[u32]> | string,
+    await apiAt.query.referenda.referendumInfoFor(referendum.index)
   ];
   const referendumInfoWhileOngoing = transformReferendum(referendumInfo);
   referendumInfoWhileOngoing.endedAt = referendum.endedAt;
@@ -107,7 +111,7 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
       await api?.query.convictionVoting.votingFor.entries();
 
 
-    const votingForTillNow: VotePolkadot[] = openGovVotesTillNow?.map(transformVote)
+    const votingForTillNow: VotePolkadot[] = openGovVotesTillNow?.map(transformVoteMulti)
     console.log(`Got voting for ${votingForTillNow.length} entries`, {
       label: "Democracy",
     });
@@ -546,7 +550,7 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
           label: "Democracy",
         }
       );
-      if (!referendum.endedAt){
+      if (!referendum.endedAt) {
         throw new Error("endedAt is undefined for a past referendum");
       }
       const apiAt = await getApiAt(
@@ -558,7 +562,7 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
       const openGovVotesTillRefEnd =
         await apiAt.query.convictionVoting.votingFor.entries();
 
-      const votingForTillRefEnd: VotePolkadot[] = openGovVotesTillRefEnd?.map(transformVote)
+      const votingForTillRefEnd: VotePolkadot[] = openGovVotesTillRefEnd?.map(transformVoteMulti)
 
       console.log(`Got voting until ref end ${votingForTillRefEnd.length} entries`, {
         label: "Democracy",

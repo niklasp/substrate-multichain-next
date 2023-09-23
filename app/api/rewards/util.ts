@@ -13,6 +13,7 @@ import {
   ConvictionVote,
   DecoratedConvictionVote,
   DirectVoteLock,
+  VotePolkadot,
 } from "@/types";
 import PinataClient from "@pinata/sdk";
 import pinataSDK from "@pinata/sdk";
@@ -24,6 +25,7 @@ import { Decorate } from "@polkadot/api/base/Decorate";
 import seedrandom from "seedrandom";
 import { rewardsConfig } from "@/config/rewards";
 import { ApiPromise } from "@polkadot/api";
+import { transformVote } from "@/app/[chain]/vote/util";
 
 const EXPONENT_CONSTANTS = [3, 0.4];
 
@@ -68,7 +70,8 @@ export const getDecoratedVotesWithInfo = async (
   );
 
   let votes: ConvictionVote[] = [];
-  let totalIssuance: string | undefined
+  let votesWithMeetingRequirements: VoteConvictionRequirements[] = [];
+  let totalIssuance: string | undefined;
   let referendum: ReferendumPolkadot | undefined;
 
   if (convictionVoting) {
@@ -82,14 +85,22 @@ export const getDecoratedVotesWithInfo = async (
     `↪ Getting locks for referendum ${config.refIndex} with ${votes.length} votes.`
   );
 
+
+  if (!referendum?.endedAt) {
+    throw new Error("No endedAt Block on Referendum");
+  }
+  if (!referendum?.track) {
+    throw new Error("No track on Referendum");
+  }
+  if (!totalIssuance) {
+    throw new Error("No Total Issuance");
+  }
   // 1. decorate `lockedWithConviction` - relevant info we consider instead of the vote * locked
   votes = await retrieveAccountLocks(
     api,
     votes,
-    // @ts-ignore
-    referendum.confirmationBlockNumber,
-    // @ts-ignore
-    referendum.track
+    parseInt(referendum?.endedAt),
+    parseInt(referendum?.track)
   );
 
   // logger.info(`↪ Applying bonuses for referendum ${config.refIndex}.`)
@@ -104,10 +115,8 @@ export const getDecoratedVotesWithInfo = async (
   );
 
   // 3. decorate `meetsRequirements` - whether vote > threshold
-  // @ts-ignore
-  votes = await checkVotesMeetingRequirements(
+  votesWithMeetingRequirements = await checkVotesMeetingRequirements(
     votes,
-    // @ts-ignore
     totalIssuance,
     config,
     chainDecimals
@@ -266,6 +275,10 @@ export const checkVotesMeetingRequirements = async (
   config: RewardConfiguration,
   chainDecimals: BN
 ): Promise<VoteConvictionRequirements[]> => {
+  console.log("totalIssuance", totalIssuance)
+  console.log("chain", chainDecimals.toString())
+  console.log(config.min)
+  console.log(config.max)
   const minRequiredLockedWithConvicition = BN.max(
     new BN(config.min),
     new BN("0")
@@ -275,14 +288,17 @@ export const checkVotesMeetingRequirements = async (
     new BN(totalIssuance)
   );
 
-  config.minRequiredLockedWithConvicition = getDecimal(
+  config.minRequiredLockedWithConviction = getDecimal(
     minRequiredLockedWithConvicition.toString(),
     chainDecimals
   );
-  config.maxAllowedLockedWithConvicition = getDecimal(
+  console.log("min", config.minRequiredLockedWithConviction)
+  config.maxAllowedLockedWithConviction = getDecimal(
     maxAllowedLockedWithConvicition.toString(),
     chainDecimals
   );
+  console.log("max", config.maxAllowedLockedWithConviction)
+
 
   const filtered: VoteConvictionRequirements[] = votes.map((vote, i) => {
     const meetsRequirements = !(
@@ -345,20 +361,19 @@ export const retrieveAccountLocks = async (
     );
 
     // get userDelegations for this track
-    const accountVotes = await apiAt.query.convictionVoting?.votingFor(
+    const convictionVotesAccount = await apiAt.query.convictionVoting?.votingFor(
       vote.address.toString(),
       track
     );
 
-    const parsedAccountVotes = accountVotes.toJSON(); //as DelegatingData;
-    // @ts-ignore
-    const delegating = parsedAccountVotes?.delegating;
+    const accountVote: VotePolkadot = transformVote(vote.address.toString(), track, convictionVotesAccount)
+    let delegatedLock: Lock = { endBlock: new BN(0), total: new BN(0) };
 
-    let delegatedLock: Lock;
+    if (accountVote.voteData.isDelegating) {
+      const delegating = accountVote?.voteData.asDelegating;
 
-    if (delegating) {
       // Find the lock period corresponding to the conviction
-      const convictionIndex = convictionOptions.indexOf(delegating.conviction);
+      const convictionIndex = convictionOptions.indexOf(delegating.conviction.type);
       const lockPeriod = lockPeriods[convictionIndex];
       // Calculate the end block
       const endBlock: BN = sevenDaysBlocks
@@ -366,19 +381,18 @@ export const retrieveAccountLocks = async (
         .add(endBlockBN);
 
       // Check if the balance is in hexadecimal format and convert if necessary
-      let balanceValue = delegating.balance.toString();
-      if (balanceValue.startsWith("0x")) {
-        balanceValue = parseInt(balanceValue, 16).toString();
-      }
-      const total: BN = new BN(balanceValue);
+      // let balanceValue = delegating.balance.toString();
+      // if (balanceValue.startsWith("0x")) {
+      //   balanceValue = parseInt(balanceValue, 16).toString();
+      // }
+      // const total: BN = new BN(balanceValue);
 
-      delegatedLock = { endBlock, total };
+      delegatedLock = { endBlock, total: delegating.balance };
     }
 
     //add the delegationBalanceWithConviction
     const userLocks =
-      // @ts-ignore
-      delegatedLock?.endBlock && delegatedLock?.total
+      delegatedLock?.endBlock.gtn(0)
         ? [...directLocks, delegatedLock]
         : directLocks;
 
