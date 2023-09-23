@@ -35,7 +35,7 @@ type DepositCountType = {
 
 type TxButtonProps = ButtonProps & {
   extrinsic?: TxTypes;
-  requiredBalance?: string;
+  requiredBalance: string | BN | undefined;
   deposits?: DepositCountType[];
   chainType?: ChainType;
   loadingText?: React.ReactNode;
@@ -100,8 +100,17 @@ export function TxButton(props: TxButtonProps) {
   const isLoadingProp =
     props.isLoading || isAccountBalanceLoading || isDepositCostLoading;
 
-  const requiredBalanceCalculated = requiredBalance
-    ? requiredBalance
+  const requiredBalanceBn =
+    typeof requiredBalance === "string"
+      ? bnToBn(requiredBalance)
+      : requiredBalance === undefined
+      ? BN_MAX_INTEGER
+      : requiredBalance;
+
+  console.log("required balance", requiredBalance);
+
+  const requiredBalanceCalculated = requiredBalanceBn
+    ? requiredBalanceBn
     : isTxCostLoading || isDepositCostLoading
     ? BN_MAX_INTEGER
     : //@ts-ignore
@@ -194,7 +203,7 @@ export function TxButton(props: TxButtonProps) {
               {error.name && <Error stroke="red" />}
             </>
           }
-          isDisabled={isSuccess}
+          isDisabled={isSuccess || props.isDisabled}
         >
           {isLoading && loadingText
             ? loadingText
@@ -211,14 +220,23 @@ export function TxButton(props: TxButtonProps) {
           </Button>
         </Tooltip>
       )}
-      <span className="text-right text-tiny mt-1 text-warning">
-        required: ~{humanRequiredBalance}
-      </span>
+      {!requiredBalanceBn.eq(BN_MAX_INTEGER) && (
+        <span className="text-right text-tiny mt-1 text-warning">
+          required:{" "}
+          {isTxCostLoading ||
+          isDepositCostLoading ||
+          requiredBalance === undefined ? (
+            <InlineLoader />
+          ) : (
+            humanRequiredBalance
+          )}
+        </span>
+      )}
       <span
         className={clsx("text-right text-tiny", {
           "text-success": hasEnough,
           "text-danger": !hasEnough,
-          "text-default": isLoading,
+          "text-foreground": isLoading || requiredBalanceBn.eq(BN_MAX_INTEGER),
         })}
       >
         available:{" "}
@@ -228,6 +246,7 @@ export function TxButton(props: TxButtonProps) {
           humanBalance
         )}
       </span>
+      requiredBalance:{JSON.stringify(requiredBalanceCalculated)}
     </div>
   );
 }

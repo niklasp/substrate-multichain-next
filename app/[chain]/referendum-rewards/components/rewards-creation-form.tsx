@@ -33,6 +33,8 @@ import { CollectionConfiguration, GenerateRewardsResult } from "../types";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Link } from "@nextui-org/link";
 import ModalAnalyzeSendout from "./modal-analyze-sendout";
+import { TxButton } from "@/components/TxButton";
+import { bnToBn } from "@polkadot/util";
 
 export default function RewardsCreationForm({
   chain,
@@ -60,6 +62,13 @@ export default function RewardsCreationForm({
 
   const [rewardSendoutData, setRewardSendoutData] =
     useState<GenerateRewardsResult>(undefined);
+
+  const totalFees =
+    rewardSendoutData?.fees?.nfts && rewardSendoutData?.fees?.deposit
+      ? bnToBn(rewardSendoutData.fees.nfts).add(
+          bnToBn(rewardSendoutData.fees.deposit)
+        )
+      : undefined;
 
   const [formStep, setFormStep] = useState(0);
   const nextFormStep = () => setFormStep((currentStep) => currentStep + 1);
@@ -214,6 +223,7 @@ export default function RewardsCreationForm({
                 "reputable",
                 "extrinsic",
               ]}
+              selectedKeys={["referenda"]}
               isInvalid={!!errors.criteria}
               errorMessage={!!errors.criteria && `${errors.criteria?.message}`}
               {...register("criteria", {
@@ -221,7 +231,7 @@ export default function RewardsCreationForm({
               })}
             >
               <SelectSection showDivider title="Available">
-                <SelectItem key="all" value="all">
+                <SelectItem key="referenda" value="referenda">
                   All Referendum Participants
                 </SelectItem>
               </SelectSection>
@@ -407,7 +417,7 @@ export default function RewardsCreationForm({
                 <span className="text-4xl">2</span>
                 Start the sendout process. You will be asked to sign{" "}
                 {rewardSendoutData?.txsCount?.nfts ? (
-                  <span className="text-warning">
+                  <span className="text-warning text-xl">
                     {rewardSendoutData?.txsCount?.nfts}
                   </span>
                 ) : (
@@ -423,15 +433,15 @@ export default function RewardsCreationForm({
                   </Button>
                 )}
               </div>
-              <Button
-                type="submit"
+
+              <TxButton
+                requiredBalance={totalFees}
                 variant="shadow"
                 isDisabled={isSubmitting || formStep !== 1}
-                // isLoading={isSubmitting}
                 className={clsx("w-full h-20 border-2", vividButtonClasses)}
               >
                 Start the {activeChain && <activeChain.icon />} rewards sendout
-              </Button>
+              </TxButton>
               {JSON.stringify(rewardSendoutData)}
             </div>
           </CardBody>

@@ -99,11 +99,11 @@ export async function POST(req: NextRequest) {
   try {
     const apiPinata = await setupPinata();
 
-    const callResult: GenerateRewardsResult = await generateCalls(
-      apiPinata,
-      selectedChain,
-      rewardConfig
-    );
+    // const callResult: GenerateRewardsResult = await generateCalls(
+    //   apiPinata,
+    //   selectedChain,
+    //   rewardConfig
+    // );
 
     return NextResponse.json({
       status: "success",
@@ -121,8 +121,8 @@ export async function POST(req: NextRequest) {
           //   forceUnit: "KSM",
           //   decimals: relayChainDecimals.toNumber(),
           // }),
-          nfts: "",
-          deposit: "",
+          nfts: "1423123123222",
+          deposit: "12123124123",
         },
         txsCount: {
           // kusama: txsKusama.length,
