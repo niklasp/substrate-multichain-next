@@ -84,7 +84,7 @@ export type ConvictionVote = {
   // The account that is voting
   address: string;
   // The index of the referendum
-  referendumIndex: number;
+  referendumIndex: string;
   // The conviction being voted with, ie `None`, `Locked1x`, `Locked5x`, etc
   conviction: string;
   // The balance they are voting with themselves, sans delegated balance
