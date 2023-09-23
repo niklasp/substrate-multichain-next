@@ -98,7 +98,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const apiPinata = await setupPinata();
-
+    rewardConfig.min = "1200000000000"
+    rewardConfig.max = "100000000000000000000000000000000000000000"
+    rewardConfig.first = null
+    rewardConfig.blockCutOff = null
+    rewardConfig.directOnly = false
+    rewardConfig.minAmount = 0.2
     const callResult: GenerateRewardsResult = await generateCalls(
       apiPinata,
       selectedChain,

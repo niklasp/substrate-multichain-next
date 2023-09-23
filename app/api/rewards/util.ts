@@ -7,7 +7,6 @@ import {
 import {
   RarityDistribution,
   RewardConfiguration,
-  VoteConvictionRequirements,
 } from "@/app/[chain]/referendum-rewards/types";
 import {
   ConvictionVote,
@@ -69,8 +68,7 @@ export const getDecoratedVotesWithInfo = async (
     config.refIndex
   );
 
-  let votes: ConvictionVote[] = [];
-  let votesWithMeetingRequirements: VoteConvictionRequirements[] = [];
+  let votes: DecoratedConvictionVote[] = [];
   let totalIssuance: string | undefined;
   let referendum: ReferendumPolkadot | undefined;
 
@@ -115,7 +113,7 @@ export const getDecoratedVotesWithInfo = async (
   );
 
   // 3. decorate `meetsRequirements` - whether vote > threshold
-  votesWithMeetingRequirements = await checkVotesMeetingRequirements(
+  votes = await checkVotesMeetingRequirements(
     votes,
     totalIssuance,
     config,
@@ -274,7 +272,7 @@ export const checkVotesMeetingRequirements = async (
   totalIssuance: string,
   config: RewardConfiguration,
   chainDecimals: BN
-): Promise<VoteConvictionRequirements[]> => {
+): Promise<DecoratedConvictionVote[]> => {
   console.log("totalIssuance", totalIssuance)
   console.log("chain", chainDecimals.toString())
   console.log(config.min)
@@ -300,7 +298,7 @@ export const checkVotesMeetingRequirements = async (
   console.log("max", config.maxAllowedLockedWithConviction)
 
 
-  const filtered: VoteConvictionRequirements[] = votes.map((vote, i) => {
+  const filtered: DecoratedConvictionVote[] = votes.map((vote, i) => {
     const meetsRequirements = !(
       vote.lockedWithConviction?.lt(minRequiredLockedWithConvicition) ||
       vote.lockedWithConviction?.gt(maxAllowedLockedWithConvicition) ||

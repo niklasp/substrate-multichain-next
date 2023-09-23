@@ -47,11 +47,6 @@ export interface VoteConvictionEncointer extends VoteConviction {
   encointerScore: number;
 }
 
-export interface VoteConvictionRequirements extends VoteConviction {
-  meetsRequirements: boolean;
-  lockedWithConvictionDecimal: number;
-}
-
 export type Chances = { [key: string]: number };
 
 export interface EncointerMetadata {
