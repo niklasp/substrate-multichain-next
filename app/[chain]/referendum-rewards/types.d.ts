@@ -241,8 +241,8 @@ export interface RewardConfiguration {
 
 export interface RewardOption {
   description: string;
-  maxProbability: number | null;
-  minProbability: number | null;
+  maxProbability: number;
+  minProbability: number;
   transferable: boolean;
   artist: string;
   rarity: string;

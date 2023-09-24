@@ -34,10 +34,13 @@ export async function POST(req: NextRequest) {
     formData = await req.formData();
     console.log("formData", formData);
     // get the form data as json so we can work with it
-    const rewardConfigData = await formData?.get("rewardConfig");
+    const rewardConfigData = formData?.get("rewardConfig");
+    if (!rewardConfigData){
+      throw new Error("Missing formData")
+    }
     rewardConfig = JSON.parse(
-      rewardConfigData as string
-    ) as RewardConfiguration;
+      rewardConfigData?.toString()
+    );
 
     console.log("rewardConfig json", rewardConfig);
   } catch (error) {
@@ -87,7 +90,7 @@ export async function POST(req: NextRequest) {
 
   // add the Buffers instead of the files so we can work with it
   rewardConfig?.options?.forEach(async (option) => {
-    const file: File | null = (await formData?.get(
+    const file: File | null = (formData?.get(
       `${option.rarity}File`
     )) as File;
 
@@ -99,7 +102,20 @@ export async function POST(req: NextRequest) {
 
   try {
     const apiPinata = await setupPinata();
-    rewardConfig = {...rewardConfig, ...defaultReferendumRewardsConfig}
+    rewardConfig = {
+      ...defaultReferendumRewardsConfig,
+      ...rewardConfig,
+      options: defaultReferendumRewardsConfig.options.map((defaultOption) => {
+        const overrideOption = rewardConfig.options.find(
+          (option) => option.rarity === defaultOption.rarity
+        );
+
+        return {
+          ...defaultOption,
+          ...(overrideOption || {}),
+        };
+      }),
+    };
     const callResult: GenerateRewardsResult = await generateCalls(
       apiPinata,
       selectedChain,
