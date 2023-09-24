@@ -7,7 +7,7 @@ export function RococoInfo() {
       <CardBody className="flex-none inline">
         <h3 className="text-lg text-center mb-3">⚠️ Rococo Rewards ⚠️</h3>
         On rococo you can test your sendouts without spending money. But you
-        need ROC tokens.
+        need ROC tokens. On Rococo Asset Hub.
         <ol className="list-decimal list-inside">
           <li>
             <Link
