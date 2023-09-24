@@ -128,10 +128,7 @@ export type PinImagesForOptionsResult = {
 
 export type PinImageAndMetadataForOptionsResult = {
   imageIpfsCids: {
-    [key: string]: {
-      direct: string;
-      delegated: string;
-    };
+    [key: string]: string;
   };
   metadataIpfsCids: {
     [key: string]: {

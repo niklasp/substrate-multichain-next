@@ -10,21 +10,33 @@ import { StorageKey, u32, Option } from "@polkadot/types";
 
 import { BN } from "@polkadot/util";
 import { getApiAt, getDenom } from "./util";
-import { transformReferendum, transformVote, transformVoteMulti } from "@/app/[chain]/vote/util";
+import {
+  transformReferendum,
+  transformVote,
+  transformVoteMulti,
+} from "@/app/[chain]/vote/util";
 import { ReferendumPolkadot } from "@/app/[chain]/vote/types";
 
 type ReferendumInfo = [
   id: StorageKey<[u32]> | string,
   info: Option<PalletReferendaReferendumInfoConvictionVotingTally>
-]
+];
 
-const getOpenGovReferenda = async (api: ApiPromise, referendumIndex?: string) => {
+const getOpenGovReferenda = async (
+  api: ApiPromise,
+  referendumIndex?: string
+) => {
   if (!api) {
     throw new Error("No API provided.");
   }
 
   const openGovRefs: ReferendumInfo[] = referendumIndex
-    ? [[referendumIndex.toString(), await api.query.referenda.referendumInfoFor(referendumIndex)]]
+    ? [
+        [
+          referendumIndex.toString(),
+          await api.query.referenda.referendumInfoFor(referendumIndex),
+        ],
+      ]
     : await api.query.referenda.referendumInfoFor.entries();
 
   const referenda: ReferendumPolkadot[] = openGovRefs.map(transformReferendum);
@@ -50,14 +62,23 @@ const getOpenGovReferenda = async (api: ApiPromise, referendumIndex?: string) =>
 
 const isReferendumFinished = (referendum: ReferendumPolkadot): boolean => {
   const finishedStatuses = ["approved", "cancelled", "rejected", "timedOut"];
-  return finishedStatuses.includes(referendum.status) && referendum.endedAt !== undefined;
-}
+  return (
+    finishedStatuses.includes(referendum.status) &&
+    referendum.endedAt !== undefined
+  );
+};
 
-const processFinishedReferendum = async (api: ApiPromise, referendum: ReferendumPolkadot): Promise<ReferendumPolkadot> => {
-  const apiAt = await getApiAt(api, new BN(referendum.endedAt!).subn(1).toNumber());
+const processFinishedReferendum = async (
+  api: ApiPromise,
+  referendum: ReferendumPolkadot
+): Promise<ReferendumPolkadot> => {
+  const apiAt = await getApiAt(
+    api,
+    new BN(referendum.endedAt!).subn(1).toNumber()
+  );
   const referendumInfo: ReferendumInfo = [
     referendum.index as StorageKey<[u32]> | string,
-    await apiAt.query.referenda.referendumInfoFor(referendum.index)
+    await apiAt.query.referenda.referendumInfoFor(referendum.index),
   ];
   const referendumInfoWhileOngoing = transformReferendum(referendumInfo);
   referendumInfoWhileOngoing.endedAt = referendum.endedAt;
@@ -66,9 +87,11 @@ const processFinishedReferendum = async (api: ApiPromise, referendum: Referendum
   return referendumInfoWhileOngoing;
 };
 
-
 // OpenGov Conviction Voting
-export const getConvictionVoting = async (api: ApiPromise | undefined, referendumIndex?: string) => {
+export const getConvictionVoting = async (
+  api: ApiPromise | undefined,
+  referendumIndex?: string
+) => {
   try {
     console.log(`Querying conviction voting.....`, { label: "Democracy" });
     if (!api) {
@@ -110,7 +133,6 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
     // const openGovVotesTillNow =
     //   await api?.query.convictionVoting.votingFor.entries();
 
-
     // const votingForTillNow: VotePolkadot[] = openGovVotesTillNow?.map(transformVoteMulti)
     // console.log(`Got voting for ${votingForTillNow.length} entries`, {
     //   label: "Democracy",
@@ -150,7 +172,6 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
     //   // The total delegation amounts.
     //   //     delegationVotes - the _total_ amount of tokens applied in voting. This takes the conviction into account
     //   //     delegationCapital - the base level of tokens delegated to this address
-
 
     //   // The list of votes for that track
     //   for (const [index, referendumVote] of votes) {
@@ -523,7 +544,7 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
     //   //           };
     //   //           ongoingVotes.push(delegatedVote);
     //   //         }
-    //   //       } 
+    //   //       }
     //   //     else {
     //   //         // The person they are delegating to does not have any votes.
     //   //       }
@@ -562,11 +583,15 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
       const openGovVotesTillRefEnd =
         await apiAt.query.convictionVoting.votingFor.entries();
 
-      const votingForTillRefEnd: VotePolkadot[] = openGovVotesTillRefEnd?.map(transformVoteMulti)
+      const votingForTillRefEnd: VotePolkadot[] =
+        openGovVotesTillRefEnd?.map(transformVoteMulti);
 
-      console.log(`Got voting until ref end ${votingForTillRefEnd.length} entries`, {
-        label: "Democracy",
-      });
+      console.log(
+        `Got voting until ref end ${votingForTillRefEnd.length} entries`,
+        {
+          label: "Democracy",
+        }
+      );
 
       // All the votes for the given referendum (casted and delegated)
       const refVotes = [];
@@ -587,13 +612,10 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
           // The total delegation amounts.
           //     delegationVotes - the _total_ amount of tokens applied in voting. This takes the conviction into account
           //     delegationCapital - the base level of tokens delegated to this address
-          const { votes,
-            delegations: {
-              votes: delegationVotes,
-              capital: delegationCapital
-            }
+          const {
+            votes,
+            delegations: { votes: delegationVotes, capital: delegationCapital },
           } = vote.voteData.asCasting;
-
 
           // push the given referendum votes to refVotes
           for (const [index, referendumVote] of votes) {
@@ -620,7 +642,7 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
                 voteDirectionType: type,
               };
               if (type === "Standard") {
-                const { vote, balance } = referendumVote.asStandard
+                const { vote, balance } = referendumVote.asStandard;
                 const { conviction, isAye, isNay } = vote;
 
                 // const balanceHuman = balance.isZero() ? 0 : balance.divn(denom).toNumber();
@@ -684,16 +706,19 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
                     abstain.gte(aye) && abstain.gte(nay)
                       ? "Abstain"
                       : aye.gte(nay.abs())
-                        ? "Aye"
-                        : "Nay",
+                      ? "Aye"
+                      : "Nay",
                 };
                 finishedVotes.push(v);
                 refVotes.push(v);
               } else {
                 console.log(`Vote type is unknown`, { label: "Democracy" });
-                console.log(`Vote type: ${JSON.stringify(referendumVote.type)}`, {
-                  label: "Democracy",
-                });
+                console.log(
+                  `Vote type: ${JSON.stringify(referendumVote.type)}`,
+                  {
+                    label: "Democracy",
+                  }
+                );
               }
             }
           }
@@ -710,16 +735,16 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
       for (const vote of votingForTillRefEnd) {
         // Each of these is the votingFor for an account for a given governance track
         const { accountId, track } = vote;
-        if (vote.voteData.isDelegating && track == parseInt(referendum.track as string)) {
+        if (
+          vote.voteData.isDelegating &&
+          track == parseInt(referendum.track as string)
+        ) {
           // The address is delegating to another address for this particular track
           const {
             balance,
             target,
             conviction,
-            delegations: {
-              votes: delegationVotes,
-              capital: delegationCapital,
-            },
+            delegations: { votes: delegationVotes, capital: delegationCapital },
             prior,
           } = vote.voteData.asDelegating;
           // const balanceHuman = balance.isZero() ? 0 : balance.divn(denom).toNumber();
@@ -804,37 +829,52 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
             switch (voteDirectionType) {
               case "Standard":
                 balance = {
-                  aye:
-                    voteDirection == "Aye"
-                      ? delegation.balance
-                      : "0",
-                  nay:
-                    voteDirection == "Nay"
-                      ? delegation.balance
-                      : "0",
+                  aye: voteDirection == "Aye" ? delegation.balance : "0",
+                  nay: voteDirection == "Nay" ? delegation.balance : "0",
                   abstain: "0",
                 };
                 break;
               case "Split":
                 balance = {
-                  aye:
-                    (new BN(delegation.balance).mul(new BN(vote.balance.aye).div(new BN(vote.balance.aye).add(new BN(vote.balance.nay))))).toString(),
-                  nay:
-                    (new BN(delegation.balance).mul(new BN(vote.balance.nay).div(new BN(vote.balance.aye).add(new BN(vote.balance.nay))))).toString(),
+                  aye: new BN(delegation.balance)
+                    .mul(
+                      new BN(vote.balance.aye).div(
+                        new BN(vote.balance.aye).add(new BN(vote.balance.nay))
+                      )
+                    )
+                    .toString(),
+                  nay: new BN(delegation.balance)
+                    .mul(
+                      new BN(vote.balance.nay).div(
+                        new BN(vote.balance.aye).add(new BN(vote.balance.nay))
+                      )
+                    )
+                    .toString(),
                   abstain: "0",
                 };
                 break;
               case "SplitAbstain":
-                const ayePercentage =
-                  new BN(vote.balance.aye).div(new BN(vote.balance.aye).add(new BN(vote.balance.nay)).add(new BN(vote.balance.abstain)));
-                const nayPercentage =
-                  new BN(vote.balance.nay).div(new BN(vote.balance.aye).add(new BN(vote.balance.nay)).add(new BN(vote.balance.abstain)));
-                const abstainPercentage =
-                  new BN(vote.balance.abstain).div(new BN(vote.balance.aye).add(new BN(vote.balance.nay)).add(new BN(vote.balance.abstain)));
+                const ayePercentage = new BN(vote.balance.aye).div(
+                  new BN(vote.balance.aye)
+                    .add(new BN(vote.balance.nay))
+                    .add(new BN(vote.balance.abstain))
+                );
+                const nayPercentage = new BN(vote.balance.nay).div(
+                  new BN(vote.balance.aye)
+                    .add(new BN(vote.balance.nay))
+                    .add(new BN(vote.balance.abstain))
+                );
+                const abstainPercentage = new BN(vote.balance.abstain).div(
+                  new BN(vote.balance.aye)
+                    .add(new BN(vote.balance.nay))
+                    .add(new BN(vote.balance.abstain))
+                );
                 balance = {
                   aye: new BN(delegation.balance).mul(ayePercentage).toString(),
                   nay: new BN(delegation.balance).mul(nayPercentage).toString(),
-                  abstain: new BN(delegation.balance).mul(abstainPercentage).toString(),
+                  abstain: new BN(delegation.balance)
+                    .mul(abstainPercentage)
+                    .toString(),
                 };
                 break;
             }
@@ -851,8 +891,7 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
               // The balance they are voting with themselves, sans delegated balance
               balance: balance,
               // The total amount of tokens that were delegated to them (including conviction)
-              delegatedConvictionBalance:
-                delegation.delegatedConvictionBalance,
+              delegatedConvictionBalance: delegation.delegatedConvictionBalance,
               // the total amount of tokens that were delegated to them (without conviction)
               delegatedBalance: delegation.delegatedBalance,
               // The vote type, either 'aye', or 'nay'
@@ -1026,7 +1065,7 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
       const convictionVoting = {
         referendum: queriedReferendum ? queriedReferendum : undefined,
         totalIssuance,
-        referendaVotes: [...finishedVotes, ...ongoingVotes]
+        referendaVotes: [...finishedVotes, ...ongoingVotes],
       };
       return convictionVoting;
     }

@@ -20,6 +20,7 @@ import { ApiPromise } from "@polkadot/api";
 import PinataClient from "@pinata/sdk";
 import seedrandom from "seedrandom";
 import { defaultReferendumRewardsConfig } from "@/config/default-rewards-config";
+import { getTxsReferendumRewards } from "./get-reward-txs";
 
 export async function POST(req: NextRequest) {
   //   let { rewardsConfig }: { rewardsConfig: unknown } = await req.json();
@@ -107,8 +108,6 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(callResult);
-
-    // res.status(200).json(callResult);
   } catch (error: any) {
     console.trace(error);
     // res.status(400).json({
@@ -171,16 +170,15 @@ const generateCalls = async (
   // get all transactions that are needed for the distribution
   // TODO --- warning we slice by 10 here
 
-  // let { txsKusamaAssetHub, txsPerVote } = await getTxsReferendumRewards(
-  //   nftPalletApi,
-  //   referendaPalletApi,
-  //   apiPinata,
-  //   config,
-  //   decoratedVotes,
-  //   rarityDistribution,
-  //   rng
-  //   // logger
-  // );
+  let { txsKusamaAssetHub, txsPerVote } = await getTxsReferendumRewards(
+    nftPalletApi,
+    referendaPalletApi,
+    apiPinata,
+    config,
+    decoratedVotes,
+    rarityDistribution,
+    rng
+  );
 
   // const nftCalls = nftPalletApi?.tx.utility
   //   .batchAll(txsKusamaAssetHub)
@@ -295,23 +293,23 @@ const generateCalls = async (
     config,
     // kusamaCall: JSON.stringify(kusamaCalls),
     kusamaCall: "",
-    kusamaAssetHubCall: "0x123123123...",
-    kusamaAssetHubTxs: [],
-    voters: ["5F11111", "5F222222", "5F33333"],
-    distribution: { common: 122, rare: 43, epic: 12 },
+    kusamaAssetHubCall: "", // JSON.stringify(nftCalls),
+    kusamaAssetHubTxs: txsKusamaAssetHub,
+    voters: [],
+    distribution: rarityDistribution,
     fees: {
       // kusama: formatBalance(infoKusamaCalls.partialFee, {
       //   withSi: false,
       //   forceUnit: "KSM",
-      //   decimals: relayChainDecimals.toNumber(),
+      //   decimals: kusamaChainDecimals.toNumber(),
       // }),
-      nfts: "",
-      deposit: "",
+      nfts: "123", //infoNftCalls.partialFee.toString(),
+      deposit: "123", //totalDeposit.toString(),
     },
     txsCount: {
       // kusama: txsKusama.length,
-      nfts: 7,
-      txsPerVote: 4,
+      nfts: txsKusamaAssetHub.length,
+      txsPerVote,
     },
   };
 };

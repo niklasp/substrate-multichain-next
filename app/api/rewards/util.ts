@@ -7,6 +7,7 @@ import {
 import {
   RarityDistribution,
   RewardConfiguration,
+  RewardOption,
 } from "@/app/[chain]/referendum-rewards/types";
 import {
   ConvictionVote,
@@ -19,7 +20,12 @@ import pinataSDK from "@pinata/sdk";
 import { BN, BN_ZERO } from "@polkadot/util";
 import { getConvictionVoting } from "./get-conviction-voting";
 import { ApiDecoration } from "@polkadot/api/types";
-import { Lock, PalletReferenda, PalletVote, ReferendumPolkadot } from "@/app/[chain]/vote/types";
+import {
+  Lock,
+  PalletReferenda,
+  PalletVote,
+  ReferendumPolkadot,
+} from "@/app/[chain]/vote/types";
 import { Decorate } from "@polkadot/api/base/Decorate";
 import seedrandom from "seedrandom";
 import { rewardsConfig } from "@/config/rewards";
@@ -62,18 +68,14 @@ export const getDecoratedVotesWithInfo = async (
 }> => {
   console.info(`↪ Getting referendum details and all voting wallets`);
 
-
-  const convictionVoting = await getConvictionVoting(
-    api,
-    config.refIndex
-  );
+  const convictionVoting = await getConvictionVoting(api, config.refIndex);
 
   let votes: DecoratedConvictionVote[] = [];
   let totalIssuance: string | undefined;
   let referendum: ReferendumPolkadot | undefined;
 
   if (convictionVoting) {
-    ({ referendum, totalIssuance, referendaVotes: votes } = convictionVoting)
+    ({ referendum, totalIssuance, referendaVotes: votes } = convictionVoting);
   }
 
   // start decorating the votes with additional information
@@ -82,7 +84,6 @@ export const getDecoratedVotesWithInfo = async (
   console.info(
     `↪ Getting locks for referendum ${config.refIndex} with ${votes.length} votes.`
   );
-
 
   if (!referendum?.endedAt) {
     throw new Error("No endedAt Block on Referendum");
@@ -273,10 +274,10 @@ export const checkVotesMeetingRequirements = async (
   config: RewardConfiguration,
   chainDecimals: BN
 ): Promise<DecoratedConvictionVote[]> => {
-  console.log("totalIssuance", totalIssuance)
-  console.log("chain", chainDecimals.toString())
-  console.log(config.min)
-  console.log(config.max)
+  console.log("totalIssuance", totalIssuance);
+  console.log("chain", chainDecimals.toString());
+  console.log(config.min);
+  console.log(config.max);
   const minRequiredLockedWithConvicition = BN.max(
     new BN(config.min),
     new BN("0")
@@ -290,13 +291,12 @@ export const checkVotesMeetingRequirements = async (
     minRequiredLockedWithConvicition.toString(),
     chainDecimals
   );
-  console.log("min", config.minRequiredLockedWithConviction)
+  console.log("min", config.minRequiredLockedWithConviction);
   config.maxAllowedLockedWithConviction = getDecimal(
     maxAllowedLockedWithConvicition.toString(),
     chainDecimals
   );
-  console.log("max", config.maxAllowedLockedWithConviction)
-
+  console.log("max", config.maxAllowedLockedWithConviction);
 
   const filtered: DecoratedConvictionVote[] = votes.map((vote, i) => {
     const meetsRequirements = !(
@@ -359,19 +359,26 @@ export const retrieveAccountLocks = async (
     );
 
     // get userDelegations for this track
-    const convictionVotesAccount = await apiAt.query.convictionVoting?.votingFor(
-      vote.address.toString(),
-      track
-    );
+    const convictionVotesAccount =
+      await apiAt.query.convictionVoting?.votingFor(
+        vote.address.toString(),
+        track
+      );
 
-    const accountVote: VotePolkadot = transformVote(vote.address.toString(), track, convictionVotesAccount)
+    const accountVote: VotePolkadot = transformVote(
+      vote.address.toString(),
+      track,
+      convictionVotesAccount
+    );
     let delegatedLock: Lock = { endBlock: new BN(0), total: new BN(0) };
 
     if (accountVote.voteData.isDelegating) {
       const delegating = accountVote?.voteData.asDelegating;
 
       // Find the lock period corresponding to the conviction
-      const convictionIndex = convictionOptions.indexOf(delegating.conviction.type);
+      const convictionIndex = convictionOptions.indexOf(
+        delegating.conviction.type
+      );
       const lockPeriod = lockPeriods[convictionIndex];
       // Calculate the end block
       const endBlock: BN = sevenDaysBlocks
@@ -389,10 +396,9 @@ export const retrieveAccountLocks = async (
     }
 
     //add the delegationBalanceWithConviction
-    const userLocks =
-      delegatedLock?.endBlock.gtn(0)
-        ? [...directLocks, delegatedLock]
-        : directLocks;
+    const userLocks = delegatedLock?.endBlock.gtn(0)
+      ? [...directLocks, delegatedLock]
+      : directLocks;
 
     const userLockedBalancesWithConviction = userLocks
       .filter(
@@ -404,12 +410,12 @@ export const retrieveAccountLocks = async (
         const userLockPeriods = userVote.endBlock.eqn(0)
           ? 0
           : Math.floor(
-            userVote.endBlock
-              .sub(endBlockBN)
-              .muln(10)
-              .div(sevenDaysBlocks)
-              .toNumber() / 10
-          );
+              userVote.endBlock
+                .sub(endBlockBN)
+                .muln(10)
+                .div(sevenDaysBlocks)
+                .toNumber() / 10
+            );
         const matchingPeriod = lockPeriods.reduce(
           (acc, curr, index) => (userLockPeriods >= curr ? index : acc),
           0
@@ -420,8 +426,8 @@ export const retrieveAccountLocks = async (
     const maxLockedWithConviction =
       userLockedBalancesWithConviction.length > 0
         ? userLockedBalancesWithConviction.reduce((max, current) =>
-          BN.max(max, current)
-        )
+            BN.max(max, current)
+          )
         : new BN(0);
 
     return { ...vote, lockedWithConviction: maxLockedWithConviction };
@@ -622,7 +628,8 @@ export const getApiAt = async (
   if (!api) throw new Error("Api is not defined");
   if (!blockNumber) return api;
   const blockHash =
-    (await api?.rpc.chain.getBlockHash(blockNumber)).toString() || {}.toString();
+    (await api?.rpc.chain.getBlockHash(blockNumber)).toString() ||
+    {}.toString();
   return await api?.at(blockHash);
 };
 
@@ -840,4 +847,42 @@ export const getDenom = async (
   const exponent = api?.registry.chainDecimals || 1;
   const denom = base.pow(new BN(exponent)).toNumber();
   return denom;
+};
+
+//TODO i think this can be without an array and just return the object
+export const getNftAttributesForOptions = (
+  options: RewardOption[],
+  rarityDistribution: RarityDistribution
+) => {
+  let attributes: any = {};
+
+  for (const option of options) {
+    // generate nft attributes
+    const nftAttributes = [
+      { name: "rarity", value: option.rarity },
+      { name: "totalSupply", value: rarityDistribution[option.rarity] },
+      { name: "name", value: option.title },
+      { name: "description", value: option.description },
+    ];
+
+    if (option.artist) {
+      nftAttributes.push({ name: "artist", value: option.artist });
+    }
+
+    const attributesDirect = [
+      ...nftAttributes,
+      { name: "typeOfVote", value: "direct" },
+    ];
+    const attributesDelegated = [
+      ...nftAttributes,
+      { name: "typeOfVote", value: "delegated" },
+    ];
+
+    attributes[option.rarity] = {
+      direct: attributesDirect,
+      delegated: attributesDelegated,
+    };
+  }
+
+  return attributes;
 };
