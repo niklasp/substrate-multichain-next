@@ -107,34 +107,34 @@ export const getConvictionVoting = async (api: ApiPromise | undefined, referendu
     console.log(`Querying conviction voting from the chain...`, {
       label: "Democracy",
     });
-    const openGovVotesTillNow =
-      await api?.query.convictionVoting.votingFor.entries();
+    // const openGovVotesTillNow =
+    //   await api?.query.convictionVoting.votingFor.entries();
 
 
-    const votingForTillNow: VotePolkadot[] = openGovVotesTillNow?.map(transformVoteMulti)
-    console.log(`Got voting for ${votingForTillNow.length} entries`, {
-      label: "Democracy",
-    });
+    // const votingForTillNow: VotePolkadot[] = openGovVotesTillNow?.map(transformVoteMulti)
+    // console.log(`Got voting for ${votingForTillNow.length} entries`, {
+    //   label: "Democracy",
+    // });
 
-    // Lists of accounts that are either voting themselves, or delegating to another account
-    const casting: VotePolkadot[] = [];
-    const delegating: VotePolkadot[] = [];
+    // // Lists of accounts that are either voting themselves, or delegating to another account
+    // const casting: VotePolkadot[] = [];
+    // const delegating: VotePolkadot[] = [];
 
-    // Go through the list of all the accounts that are voting and add their entries to the casting or delegating list
-    for (const vote of votingForTillNow) {
-      if (vote.voteData.isCasting) {
-        casting.push(vote);
-      } else {
-        delegating.push(vote);
-      }
-    }
+    // // Go through the list of all the accounts that are voting and add their entries to the casting or delegating list
+    // for (const vote of votingForTillNow) {
+    //   if (vote.voteData.isCasting) {
+    //     casting.push(vote);
+    //   } else {
+    //     delegating.push(vote);
+    //   }
+    // }
 
-    console.log(`${casting.length} casting entries`, {
-      label: "Democracy",
-    });
-    console.log(`${delegating.length} delegating entries`, {
-      label: "Democracy",
-    });
+    // console.log(`${casting.length} casting entries`, {
+    //   label: "Democracy",
+    // });
+    // console.log(`${delegating.length} delegating entries`, {
+    //   label: "Democracy",
+    // });
     // for (const vote of casting) {
     //   const { track, accountId } = vote
 
