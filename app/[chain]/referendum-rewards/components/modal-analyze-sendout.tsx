@@ -57,7 +57,8 @@ export default function ModalAnalyzeSendout({
                     theme="chalk"
                     src={sendoutData}
                     collapsed={true}
-                    collapseStringsAfterLength={10}
+                    collapseStringsAfterLength={false}
+                    iconStyle="circle"
                   />
                 </div>
               ) : (

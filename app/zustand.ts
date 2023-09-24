@@ -11,7 +11,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage, devtools } from "zustand/middleware";
 import { Modal, type ModalProps } from "@nextui-org/modal";
 import { Signer } from "@polkadot/api/types";
-import { defaultReferendumRewardsConfig } from "@/config/default-rewards-config";
+import { rewardsConfig } from "@/config/rewards";
 
 interface AppState {
   chain: ChainConfig;
@@ -89,7 +89,7 @@ export const useAppStore = create<AppState>()(
     },
     rewards: {
       form: {
-        values: defaultReferendumRewardsConfig,
+        values: rewardsConfig.defaultReferendumRewardsConfig,
       },
     },
 

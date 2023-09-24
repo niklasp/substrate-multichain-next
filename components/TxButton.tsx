@@ -101,17 +101,10 @@ export function TxButton(props: TxButtonProps) {
   const isLoadingProp =
     props.isLoading || isAccountBalanceLoading || isDepositCostLoading;
 
-  const requiredBalanceBn =
-    typeof requiredBalance === "string"
-      ? bnToBn(requiredBalance)
-      : requiredBalance === undefined
-      ? BN_MAX_INTEGER
-      : requiredBalance;
-
   console.log("required balance", requiredBalance);
 
-  const requiredBalanceCalculated = requiredBalanceBn
-    ? requiredBalanceBn
+  const requiredBalanceCalculated = requiredBalance
+    ? bnToBn(requiredBalance)
     : isTxCostLoading || isDepositCostLoading
     ? BN_MAX_INTEGER
     : //@ts-ignore
@@ -145,7 +138,6 @@ export function TxButton(props: TxButtonProps) {
       console.log("clicked button, awaiting propmise");
 
       if (extrinsic) {
-        // let res: SendAndFinalizeResult;
         setIsLoading(true);
         setIsSuccess(false);
         props.onPendingChange?.(true);
@@ -267,12 +259,12 @@ export function TxButton(props: TxButtonProps) {
           </Button>
         </Tooltip>
       )}
-      {!requiredBalanceBn.eq(BN_MAX_INTEGER) && (
+      {!requiredBalanceCalculated?.eq(BN_MAX_INTEGER) && (
         <span className="text-right text-tiny mt-1 text-warning">
           required:{" "}
           {isTxCostLoading ||
           isDepositCostLoading ||
-          requiredBalance === undefined ? (
+          requiredBalanceCalculated === undefined ? (
             <InlineLoader />
           ) : (
             humanRequiredBalance
@@ -283,7 +275,8 @@ export function TxButton(props: TxButtonProps) {
         className={clsx("text-right text-tiny", {
           "text-success": hasEnough,
           "text-danger": !hasEnough,
-          "text-foreground": isLoading || requiredBalanceBn.eq(BN_MAX_INTEGER),
+          "text-foreground":
+            isLoading || requiredBalanceCalculated?.eq(BN_MAX_INTEGER),
         })}
       >
         available:{" "}
@@ -295,7 +288,7 @@ export function TxButton(props: TxButtonProps) {
           humanBalance
         )}
       </span>
-      {/* requiredBalance:{JSON.stringify(requiredBalanceCalculated)} */}
+      requiredBalance:{JSON.stringify(requiredBalanceCalculated?.toString())}
     </div>
   );
 }

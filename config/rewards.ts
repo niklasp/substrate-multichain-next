@@ -38,7 +38,7 @@ export const rewardsConfig: RewardsConfigType = {
   maxFileSize: 2 * 1024 * 1024,
   defaultReferendumRewardsConfig: {
     chain: SubstrateChain.Kusama,
-    refIndex: "99",
+    refIndex: "",
     criteria: "all",
     min: "1200000000000",
     max: "100000000000000000000000000000000000000000",
