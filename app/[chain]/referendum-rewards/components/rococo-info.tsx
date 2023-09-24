@@ -4,7 +4,7 @@ import { Link, LinkIcon } from "@nextui-org/link";
 export function RococoInfo() {
   return (
     <Card className="border border-2 border-warning-500 text-tiny mb-8">
-      <CardBody className="flex-none inline">
+      <CardBody className="flex-none inline text-center">
         <h3 className="text-lg text-center mb-3">⚠️ Rococo Rewards ⚠️</h3>
         On rococo you can test your sendouts without spending money. But you
         need ROC tokens. On Rococo Asset Hub.

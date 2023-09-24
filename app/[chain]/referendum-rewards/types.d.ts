@@ -47,11 +47,6 @@ export interface VoteConvictionEncointer extends VoteConviction {
   encointerScore: number;
 }
 
-export interface VoteConvictionRequirements extends VoteConviction {
-  meetsRequirements: boolean;
-  lockedWithConvictionDecimal: number;
-}
-
 export type Chances = { [key: string]: number };
 
 export interface EncointerMetadata {
@@ -235,8 +230,8 @@ export interface RewardConfiguration {
   lowerLimitOfCurve?: number | null;
   upperLimitOfCurve?: number | null;
   medianOfCurve?: number | null;
-  minRequiredLockedWithConvicition?: number | null;
-  maxAllowedLockedWithConvicition?: number | null;
+  minRequiredLockedWithConviction?: number | null;
+  maxAllowedLockedWithConviction?: number | null;
   maxLockedWithConviction?: number | null;
   minLockedWithConviction?: number | null;
   sender?: string;

@@ -19,6 +19,7 @@ import { getDecoratedVotesWithInfo, setupPinata } from "./util";
 import { ApiPromise } from "@polkadot/api";
 import PinataClient from "@pinata/sdk";
 import seedrandom from "seedrandom";
+import { defaultReferendumRewardsConfig } from "@/config/default-rewards-config";
 
 export async function POST(req: NextRequest) {
   //   let { rewardsConfig }: { rewardsConfig: unknown } = await req.json();
@@ -98,39 +99,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const apiPinata = await setupPinata();
+    rewardConfig = { ...rewardConfig, ...defaultReferendumRewardsConfig };
+    const callResult: GenerateRewardsResult = await generateCalls(
+      apiPinata,
+      selectedChain,
+      rewardConfig
+    );
 
-    // const callResult: GenerateRewardsResult = await generateCalls(
-    //   apiPinata,
-    //   selectedChain,
-    //   rewardConfig
-    // );
-
-    return NextResponse.json({
-      status: "success",
-      data: {
-        call: "omitted",
-        // kusamaCall: JSON.stringify(kusamaCalls),
-        kusamaCall: "",
-        kusamaAssetHubCall: "0x123123123...",
-        kusamaAssetHubTxs: [],
-        voters: ["5F11111", "5F222222", "5F33333"],
-        distribution: { common: 122, rare: 43, epic: 12 },
-        fees: {
-          // kusama: formatBalance(infoKusamaCalls.partialFee, {
-          //   withSi: false,
-          //   forceUnit: "KSM",
-          //   decimals: relayChainDecimals.toNumber(),
-          // }),
-          nfts: "1423123123222",
-          deposit: "12123124123",
-        },
-        txsCount: {
-          // kusama: txsKusama.length,
-          nfts: 7,
-          txsPerVote: 4,
-        },
-      },
-    });
+    return NextResponse.json(callResult);
 
     // res.status(200).json(callResult);
   } catch (error: any) {

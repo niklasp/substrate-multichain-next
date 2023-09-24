@@ -14,7 +14,7 @@ export function InlineLoader(props: InlineLoaderProps) {
       <span>.</span>
       <span>.</span>
       <span>.</span>
-      {afterContent && <span>{afterContent}</span>}
+      {afterContent && <span className="whitespace-pre">{afterContent}</span>}
     </div>
   );
 }

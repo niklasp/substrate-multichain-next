@@ -241,7 +241,9 @@ export function TxButton(props: TxButtonProps) {
       >
         available:{" "}
         {isAccountBalanceLoading ? (
-          <InlineLoader afterContent={` ${symbol}`} />
+          <>
+            <InlineLoader /> {symbol}
+          </>
         ) : (
           humanBalance
         )}

@@ -509,21 +509,23 @@ export function getVoteTx(
  * @param param0
  * @returns
  */
-export const transformVote = ([storageKey, codec]: [
+export const transformVoteMulti = ([storageKey, codec]: [
   StorageKey<[AccountId32, u16]>,
   Codec
 ]): VotePolkadot => {
   // Extract data from storageKey
   const [accountId, track] = storageKey.args;
 
+  return transformVote(accountId.toString(), track.toNumber(), codec)
+};
+
+export const transformVote = (accountId: string, track: number, codec: Codec): VotePolkadot => {
   // Cast Codec to the specific type PalletConvictionVotingVoteVoting and extract necessary fields
   const voteData = codec as PalletConvictionVotingVoteVoting;
 
-  // Now, voteData should have properties defined in PalletConvictionVotingVoteVoting which you can use as needed
-
   return {
-    accountId: accountId.toString(),
-    track: track.toNumber(),
+    accountId: accountId,
+    track: track,
     voteData,
   };
 };
