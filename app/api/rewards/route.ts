@@ -19,9 +19,7 @@ import { getDecoratedVotesWithInfo, setupPinata } from "./util";
 import { ApiPromise } from "@polkadot/api";
 import PinataClient from "@pinata/sdk";
 import seedrandom from "seedrandom";
-import { defaultReferendumRewardsConfig } from "@/config/default-rewards-config";
 import { getTxsReferendumRewards } from "./get-reward-txs";
-import { rewardsConfig } from "../../../config/rewards";
 import { Readable } from "stream";
 import { encodeAddress } from "@polkadot/keyring";
 import {
@@ -29,9 +27,12 @@ import {
   getNFTItemDeposit,
   getNFTMetadataDeposit,
 } from "@/config/txs";
+import { rewardsConfig } from "../../../config/rewards";
 
 export async function POST(req: NextRequest) {
   //   let { rewardsConfig }: { rewardsConfig: unknown } = await req.json();
+
+  const { DEFAULT_REWARDS_CONFIG } = rewardsConfig;
 
   let zodErrors = {};
   let formData: FormData;
@@ -122,13 +123,13 @@ export async function POST(req: NextRequest) {
   try {
     const apiPinata = await setupPinata();
     rewardConfig = {
-      ...defaultReferendumRewardsConfig,
+      ...DEFAULT_REWARDS_CONFIG,
       ...rewardConfig,
       collectionConfig: {
-        ...defaultReferendumRewardsConfig.collectionConfig,
+        ...DEFAULT_REWARDS_CONFIG.collectionConfig,
         ...rewardConfig.collectionConfig,
       },
-      options: defaultReferendumRewardsConfig.options.map((defaultOption) => {
+      options: DEFAULT_REWARDS_CONFIG.options.map((defaultOption) => {
         const overrideOption = rewardConfig.options.find(
           (option) => option.rarity === defaultOption.rarity
         );

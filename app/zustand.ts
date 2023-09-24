@@ -23,6 +23,8 @@ interface AppState {
   };
   setTrackFilter: (trackFilter: string) => void;
 
+  confetti: boolean;
+
   user: {
     extensionInjectedPromise?: Promise<InjectedExtension[]>; // promise of injected extension
     extensions: InjectedExtension[]; // injected extension
@@ -55,6 +57,8 @@ interface AppState {
   updateVoteState: (referendumId: string, vote: any) => void;
   removeVoteState: (referendumId: string) => void;
   clearVoteState: () => void;
+
+  explode: (boolean) => void;
 
   rewards: {
     form: {
@@ -89,10 +93,15 @@ export const useAppStore = create<AppState>()(
     },
     rewards: {
       form: {
-        values: rewardsConfig.defaultReferendumRewardsConfig,
+        values: rewardsConfig.DEFAULT_REWARDS_CONFIG,
       },
     },
-
+    confetti: false,
+    explode: (show) => {
+      set({
+        confetti: show,
+      });
+    },
     setRewardFormValues: (values) => {
       const { rewards } = get();
       set({

@@ -4,7 +4,7 @@
 // import { useForm, FormProvider, useFormContext } from "react-hook-form";
 // import debounce from "lodash.debounce";
 
-// import { defaultReferendumRewardsConfig } from "../../../data/default-referendum-rewards-config";
+// import { DEFAULT_REWARDS_CONFIG } from "../../../data/default-referendum-rewards-config";
 // import useAppStore from "../../../zustand";
 
 // import style from "./rewards-creation-form.module.scss";
@@ -67,7 +67,7 @@
 //   const isMounted = useIsMounted();
 
 //   const formMethods = useForm({
-//     defaultValues: defaultReferendumRewardsConfig,
+//     defaultValues: DEFAULT_REWARDS_CONFIG,
 //   });
 
 //   const { data: pastReferendaIndices, isLoading: isPastRefIndicesLoading } =

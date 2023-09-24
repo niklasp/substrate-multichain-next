@@ -13,7 +13,7 @@ import {
   RewardConfiguration,
   RewardOption,
 } from "../[chain]/referendum-rewards/types";
-import { defaultReferendumRewardsConfig } from "@/config/default-rewards-config";
+import { DEFAULT_REWARDS_CONFIG } from "@/config/default-rewards-config";
 import { rewardsConfig } from "@/config/rewards";
 
 const defaultOptions: Partial<PinataPinOptions> = {

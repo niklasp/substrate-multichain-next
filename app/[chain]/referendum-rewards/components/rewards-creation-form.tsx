@@ -46,12 +46,14 @@ export default function RewardsCreationForm({
   const { ss58Format, name } = getChainInfo(chain);
   const chainRewardsSchema = rewardsSchema(name, ss58Format);
 
+  const explode = useAppStore((s) => s.explode);
+
   const walletAddress = useAppStore(
     (state) => state.user.actingAccount?.address
   );
 
   type TypeRewardsSchema = z.infer<typeof chainRewardsSchema>;
-  const { defaultReferendumRewardsConfig } = rewardsConfig;
+  const { DEFAULT_REWARDS_CONFIG } = rewardsConfig;
 
   // const openModal = useAppStore((state) => state.openModal);
 
@@ -81,7 +83,7 @@ export default function RewardsCreationForm({
 
   const formMethods = useForm<TypeRewardsSchema>({
     resolver: zodResolver(chainRewardsSchema),
-    defaultValues: defaultReferendumRewardsConfig,
+    defaultValues: DEFAULT_REWARDS_CONFIG,
   });
   const {
     register,
@@ -127,30 +129,16 @@ export default function RewardsCreationForm({
     onOpenChange();
   }
 
-  // function onModalClose(): void {
-  //   console.log("modalClosed");
-  //   setIsNewCollectionLoading(false);
-  //   onClose();
-  // }
-
   async function createNewCollection() {
     setIsNewCollectionLoading(true);
     onOpen();
-    // openModal(
-    //   <CreateNFTCollectionModal
-    //     setCollectionConfig={setCollectionConfig}
-    //     setIsNewCollectionLoading={setIsNewCollectionLoading}
-    //   />,
-    //   {
-
-    //     children: <></>,
-    //   }
-    // );
   }
 
   async function onSubmit(data: TypeRewardsSchema) {
     // const result = await createRewards(data);
     // console.log("result", result);
+
+    explode(true);
 
     const formData = new FormData();
     formData.append("rewardConfig", JSON.stringify(data));
@@ -397,7 +385,7 @@ export default function RewardsCreationForm({
             <RewardsCreationRarityFields
               key={rarity}
               rarity={rarity}
-              rewardConfig={defaultReferendumRewardsConfig}
+              rewardConfig={DEFAULT_REWARDS_CONFIG}
             />
           ))}
         </div>

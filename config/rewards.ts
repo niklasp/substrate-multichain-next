@@ -5,7 +5,7 @@ export type RewardsConfigType = {
   royaltyAddress: string;
   acceptedNftFormats: string[];
   maxFileSize: number;
-  defaultReferendumRewardsConfig: RewardConfiguration;
+  DEFAULT_REWARDS_CONFIG: RewardConfiguration;
   rewardsFilter: string[];
   NFT_BATCH_SIZE_MAX: number;
 };
@@ -36,7 +36,7 @@ export const rewardsConfig: RewardsConfigType = {
     "3d/glb",
   ],
   maxFileSize: 2 * 1024 * 1024,
-  defaultReferendumRewardsConfig: {
+  DEFAULT_REWARDS_CONFIG: {
     chain: SubstrateChain.Kusama,
     refIndex: "",
     criteria: "all",
