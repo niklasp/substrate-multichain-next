@@ -21,6 +21,14 @@ import PinataClient from "@pinata/sdk";
 import seedrandom from "seedrandom";
 import { defaultReferendumRewardsConfig } from "@/config/default-rewards-config";
 import { getTxsReferendumRewards } from "./get-reward-txs";
+import { rewardsConfig } from "../../../config/rewards";
+import { Readable } from "stream";
+import { encodeAddress } from "@polkadot/keyring";
+import {
+  getNFTCollectionDeposit,
+  getNFTItemDeposit,
+  getNFTMetadataDeposit,
+} from "@/config/txs";
 
 export async function POST(req: NextRequest) {
   //   let { rewardsConfig }: { rewardsConfig: unknown } = await req.json();
@@ -29,16 +37,21 @@ export async function POST(req: NextRequest) {
   let formData: FormData;
   let rewardConfig: RewardConfiguration;
   let selectedChain: SubstrateChain;
+  let sender;
 
   try {
     // parse the form data that is coming from the client
     formData = await req.formData();
     console.log("formData", formData);
+
+    sender = formData?.get("sender");
+
     // get the form data as json so we can work with it
-    const rewardConfigData = await formData?.get("rewardConfig");
-    rewardConfig = JSON.parse(
-      rewardConfigData as string
-    ) as RewardConfiguration;
+    const rewardConfigData = formData?.get("rewardConfig");
+    if (!rewardConfigData) {
+      throw new Error("Missing formData");
+    }
+    rewardConfig = JSON.parse(rewardConfigData?.toString());
 
     console.log("rewardConfig json", rewardConfig);
   } catch (error) {
@@ -86,28 +99,54 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // add the Buffers instead of the files so we can work with it
-  rewardConfig?.options?.forEach(async (option) => {
-    const file: File | null = (await formData?.get(
-      `${option.rarity}File`
-    )) as File;
+  try {
+    // add the Buffers instead of the files so we can work with it
+    rewardConfig?.options?.forEach(async (option) => {
+      const file: File | null = formData?.get(`${option.rarity}File`) as File;
 
-    if (file) {
-      const bytes = await file?.arrayBuffer();
-      option.file = Buffer.from(bytes);
-    }
-  });
+      if (file) {
+        const bytes = await file?.arrayBuffer();
+        option.file = option.file = Readable.from(Buffer.from(bytes));
+      }
+    });
+
+    // if (rewardConfig.collectionConfig.isNew) {
+    //   const file = formData?.get('collectionImage') as File;
+    //   const readableFileStream = fs.createReadStream(file.filepath);
+    //   config.collectionConfig.file = readableFileStream;
+    // }
+  } catch (e) {
+    throw "Error converting files to readable streams";
+  }
 
   try {
     const apiPinata = await setupPinata();
-    rewardConfig = { ...rewardConfig, ...defaultReferendumRewardsConfig };
+    rewardConfig = {
+      ...defaultReferendumRewardsConfig,
+      ...rewardConfig,
+      collectionConfig: {
+        ...defaultReferendumRewardsConfig.collectionConfig,
+        ...rewardConfig.collectionConfig,
+      },
+      options: defaultReferendumRewardsConfig.options.map((defaultOption) => {
+        const overrideOption = rewardConfig.options.find(
+          (option) => option.rarity === defaultOption.rarity
+        );
+
+        return {
+          ...defaultOption,
+          ...(overrideOption || {}),
+        };
+      }),
+    };
     const callResult: GenerateRewardsResult = await generateCalls(
       apiPinata,
       selectedChain,
-      rewardConfig
+      rewardConfig,
+      sender as string
     );
 
-    return NextResponse.json(callResult);
+    return NextResponse.json({ status: "success", ...callResult });
   } catch (error: any) {
     console.trace(error);
     // res.status(400).json({
@@ -122,9 +161,10 @@ const generateCalls = async (
   apiPinata: PinataClient | null,
   selectedChain: SubstrateChain,
   config: RewardConfiguration,
+  sender: string | null,
   seed: number = 0
 ): Promise<GenerateRewardsResult> => {
-  const { refIndex, sender } = config;
+  const { refIndex } = config;
 
   console.info(
     `🚀 Generating calls for reward distribution of referendum ${refIndex}`
@@ -134,7 +174,7 @@ const generateCalls = async (
 
   const chainConfig = await getChainByName(selectedChain);
   const { api: referendaPalletApi, assetHubApi: nftPalletApi } = chainConfig;
-  const { decimals: relayChainDecimals } = chainConfig;
+  const { decimals: relayChainDecimals, ss58Format } = chainConfig;
   const referendumIndex = new BN(config.refIndex);
 
   // seed the randomizer
@@ -186,45 +226,51 @@ const generateCalls = async (
 
   // // const kusamaCalls = referendaPalletApi.tx.utility.batchAll(txsKusama).method.toHex();
 
-  // console.info(
-  //   `📊 Generated ${txsKusamaAssetHub.length} txs for minting NFTs on Asset Hub (Kusama)`
-  //   // ,` and ${txsKusama.length} txs for Kusama XCM calls`
-  // );
+  console.info(
+    `📊 Generated ${txsKusamaAssetHub.length} txs for minting NFTs on Asset Hub (Kusama)`
+    // ,` and ${txsKusama.length} txs for Kusama XCM calls`
+  );
 
-  // console.info(`💵 Calculating fees for sender ${config.sender}`);
+  let infoNftCalls = undefined;
 
-  // // const infoKusamaCalls = await referendaPalletApi.tx.utility
-  // //   .batchAll(txsKusama)
-  // //   .paymentInfo(config.sender);
+  if (sender) {
+    const encodedAddress = encodeAddress(sender, ss58Format);
+    console.info(
+      `💵 Calculating fees for sender ${sender} on chain address ${encodedAddress}`
+    );
 
-  // const amountOfTxs = txsKusamaAssetHub.length;
-  // const amountOfNFTs = decoratedVotes.length;
-  // const txsPerNFT = amountOfTxs / amountOfNFTs;
+    const amountOfTxs = txsKusamaAssetHub.length;
+    const amountOfNFTs = decoratedVotes.length;
+    const txsPerNFT = amountOfTxs / amountOfNFTs;
 
-  // console.info(`📊 Generated ${amountOfTxs} txs for ${amountOfNFTs} NFTs`);
-  // console.info(`📊 Generated ${txsPerNFT} txs per NFT`);
+    console.info(`📊 Generated ${amountOfTxs} txs for ${amountOfNFTs} NFTs`);
+    console.info(`📊 Generated ${txsPerNFT} txs per NFT`);
 
-  // const infoNftCalls = await nftPalletApi.tx.utility
-  //   .batchAll(txsKusamaAssetHub)
-  //   .paymentInfo(config.sender);
+    infoNftCalls = await nftPalletApi?.tx.utility
+      .batchAll(txsKusamaAssetHub)
+      .paymentInfo(encodedAddress);
 
-  // console.info("successfully calculated fees");
+    console.info("successfully calculated fees");
+  }
 
-  // const collectionDeposit = await getNFTCollectionDeposit(nftPalletApi);
-  // const itemDeposit = await getNFTItemDeposit(nftPalletApi);
-  // const metadataDepositBase = await getNFTMetadataDeposit(nftPalletApi);
-  // // const attributeDepositBase = await getNFTAttributeDeposit(nftPalletApi);
+  let totalDeposit = undefined;
+  const collectionDeposit = await getNFTCollectionDeposit(nftPalletApi);
+  const itemDeposit = await getNFTItemDeposit(nftPalletApi);
+  const metadataDepositBase = await getNFTMetadataDeposit(nftPalletApi);
+  // const attributeDepositBase = await getNFTAttributeDeposit(nftPalletApi);
 
-  // const voters = decoratedVotes.map((vote) => vote.address);
-  // const totalNFTs = voters.length;
+  const voters = decoratedVotes.map((vote) => vote.address);
+  const totalNFTs = voters.length;
 
-  // let totalDeposit = new BN(itemDeposit)
-  //   .add(new BN(metadataDepositBase))
-  //   .muln(totalNFTs);
+  if (itemDeposit && metadataDepositBase) {
+    totalDeposit = new BN(itemDeposit)
+      .add(new BN(metadataDepositBase))
+      .muln(totalNFTs);
 
-  // if (config.collectionConfig.isNew) {
-  //   totalDeposit.add(new BN(collectionDeposit));
-  // }
+    if (config.collectionConfig.isNew && totalDeposit && collectionDeposit) {
+      totalDeposit.add(new BN(collectionDeposit));
+    }
+  }
 
   // console.info(
   //   `📊 Total fees for sender ${
@@ -295,7 +341,7 @@ const generateCalls = async (
     kusamaCall: "",
     kusamaAssetHubCall: "", // JSON.stringify(nftCalls),
     kusamaAssetHubTxs: txsKusamaAssetHub,
-    voters: [],
+    voters,
     distribution: rarityDistribution,
     fees: {
       // kusama: formatBalance(infoKusamaCalls.partialFee, {
@@ -303,11 +349,11 @@ const generateCalls = async (
       //   forceUnit: "KSM",
       //   decimals: kusamaChainDecimals.toNumber(),
       // }),
-      nfts: "123", //infoNftCalls.partialFee.toString(),
-      deposit: "123", //totalDeposit.toString(),
+      nfts: infoNftCalls?.partialFee?.toString(),
+      deposit: totalDeposit?.toString(),
     },
     txsCount: {
-      // kusama: txsKusama.length,
+      kusama: txsKusamaAssetHub.length,
       nfts: txsKusamaAssetHub.length,
       txsPerVote,
     },

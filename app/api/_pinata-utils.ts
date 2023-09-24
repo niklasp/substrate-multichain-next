@@ -119,6 +119,8 @@ export const pinImageAndMetadataForOptions = async (
     //image file
     let imageIpfsCid = imageIpfsCids[option.rarity];
 
+    // console.log("pinImageAndMetadataForOptions options.file", option.file);
+
     //no need to do the image pin for default option
     if (!imageIpfsCid) {
       if (option.imageCid) {
@@ -225,6 +227,9 @@ export const pinImageAndMetadataForCollection = async (
   config: RewardConfiguration
 ): Promise<PinImageAndMetadataForCollectionResult> => {
   const { collectionConfig } = config;
+
+  console.log("pinImageAndMetadataForCollection", collectionConfig);
+
   const pinataFileOptions: PinataPinOptions = {
     pinataMetadata: {
       name: `referendum-${config.refIndex}_${collectionConfig.name}`,

@@ -156,8 +156,7 @@ export const getDecoratedVotesWithInfo = async (
     config,
     lowerLimitOfCurve,
     upperLimitOfCurve,
-    medianOfCurve,
-    0
+    medianOfCurve
     // logger
   );
   votes = decoratedWithChancesVotes.votesWithChances;
@@ -601,11 +600,11 @@ const decorateWithChances = (
     rarityDistribution["rare"] > rarityDistribution["epic"] * 2;
 
   if (invariantHolds) {
-    // logger.info(
-    //   `✅ Distribution invariant holds for ${JSON.stringify(
-    //     rarityDistribution
-    //   )} after ${seed} iterations.`
-    // );
+    console.log(
+      `✅ Distribution invariant holds for ${JSON.stringify(
+        rarityDistribution
+      )} after ${seed} iterations.`
+    );
     config.seed = seed.toString();
     return { votesWithChances, distribution: rarityDistribution };
   } else {

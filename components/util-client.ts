@@ -19,6 +19,7 @@ export const defaultToastMessages = [
 
 export type TxTypes =
   | string
+  | string[]
   | SubmittableExtrinsic<any>[]
   | SubmittableExtrinsic<any>
   | undefined;

@@ -45,6 +45,11 @@ export default function RewardsCreationForm({
     useState(false);
   const { ss58Format, name } = getChainInfo(chain);
   const chainRewardsSchema = rewardsSchema(name, ss58Format);
+
+  const walletAddress = useAppStore(
+    (state) => state.user.actingAccount?.address
+  );
+
   type TypeRewardsSchema = z.infer<typeof chainRewardsSchema>;
   const { defaultReferendumRewardsConfig } = rewardsConfig;
 
@@ -150,6 +155,9 @@ export default function RewardsCreationForm({
     const formData = new FormData();
     formData.append("rewardConfig", JSON.stringify(data));
     formData.append("chain", chain);
+    if (walletAddress) {
+      formData.append("sender", walletAddress);
+    }
     data.options?.forEach((option) => {
       if (!option.imageCid && option.file?.[0]) {
         console.log("option file", option.file[0]);
@@ -165,7 +173,7 @@ export default function RewardsCreationForm({
       body: formData,
     });
     const responseData = await response.json();
-    console.log("responseData", responseData);
+    console.log("raw response data", responseData);
 
     if (!response.ok) {
       console.error("error getting response from server", responseData);
@@ -192,8 +200,33 @@ export default function RewardsCreationForm({
       }
     }
 
+    console.log("response", response);
+
     if (response.ok && responseData.status === "success") {
-      setRewardSendoutData(responseData.data);
+      const maxTxsPerBatch =
+        Math.floor(
+          rewardsConfig.NFT_BATCH_SIZE_MAX / responseData?.txsCount?.txsPerVote
+        ) * responseData?.txsCount?.txsPerVote;
+
+      // group the kusamaAssetHubTxs in batches of max size maxTxsPerbatch making sure that txs belonging together (multiples of 13) are never split to different batches
+      const kusamaAssetHubTxsBatches = responseData?.kusamaAssetHubTxs?.reduce(
+        (acc, tx, index) => {
+          const batchIndex = Math.floor(index / maxTxsPerBatch);
+          if (!acc[batchIndex]) {
+            acc[batchIndex] = [];
+          }
+          acc[batchIndex].push(tx);
+          return acc;
+        },
+        []
+      );
+
+      setRewardSendoutData({
+        ...responseData,
+        kusamaAssetHubTxsBatches,
+      });
+
+      console.log("kusamaAssetHubTxsBatches", kusamaAssetHubTxsBatches.length);
       nextFormStep();
     }
   }
@@ -382,9 +415,9 @@ export default function RewardsCreationForm({
                   <span className="text-4xl text-secondary">→</span>
                 )}
                 <span className="text-4xl">1</span>Create on chain transactions
-                based on your configuration above (i.e. pin files to ipfs,
-                calculate distribution of nfts, mint nft transactions, set nft
-                attributes, ...)
+                based on your configuration above <br />
+                (i.e. pin files to ipfs, calculate distribution of nfts, mint
+                nft transactions, set nft attributes, ...)
               </div>
               {errors && errors.root && (
                 <p className="text-danger w-full text-center mt-3">
@@ -416,9 +449,9 @@ export default function RewardsCreationForm({
                 )}
                 <span className="text-4xl">2</span>
                 Start the sendout process. You will be asked to sign{" "}
-                {rewardSendoutData?.txsCount?.nfts ? (
+                {rewardSendoutData?.kusamaAssetHubTxsBatches?.length ? (
                   <span className="text-warning text-xl">
-                    {rewardSendoutData?.txsCount?.nfts}
+                    {rewardSendoutData?.kusamaAssetHubTxsBatches?.length}
                   </span>
                 ) : (
                   "some "
@@ -435,6 +468,7 @@ export default function RewardsCreationForm({
               </div>
 
               <TxButton
+                extrinsic={rewardSendoutData?.kusamaAssetHubTxsBatches}
                 requiredBalance={totalFees}
                 variant="shadow"
                 isDisabled={isSubmitting || formStep !== 1}
@@ -442,7 +476,6 @@ export default function RewardsCreationForm({
               >
                 Start the {activeChain && <activeChain.icon />} rewards sendout
               </TxButton>
-              {JSON.stringify(rewardSendoutData)}
             </div>
           </CardBody>
         </Card>
@@ -455,7 +488,7 @@ export default function RewardsCreationForm({
           {...register(`chain`)}
         />
 
-        <pre className="text-xs">{JSON.stringify(watch(), null, 2)}</pre>
+        {/* <pre className="text-xs">{JSON.stringify(watch(), null, 2)}</pre> */}
       </form>
       <ModalCreateNFTCollection
         setCollectionConfig={setCollectionConfig}

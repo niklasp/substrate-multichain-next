@@ -20,32 +20,26 @@ const fileUpload =
     ? z
         .any()
         .refine((file) => file, "Image is required.")
-        .optional()
         .refine(
           (file) => file?.size <= 2 * 1024 * 1024,
           `Max file size is 2MB.`
         )
-        .optional()
         .refine(
           (file) => rewardsConfig.acceptedNftFormats.includes(file?.type),
           "File Format not supported"
         )
-        .optional()
     : z
         .any()
         .refine((files) => files?.length == 1, "Image is required.")
-        .optional()
         .refine(
           (files) => files?.[0]?.size <= 2 * 1024 * 1024,
           `Max file size is 2MB.`
         )
-        .optional()
         .refine(
           (files) =>
             rewardsConfig.acceptedNftFormats.includes(files?.[0]?.type),
           "File Format not supported"
-        )
-        .optional();
+        );
 
 export const zodSchemaObject = (chain: SubstrateChain, ss58Format: number) => {
   return {
@@ -67,7 +61,7 @@ export const zodSchemaObject = (chain: SubstrateChain, ss58Format: number) => {
       // name: z.string().min(1, "Name is required"),
       // description: z.string().min(1, "Description is required"),
       isNew: z.boolean().default(false),
-      file: fileUpload,
+      file: fileUpload.optional(),
     }),
     options: z.array(
       z.object({
@@ -77,8 +71,8 @@ export const zodSchemaObject = (chain: SubstrateChain, ss58Format: number) => {
         artist: z.string().optional(),
         imageCid: z.string().optional(),
         //TODO
-        // file: fileUpload,
-        file: z.any().optional(),
+        file: fileUpload,
+        // file: z.any().optional(),
       })
     ),
   };
@@ -89,3 +83,15 @@ export const rewardsSchema = (chain: SubstrateChain, ss58Format: number) => {
   const obj = zodSchemaObject(chain, ss58Format);
   return z.object(obj);
 };
+
+export async function executeAsyncFunctionsInSequence<T>(
+  asyncFunctions: Array<() => Promise<T>>
+) {
+  let results: T[] = [];
+
+  for (const asyncFunction of asyncFunctions) {
+    results.push(await asyncFunction());
+  }
+
+  return results;
+}

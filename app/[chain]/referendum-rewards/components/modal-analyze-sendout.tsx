@@ -22,6 +22,7 @@ import { chain } from "lodash";
 import { Button } from "@nextui-org/button";
 import { Deposit } from "@/hooks/use-deposit";
 import { getTxCollectionCreate } from "@/config/txs";
+import ReactJson from "react-json-view";
 
 type PropType = Omit<ModalProps, "children"> & {
   sendoutData: GenerateRewardsResult;
@@ -40,6 +41,7 @@ export default function ModalAnalyzeSendout({
       placement="top-center"
       size="2xl"
       radius="sm"
+      scrollBehavior="inside"
     >
       <ModalContent>
         {(onClose) => (
@@ -49,9 +51,18 @@ export default function ModalAnalyzeSendout({
             </ModalHeader>
 
             <ModalBody>
-              <pre className="text-tiny">
-                {JSON.stringify(sendoutData, null, 2)}
-              </pre>
+              {sendoutData ? (
+                <div className="overflow-scroll">
+                  <ReactJson
+                    theme="chalk"
+                    src={sendoutData}
+                    collapsed={true}
+                    collapseStringsAfterLength={10}
+                  />
+                </div>
+              ) : (
+                "Error reading sendout data"
+              )}
             </ModalBody>
             <ModalFooter>
               <Button onClick={onClose}>Close</Button>

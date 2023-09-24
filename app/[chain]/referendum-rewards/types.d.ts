@@ -4,11 +4,12 @@ export type GenerateRewardsResult =
   | {
       call: string | undefined;
       config: RewardConfiguration;
-      kusamaCall: string | undefined;
-      kusamaAssetHubCall: string | undefined;
-      kusamaAssetHubTxs: string[] | undefined;
-      distribution: RarityDistribution | undefined;
-      voters: string[] | undefined;
+      kusamaCall?: string;
+      kusamaAssetHubCall?: string;
+      kusamaAssetHubTxs?: string[];
+      kusamaAssetHubTxsBatches?: string[];
+      distribution?: RarityDistribution;
+      voters?: string[];
       fees?: {
         kusama?: string;
         nfts?: string;
@@ -238,8 +239,8 @@ export interface RewardConfiguration {
 
 export interface RewardOption {
   description: string;
-  maxProbability: number | null;
-  minProbability: number | null;
+  maxProbability: number;
+  minProbability: number;
   transferable: boolean;
   artist: string;
   rarity: string;

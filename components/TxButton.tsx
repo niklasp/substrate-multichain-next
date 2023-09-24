@@ -27,6 +27,7 @@ import { ApiPromise } from "@polkadot/api";
 import { chain, set } from "lodash";
 import Check from "@w3f/polkadot-icons/keyline/Check";
 import Error from "@w3f/polkadot-icons/keyline/Error";
+import { executeAsyncFunctionsInSequence } from "@/app/[chain]/referendum-rewards/util";
 
 type DepositCountType = {
   type: Deposit;
@@ -42,7 +43,7 @@ type TxButtonProps = ButtonProps & {
   successText?: React.ReactNode;
   error?: { name: string; message: string };
   setError?: (error: { name: string; message: string }) => void;
-  onFinished?: (res: SendAndFinalizeResult) => void;
+  onFinished?: (res: SendAndFinalizeResult | SendAndFinalizeResult[]) => void;
   onPendingChange?: (isPending: boolean) => void;
 };
 
@@ -149,28 +150,74 @@ export function TxButton(props: TxButtonProps) {
         setIsSuccess(false);
         props.onPendingChange?.(true);
 
-        const res = await sendAndFinalize(
-          api,
-          extrinsic,
-          actingAccountSigner,
-          actingAccount?.address
-        );
+        let res;
+
+        if (Array.isArray(extrinsic)) {
+          // execute sendAndFinalize for each batch and record the results
+          const userSignatureRequests = extrinsic.map((batch) => {
+            return async () =>
+              sendAndFinalize(
+                api,
+                batch,
+                actingAccountSigner,
+                actingAccount?.address
+              );
+          });
+
+          res = await executeAsyncFunctionsInSequence<SendAndFinalizeResult>(
+            userSignatureRequests
+          );
+          console.log("allSignatureResults", res);
+
+          if (res.every((res) => res.status === "success")) {
+            setIsSuccess(true);
+            // const configReqBody = {
+            //   ...callData.config,
+            //   blockNumbers: allSignatureResults.map((res) =>
+            //     res.blockHeader.number.toNumber()
+            //   ),
+            //   txHashes: allSignatureResults.map((res) => res.txHash),
+            // };
+
+            // const createConfigRes = await fetch("/api/create-config-nft", {
+            //   method: "POST",
+            //   body: JSON.stringify(configReqBody),
+            // });
+            // console.log("create Config NFT result", createConfigRes);
+          } else {
+            setError({
+              name: "Error sequential sign",
+              message: "Error sequential sign",
+            });
+            setErrorProp?.({
+              name: "Error sequential sign",
+              message: "Error sequential sign",
+            });
+          }
+        } else {
+          res = await sendAndFinalize(
+            api,
+            extrinsic,
+            actingAccountSigner,
+            actingAccount?.address
+          );
+
+          if (res.status !== "error") {
+            console.log("after submit", res);
+            setIsSuccess(true);
+          } else {
+            setError({
+              name: res.message,
+              message: res.message,
+            });
+            setErrorProp?.({
+              name: res.message,
+              message: res.message,
+            });
+          }
+        }
 
         props.onFinished?.(res);
-
-        if (res.status !== "error") {
-          console.log("after submit", res);
-          setIsSuccess(true);
-        } else {
-          setError({
-            name: res.message,
-            message: res.message,
-          });
-          setErrorProp?.({
-            name: res.message,
-            message: res.message,
-          });
-        }
       }
     } catch (e: any) {
       setError({
@@ -248,7 +295,7 @@ export function TxButton(props: TxButtonProps) {
           humanBalance
         )}
       </span>
-      requiredBalance:{JSON.stringify(requiredBalanceCalculated)}
+      {/* requiredBalance:{JSON.stringify(requiredBalanceCalculated)} */}
     </div>
   );
 }
