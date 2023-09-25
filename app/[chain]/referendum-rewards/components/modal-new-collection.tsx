@@ -119,96 +119,7 @@ export default function ModalCreateNFTCollection({
     console.log("result from create collection", result);
 
     return result;
-
-    // console.table("create collection result", result);
-    // console.table(data);
-    // const formData = new FormData();
-    // formData.append(
-    //   "data",
-    //   JSON.stringify({
-    //     collectionName: data.collectionName,
-    //     description: data.description,
-    //     sender,
-    //   })
-    // );
-    // formData.append("imageFile", data.imageFile?.[0]);
-    // setIsLoading(true);
-    // //sets in parent form
-    // setIsNewCollectionLoading(true);
-    // const res = await fetch("/api/create-new-collection/", {
-    //   method: "POST",
-    //   body: formData,
-    // });
-    // const { tx, name, message } = await res.json();
-    // console.info(`result from create-new-collection:`, {
-    //   tx,
-    //   name,
-    //   message,
-    // });
-    // if (name === "Error") {
-    //   setError({ name, message });
-    // }
-    // try {
-    //   const { status, events, blockHeader } = await signTx(tx);
-    //   console.log("status of create collection", {
-    //     status,
-    //     events,
-    //     blockHeader,
-    //   });
-    //   if (status === "success") {
-    //     const newCollectionIdEvent = events.find(
-    //       (e) => e.event.section === "nfts" && e.event.method === "Created"
-    //     );
-    //     const newCollectionId = newCollectionIdEvent?.event?.data[0];
-    //     setCollectionConfig({
-    //       id: newCollectionId.toPrimitive(),
-    //       name: data.name,
-    //       description: data.description,
-    //       file: data.imageFile,
-    //       isNew: true,
-    //     });
-    //     closeModal();
-    //   }
-    // } catch (error) {
-    //   console.log("error signing transaction", error);
-    //   setError({
-    //     name: "Error",
-    //     message: `Error signing transaction: ${error}`,
-    //   });
-    // }
-    // setIsLoading(false);
-    // setIsNewCollectionLoading(false);
   };
-
-  // async function signTx(
-  //   tx: TxTypes
-  // ): Promise<SendAndFinalizeResult | undefined> {
-  //   const user = useAppStore((state) => state.user);
-  //   const { actingAccountSigner: signer, actingAccount } = user;
-  //   const { address } = actingAccount || {};
-
-  //   if (!address) {
-  //     setError({
-  //       message: "Please connect your wallet to continue.",
-  //       name: "Wallet not connected",
-  //     });
-  //     throw new Error("Wallet not connected");
-  //   }
-
-  //   // const signatureRes = await sendAndFinalize(
-  //   //   apiKusamaAssetHub,
-  //   //   tx,
-  //   //   signer,
-  //   //   walletAddress,
-  //   //   {
-  //   //     title: "Creating NFT collection",
-  //   //     messages: defaultToastMessages,
-  //   //   }
-  //   // );
-
-  //   // return signatureRes;
-  //   return;
-  // }
 
   return (
     <Modal
@@ -281,7 +192,7 @@ export default function ModalCreateNFTCollection({
               >
                 Cancel
               </Button>
-              <TxButton
+              <TxButton<SendAndFinalizeResult>
                 color="secondary"
                 className="w-full"
                 successText="Collection created!"

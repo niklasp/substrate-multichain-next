@@ -3,14 +3,14 @@
 import Image from "@/components/image-fade";
 import { sampleSize } from "lodash";
 import clsx from "clsx";
-import { websiteConfig } from "@/data/website-config";
 import { GET_REFERENDUM_NFTS } from "@/data/queries";
 import request from "graphql-request";
 import { useNFTs } from "@/hooks/use-nfts";
+import { NFT_CONFIG } from "@/config/nfts";
 
 async function fetchReferendumNFTsDistinct(): Promise<{ nfts: any[] }> {
   return await request(
-    websiteConfig.singular_graphql_endpoint,
+    NFT_CONFIG.singular_graphql_endpoint,
     GET_REFERENDUM_NFTS,
     {
       where: {
@@ -18,7 +18,7 @@ async function fetchReferendumNFTsDistinct(): Promise<{ nfts: any[] }> {
           _eq: "",
         },
         collectionId: {
-          _in: websiteConfig.singular_referendum_collections,
+          _in: NFT_CONFIG.singular_referendum_collections,
         },
         metadata_properties: {
           _contains: {
@@ -66,7 +66,7 @@ async function getNFTs() {
       };
     })
   );
-  return [...transformedNFTs, ...websiteConfig.classic_referendums];
+  return [...transformedNFTs, ...NFT_CONFIG.classic_referendums];
 }
 
 export function NFTSnippets() {

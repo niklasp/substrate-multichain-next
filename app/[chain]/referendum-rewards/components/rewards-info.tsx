@@ -10,7 +10,7 @@ export function RewardsInfo() {
   const { icon } = activeChain || {};
   return (
     <Card className="border border-2 border-secondary text-tiny mb-8 items-center align-center text-center">
-      <CardBody className="flex-none inline">
+      <CardBody className="flex-none inline text-center">
         NFTs will be minted on{" "}
         <span className="text-warning">
           {titleCase(activeChain?.name)}&nbsp;Asset Hub

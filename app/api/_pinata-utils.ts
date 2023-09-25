@@ -1,9 +1,7 @@
 import { Readable } from "stream";
-import fs from "fs";
 import { PinataPinOptions } from "@pinata/sdk";
 import { config } from "process";
 import pinataSDK from "@pinata/sdk";
-
 import { sum } from "lodash";
 import {
   PinImageAndMetadataForCollectionResult,
@@ -13,7 +11,6 @@ import {
   RewardConfiguration,
   RewardOption,
 } from "../[chain]/referendum-rewards/types";
-import { DEFAULT_REWARDS_CONFIG } from "@/config/default-rewards-config";
 import { rewardsConfig } from "@/config/rewards";
 
 const defaultOptions: Partial<PinataPinOptions> = {

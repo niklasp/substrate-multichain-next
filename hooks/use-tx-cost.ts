@@ -28,6 +28,5 @@ export const useTxCost = (tx: TxTypes, chainType?: ChainType) => {
       const txCost = await getTxCost(api, tx, address);
       return txCost;
     },
-    refetchOnWindowFocus: false,
   });
 };

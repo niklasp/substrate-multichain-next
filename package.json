@@ -60,6 +60,7 @@
     "eslint-config-next": "^13.5.1",
     "formidable": "^3.5.1",
     "framer-motion": "^10.16.2",
+    "fs": "^0.0.1-security",
     "graphql": "^16.8.0",
     "graphql-request": "^6.1.0",
     "intl-messageformat": "^10.5.0",

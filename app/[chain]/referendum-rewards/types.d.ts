@@ -2,8 +2,8 @@ import { SubstrateChain } from "@/types";
 
 export type GenerateRewardsResult =
   | {
-      call: string | undefined;
-      config: RewardConfiguration;
+      call?: string;
+      config?: RewardConfiguration;
       kusamaCall?: string;
       kusamaAssetHubCall?: string;
       kusamaAssetHubTxs?: string[];
@@ -20,6 +20,7 @@ export type GenerateRewardsResult =
         nfts?: number;
         txsPerVote?: number;
       };
+      status: "success" | "error";
     }
   | undefined;
 
@@ -201,10 +202,15 @@ export interface ConfigNFT {
   settingsCollectionId: number;
 }
 
+enum RewardCriteria {
+  All = "all",
+  Threshold = "threshold",
+}
+
 export interface RewardConfiguration {
   chain: SubstrateChain | undefined;
   refIndex: string;
-  criteria: "all" | "threshold";
+  criteria: RewardCriteria;
   min: string;
   max: string;
   first: number | null;

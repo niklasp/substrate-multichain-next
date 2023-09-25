@@ -34,25 +34,25 @@ type DepositCountType = {
   amount?: number;
 };
 
-type TxButtonProps = ButtonProps & {
-  extrinsic?: TxTypes;
-  requiredBalance: string | BN | undefined;
-  deposits?: DepositCountType[];
-  chainType?: ChainType;
-  loadingText?: React.ReactNode;
-  successText?: React.ReactNode;
-  error?: { name: string; message: string };
-  setError?: (error: { name: string; message: string }) => void;
-  onFinished?: (res: SendAndFinalizeResult | SendAndFinalizeResult[]) => void;
-  onPendingChange?: (isPending: boolean) => void;
-};
-
 /**
  * Button that sends txs or promises and checks if a sufficient balance is available in case of a tx
  * @param props
  * @returns
  */
-export function TxButton(props: TxButtonProps) {
+export function TxButton<T>(
+  props: ButtonProps & {
+    extrinsic?: TxTypes;
+    requiredBalance?: string | BN;
+    deposits?: DepositCountType[];
+    chainType?: ChainType;
+    loadingText?: React.ReactNode;
+    successText?: React.ReactNode;
+    error?: { name: string; message: string };
+    setError?: (error: { name: string; message: string }) => void;
+    onFinished?: (res: T) => void;
+    onPendingChange?: (isPending: boolean) => void;
+  }
+) {
   const {
     requiredBalance,
     extrinsic,
@@ -100,8 +100,6 @@ export function TxButton(props: TxButtonProps) {
 
   const isLoadingProp =
     props.isLoading || isAccountBalanceLoading || isDepositCostLoading;
-
-  console.log("required balance", requiredBalance);
 
   const requiredBalanceCalculated = requiredBalance
     ? bnToBn(requiredBalance)
@@ -261,7 +259,7 @@ export function TxButton(props: TxButtonProps) {
       )}
       {!requiredBalanceCalculated?.eq(BN_MAX_INTEGER) && (
         <span className="text-right text-tiny mt-1 text-warning">
-          required:{" "}
+          required: ~
           {isTxCostLoading ||
           isDepositCostLoading ||
           requiredBalanceCalculated === undefined ? (
@@ -288,7 +286,6 @@ export function TxButton(props: TxButtonProps) {
           humanBalance
         )}
       </span>
-      requiredBalance:{JSON.stringify(requiredBalanceCalculated?.toString())}
     </div>
   );
 }

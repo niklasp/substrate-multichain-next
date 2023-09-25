@@ -1,22 +1,18 @@
-import fs from "fs";
-import {
-  rewardsSchema,
-  zodSchemaObject,
-} from "@/app/[chain]/referendum-rewards/util";
+import { zodSchemaObject } from "@/app/[chain]/referendum-rewards/util";
 import { DEFAULT_CHAIN, getChainByName, getChainInfo } from "@/config/chains";
 import { SubstrateChain } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
-import formidable, { errors as formidableErrors } from "formidable";
-import {
-  GenerateRewardsResult,
-  RewardOption,
-} from "@/app/[chain]/referendum-rewards/types";
 import { zfd } from "zod-form-data";
-import { type } from "os";
-import { RewardConfiguration } from "../../[chain]/referendum-rewards/types";
+import {
+  RewardConfiguration,
+  GenerateRewardsResult,
+} from "../../[chain]/referendum-rewards/types";
 import { BN, bnToBn } from "@polkadot/util";
-import { getDecoratedVotesWithInfo, setupPinata } from "./util";
-import { ApiPromise } from "@polkadot/api";
+import {
+  getDecoratedVotesWithInfo,
+  mergeWithDefaultConfig,
+  setupPinata,
+} from "./util";
 import PinataClient from "@pinata/sdk";
 import seedrandom from "seedrandom";
 import { getTxsReferendumRewards } from "./get-reward-txs";
@@ -27,11 +23,13 @@ import {
   getNFTItemDeposit,
   getNFTMetadataDeposit,
 } from "@/config/txs";
+import fs from "fs";
 import { rewardsConfig } from "../../../config/rewards";
 
 export async function POST(req: NextRequest) {
   //   let { rewardsConfig }: { rewardsConfig: unknown } = await req.json();
 
+  let res = NextResponse<GenerateRewardsResult>;
   const { DEFAULT_REWARDS_CONFIG } = rewardsConfig;
 
   let zodErrors = {};
@@ -57,7 +55,7 @@ export async function POST(req: NextRequest) {
     console.log("rewardConfig json", rewardConfig);
   } catch (error) {
     console.log("Error parsing form data", error);
-    return NextResponse.json({
+    return res.json({
       errors: { form: "Error parsing form data" },
       success: false,
     });
@@ -73,6 +71,9 @@ export async function POST(req: NextRequest) {
     rewardConfig.options.forEach((option) => {
       option.file = formData?.get(`${option.rarity}File`);
     });
+
+    // override the file of the collection config with a file from the parsed form data
+    rewardConfig.collectionConfig.file = formData?.get("collectionImage");
 
     console.log("rewardConfig after file transform", rewardConfig);
 
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
     }
   } catch (error) {
     console.log("error validating form data", error);
-    return NextResponse.json(
+    return res.json(
       Object.keys(zodErrors).length > 0
         ? { errors: zodErrors, success: false }
         : { success: true }
@@ -111,35 +112,18 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // if (rewardConfig.collectionConfig.isNew) {
-    //   const file = formData?.get('collectionImage') as File;
-    //   const readableFileStream = fs.createReadStream(file.filepath);
-    //   config.collectionConfig.file = readableFileStream;
-    // }
+    if (rewardConfig.collectionConfig.isNew) {
+      const file = formData?.get("collectionImage") as File;
+      const bytes = await file?.arrayBuffer();
+      rewardConfig.collectionConfig.file = Readable.from(Buffer.from(bytes));
+    }
   } catch (e) {
     throw "Error converting files to readable streams";
   }
 
   try {
     const apiPinata = await setupPinata();
-    rewardConfig = {
-      ...DEFAULT_REWARDS_CONFIG,
-      ...rewardConfig,
-      collectionConfig: {
-        ...DEFAULT_REWARDS_CONFIG.collectionConfig,
-        ...rewardConfig.collectionConfig,
-      },
-      options: DEFAULT_REWARDS_CONFIG.options.map((defaultOption) => {
-        const overrideOption = rewardConfig.options.find(
-          (option) => option.rarity === defaultOption.rarity
-        );
-
-        return {
-          ...defaultOption,
-          ...(overrideOption || {}),
-        };
-      }),
-    };
+    rewardConfig = mergeWithDefaultConfig(rewardConfig);
     const callResult: GenerateRewardsResult = await generateCalls(
       apiPinata,
       selectedChain,
@@ -147,14 +131,17 @@ export async function POST(req: NextRequest) {
       sender as string
     );
 
-    return NextResponse.json({ status: "success", ...callResult });
+    return res.json({ status: "success", ...callResult });
   } catch (error: any) {
     console.trace(error);
     // res.status(400).json({
     //   name: error.name,
     //   message: error.message,
     // });
-    return NextResponse.json({ errors: { form: error.message } });
+    return res.json({
+      status: "error",
+      errors: { form: error.message },
+    });
   }
 }
 

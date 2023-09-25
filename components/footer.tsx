@@ -3,14 +3,20 @@ import { Link } from "@nextui-org/link";
 export function Footer() {
   return (
     <footer className="bg-gray-50 dark:bg-gray-900 body-font mt-8">
-      <div className="container mx-auto max-w-7xl py-16 px-2 sm:px-4 md:px-6 flex-grow gap-4">
+      <div className="container mx-auto max-w-4xl py-16 flex-grow gap-4">
         <div className="flex flex-row flex-wrap flex-1 content-center md:content-start text-sm items-center">
           <p className="w-full sm:w-auto text-center text-sm text-gray-500">
             Proof of Chaos © {new Date().getFullYear()}
           </p>
           <p className="w-full sm:w-auto text-center sm:ml-4 text-sm text-gray-500 sm:pl-4 sm:border-l sm:border-gray-200">
-            Website by <Link href="https://github.com/niklasp">niftesty</Link> &{" "}
-            <Link href="https://twitter.com/tumispro">Tum</Link>
+            Website by{" "}
+            <Link href="https://github.com/niklasp" size="sm">
+              niftesty
+            </Link>{" "}
+            &{" "}
+            <Link href="https://twitter.com/tumispro" size="sm">
+              Tum
+            </Link>
           </p>
           <p className="w-full sm:w-auto text-center text-sm text-gray-500 sm:pl-4 sm:border-l sm:border-gray-200 sm:ml-4">
             supported by the Kusama treasury

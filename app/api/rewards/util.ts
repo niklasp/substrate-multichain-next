@@ -885,3 +885,26 @@ export const getNftAttributesForOptions = (
 
   return attributes;
 };
+
+export function mergeWithDefaultConfig(config: any): RewardConfiguration {
+  return {
+    ...rewardsConfig.DEFAULT_REWARDS_CONFIG,
+    ...config,
+    collectionConfig: {
+      ...rewardsConfig.DEFAULT_REWARDS_CONFIG.collectionConfig,
+      ...config.collectionConfig,
+    },
+    options: rewardsConfig.DEFAULT_REWARDS_CONFIG.options.map(
+      (defaultOption: RewardOption) => {
+        const overrideOption = config.options?.find(
+          (option: any) => option.rarity === defaultOption.rarity
+        );
+
+        return {
+          ...defaultOption,
+          ...(overrideOption || {}),
+        };
+      }
+    ),
+  };
+}

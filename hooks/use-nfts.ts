@@ -1,11 +1,11 @@
 import { useQuery } from "react-query";
 import { request, gql } from "graphql-request";
-import { websiteConfig } from "@/data/website-config";
 import { GET_REFERENDUM_NFTS } from "@/data/queries";
+import { NFT_CONFIG } from "@/config/nfts";
 
 async function fetchReferendumNFTsDistinct(): Promise<any> {
   return await request(
-    websiteConfig.singular_graphql_endpoint,
+    NFT_CONFIG.singular_graphql_endpoint,
     GET_REFERENDUM_NFTS,
     {
       where: {
@@ -13,7 +13,7 @@ async function fetchReferendumNFTsDistinct(): Promise<any> {
           _eq: "",
         },
         collectionId: {
-          _in: websiteConfig.singular_referendum_collections,
+          _in: NFT_CONFIG.singular_referendum_collections,
         },
         metadata_properties: {
           _contains: {
@@ -65,7 +65,7 @@ export function useNFTs(queryOptions: any) {
           };
         })
       );
-      return [...transformedNFTs, ...websiteConfig.classic_referendums];
+      return [...transformedNFTs, ...NFT_CONFIG.classic_referendums];
     },
     queryOptions
   );

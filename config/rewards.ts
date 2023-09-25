@@ -1,4 +1,7 @@
-import { RewardConfiguration } from "@/app/[chain]/referendum-rewards/types";
+import type {
+  RewardConfiguration,
+  RewardCriteria,
+} from "@/app/[chain]/referendum-rewards/types";
 import { SubstrateChain } from "@/types";
 
 export type RewardsConfigType = {
@@ -39,7 +42,7 @@ export const rewardsConfig: RewardsConfigType = {
   DEFAULT_REWARDS_CONFIG: {
     chain: SubstrateChain.Kusama,
     refIndex: "",
-    criteria: "all",
+    criteria: RewardCriteria.All,
     min: "1200000000000",
     max: "100000000000000000000000000000000000000000",
     first: null,

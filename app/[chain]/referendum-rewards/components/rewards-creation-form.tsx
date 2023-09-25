@@ -15,26 +15,29 @@ import { FormProvider, useForm } from "react-hook-form";
 import { rewardsSchema, validateAddress } from "../util";
 import { SubstrateChain } from "@/types";
 import { getChainInfo } from "@/config/chains";
-import { ZodType, z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSubstrateChain } from "@/context/substrate-chain-context";
 import { useAppStore } from "@/app/zustand";
-import CreateNFTCollectionModal from "./modal-new-collection";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
-} from "@nextui-org/modal";
+import { useDisclosure } from "@nextui-org/modal";
 import ModalCreateNFTCollection from "./modal-new-collection";
-import { CollectionConfiguration, GenerateRewardsResult } from "../types";
+import {
+  CollectionConfiguration,
+  GenerateRewardsResult,
+  RewardConfiguration,
+  RewardCriteria,
+  SendAndFinalizeResult,
+} from "../types";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Link } from "@nextui-org/link";
 import ModalAnalyzeSendout from "./modal-analyze-sendout";
 import { TxButton } from "@/components/TxButton";
 import { bnToBn } from "@polkadot/util";
+import { mergeWithDefaultConfig } from "@/app/api/rewards/util";
+
+type ConfigReqBody = RewardConfiguration & {
+  blockNumbers?: number[];
+  txHashes: (string | undefined)[];
+};
 
 export default function RewardsCreationForm({
   chain,
@@ -43,8 +46,8 @@ export default function RewardsCreationForm({
 }) {
   const [isCollectionCreatePending, setIsCollectionCreatePending] =
     useState(false);
-  const { ss58Format, name } = getChainInfo(chain);
-  const chainRewardsSchema = rewardsSchema(name, ss58Format);
+  const { ss58Format, name: activeChainName } = getChainInfo(chain);
+  const chainRewardsSchema = rewardsSchema(activeChainName, ss58Format);
 
   const explode = useAppStore((s) => s.explode);
 
@@ -134,18 +137,46 @@ export default function RewardsCreationForm({
     onOpen();
   }
 
-  async function onSubmit(data: TypeRewardsSchema) {
-    // const result = await createRewards(data);
-    // console.log("result", result);
+  async function actionCreateConfigNFT(configReqBody: ConfigReqBody) {
+    const createConfigRes = await fetch("/api/create-config-nft", {
+      method: "POST",
+      body: JSON.stringify(configReqBody),
+    });
 
+    console.log("create config nft result", createConfigRes);
+  }
+
+  function onFinished(results: SendAndFinalizeResult[]): void {
     explode(true);
+    console.log("onfinished", results);
 
+    if (results.every((res) => res.status === "success")) {
+      const configReqBody = {
+        ...mergeWithDefaultConfig(watchFormFields),
+        chain: activeChainName,
+        criteria: watchFormFields.criteria as RewardCriteria,
+        blockNumbers: results.map((res) => res.blockHeader.number.toNumber()),
+        txHashes: results.map((res) => res.txHash),
+      };
+
+      actionCreateConfigNFT(configReqBody);
+    }
+  }
+
+  async function onSubmit(data: TypeRewardsSchema) {
+    // append all data needed for the rewards creation to a FormData object
     const formData = new FormData();
+
+    // form fields
     formData.append("rewardConfig", JSON.stringify(data));
+
+    // chain + walletAddress of the sender
     formData.append("chain", chain);
     if (walletAddress) {
       formData.append("sender", walletAddress);
     }
+
+    // uploaded files
     data.options?.forEach((option) => {
       if (!option.imageCid && option.file?.[0]) {
         console.log("option file", option.file[0]);
@@ -156,6 +187,14 @@ export default function RewardsCreationForm({
         );
       }
     });
+    if (data.collectionConfig.file?.[0]) {
+      formData.append(
+        "collectionImage",
+        data.collectionConfig.file[0],
+        data.collectionConfig.file[0].name
+      );
+    }
+
     const response = await fetch("/api/rewards", {
       method: "POST",
       body: formData,
@@ -461,6 +500,7 @@ export default function RewardsCreationForm({
                 variant="shadow"
                 isDisabled={isSubmitting || formStep !== 1}
                 className={clsx("w-full h-20 border-2", vividButtonClasses)}
+                onFinished={onFinished}
               >
                 Start the {activeChain && <activeChain.icon />} rewards sendout
               </TxButton>
