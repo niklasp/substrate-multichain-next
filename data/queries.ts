@@ -1,5 +1,4 @@
 import { gql as agql } from "@apollo/client";
-import { websiteConfig } from "../data/website-config";
 
 export const QUERY_QUIZZES = agql`
   query QuizzesQuery($where: QuizWhereInput) {

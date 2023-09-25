@@ -49,7 +49,7 @@ export function TxButton<T>(
     successText?: React.ReactNode;
     error?: { name: string; message: string };
     setError?: (error: { name: string; message: string }) => void;
-    onFinished?: (res: T) => void;
+    onFinished?: (res: SendAndFinalizeResult | SendAndFinalizeResult[]) => void;
     onPendingChange?: (isPending: boolean) => void;
   }
 ) {

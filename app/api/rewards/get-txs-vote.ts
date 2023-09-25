@@ -11,7 +11,7 @@ export const getTxsForVotes = (
   apiKusamaAssetHub: ApiPromise,
   config: RewardConfiguration,
   fileAndMetadataCids: PinImageAndMetadataForOptionsResult,
-  attributes,
+  attributes: any,
   decoratedVotes: DecoratedConvictionVote[],
   rng: RNG,
   referendumIndex: string

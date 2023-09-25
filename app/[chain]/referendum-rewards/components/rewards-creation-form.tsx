@@ -33,9 +33,10 @@ import ModalAnalyzeSendout from "./modal-analyze-sendout";
 import { TxButton } from "@/components/TxButton";
 import { bnToBn } from "@polkadot/util";
 import { mergeWithDefaultConfig } from "../../../../components/util";
+import { TxTypes } from "../../../../components/util-client";
 
 type ConfigReqBody = RewardConfiguration & {
-  blockNumbers?: number[];
+  blockNumbers?: (number | undefined)[];
   txHashes: (string | undefined)[];
 };
 
@@ -146,9 +147,15 @@ export default function RewardsCreationForm({
     console.log("create config nft result", createConfigRes);
   }
 
-  function onFinished(results: SendAndFinalizeResult[]): void {
+  function onFinished(
+    results: SendAndFinalizeResult[] | SendAndFinalizeResult
+  ): void {
     explode(true);
     console.log("onfinished", results);
+
+    if (!Array.isArray(results)) {
+      results = [results];
+    }
 
     if (results.every((res) => res.status === "success")) {
       const sendoutConfig = rewardSendoutData?.config ?? watchFormFields;
@@ -157,7 +164,7 @@ export default function RewardsCreationForm({
         ...mergeWithDefaultConfig(sendoutConfig),
         chain: activeChainName,
         criteria: watchFormFields.criteria as RewardCriteria,
-        blockNumbers: results.map((res) => res.blockHeader.number.toNumber()),
+        blockNumbers: results.map((res) => res.blockHeader?.number.toNumber()),
         txHashes: results.map((res) => res.txHash),
       };
 
@@ -237,25 +244,30 @@ export default function RewardsCreationForm({
           rewardsConfig.NFT_BATCH_SIZE_MAX / responseData?.txsCount?.txsPerVote
         ) * responseData?.txsCount?.txsPerVote;
 
-      // group the kusamaAssetHubTxs in batches of max size maxTxsPerbatch making sure that txs belonging together (multiples of 13) are never split to different batches
-      const kusamaAssetHubTxsBatches = responseData?.kusamaAssetHubTxs?.reduce(
-        (acc, tx, index) => {
-          const batchIndex = Math.floor(index / maxTxsPerBatch);
+      let kusamaAssetHubTxsBatches: TxTypes[] | undefined =
+        responseData?.kusamaAssetHubTxs;
+
+      if (kusamaAssetHubTxsBatches && Array.isArray(kusamaAssetHubTxsBatches)) {
+        // group the kusamaAssetHubTxs in batches of max size maxTxsPerbatch making sure that txs belonging together (multiples of 13) are never split to different batches
+        const batches = kusamaAssetHubTxsBatches.reduce((acc, tx, index) => {
+          const batchIndex: number = Math.floor(index / maxTxsPerBatch);
           if (!acc[batchIndex]) {
             acc[batchIndex] = [];
           }
           acc[batchIndex].push(tx);
           return acc;
-        },
-        []
-      );
+        }, [] as TxTypes[][]);
 
-      setRewardSendoutData({
-        ...responseData,
-        kusamaAssetHubTxsBatches,
-      });
+        setRewardSendoutData({
+          ...responseData,
+          batches,
+        });
+      } else {
+        setRewardSendoutData({
+          ...responseData,
+        });
+      }
 
-      console.log("kusamaAssetHubTxsBatches", kusamaAssetHubTxsBatches.length);
       nextFormStep();
     }
   }

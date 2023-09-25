@@ -58,7 +58,7 @@ interface AppState {
   removeVoteState: (referendumId: string) => void;
   clearVoteState: () => void;
 
-  explode: (boolean) => void;
+  explode: (show: boolean) => void;
 
   rewards: {
     form: {

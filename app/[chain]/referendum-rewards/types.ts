@@ -1,4 +1,6 @@
-import { SubstrateChain } from "@/types";
+import { DecoratedConvictionVote, SubstrateChain, ToastType } from "@/types";
+import { Bytes } from "@polkadot/types-codec";
+import { Header } from "@polkadot/types/interfaces";
 
 export type GenerateRewardsResult =
   | {
@@ -32,7 +34,7 @@ export type CreateCollectionResult = {
   txsCount: number | undefined;
 };
 
-export interface VoteConvictionDragon extends VoteConviction {
+export interface VoteConvictionDragon extends DecoratedConvictionVote {
   dragonEquipped: string;
 }
 
@@ -45,7 +47,7 @@ export interface VoteConvictionDragonQuizEncointer
   encointerScore: number;
 }
 
-export interface VoteConvictionEncointer extends VoteConviction {
+export interface VoteConvictionEncointer extends DecoratedConvictionVote {
   encointerScore: number;
 }
 

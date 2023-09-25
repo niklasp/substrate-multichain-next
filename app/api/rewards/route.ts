@@ -320,6 +320,7 @@ const generateCalls = async (
   // );
 
   return {
+    status: "success",
     call: "omitted",
     config,
     // kusamaCall: JSON.stringify(kusamaCalls),

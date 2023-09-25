@@ -69,8 +69,14 @@ export default function ModalCreateNFTCollection({
 
   const watchFormFields = watch();
 
-  const onFinished = (data: SendAndFinalizeResult) => {
+  const onFinished = (
+    data: SendAndFinalizeResult | SendAndFinalizeResult[]
+  ) => {
     console.log("onFinished", data);
+
+    if (Array.isArray(data)) {
+      data = data[0];
+    }
 
     const { status, events, blockHeader } = data || {};
 
