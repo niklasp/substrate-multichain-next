@@ -32,7 +32,7 @@ import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import ModalAnalyzeSendout from "./modal-analyze-sendout";
 import { TxButton } from "@/components/TxButton";
 import { bnToBn } from "@polkadot/util";
-import { mergeWithDefaultConfig } from "@/app/api/rewards/util";
+import { mergeWithDefaultConfig } from "../../../../components/util";
 
 type ConfigReqBody = RewardConfiguration & {
   blockNumbers?: number[];
@@ -151,8 +151,10 @@ export default function RewardsCreationForm({
     console.log("onfinished", results);
 
     if (results.every((res) => res.status === "success")) {
+      const sendoutConfig = rewardSendoutData?.config ?? watchFormFields;
+
       const configReqBody = {
-        ...mergeWithDefaultConfig(watchFormFields),
+        ...mergeWithDefaultConfig(sendoutConfig),
         chain: activeChainName,
         criteria: watchFormFields.criteria as RewardCriteria,
         blockNumbers: results.map((res) => res.blockHeader.number.toNumber()),
@@ -283,7 +285,8 @@ export default function RewardsCreationForm({
                 "reputable",
                 "extrinsic",
               ]}
-              selectedKeys={["referenda"]}
+              defaultSelectedKeys={[watchFormFields.criteria]}
+              selectionMode="single"
               isInvalid={!!errors.criteria}
               errorMessage={!!errors.criteria && `${errors.criteria?.message}`}
               {...register("criteria", {

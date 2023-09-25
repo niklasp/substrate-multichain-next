@@ -8,11 +8,7 @@ import {
   GenerateRewardsResult,
 } from "../../[chain]/referendum-rewards/types";
 import { BN, bnToBn } from "@polkadot/util";
-import {
-  getDecoratedVotesWithInfo,
-  mergeWithDefaultConfig,
-  setupPinata,
-} from "./util";
+import { getDecoratedVotesWithInfo, setupPinata } from "./util";
 import PinataClient from "@pinata/sdk";
 import seedrandom from "seedrandom";
 import { getTxsReferendumRewards } from "./get-reward-txs";
@@ -25,6 +21,7 @@ import {
 } from "@/config/txs";
 import fs from "fs";
 import { rewardsConfig } from "../../../config/rewards";
+import { mergeWithDefaultConfig } from "@/components/util";
 
 export async function POST(req: NextRequest) {
   //   let { rewardsConfig }: { rewardsConfig: unknown } = await req.json();

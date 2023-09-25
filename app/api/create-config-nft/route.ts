@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { mergeWithDefaultConfig, setupPinata } from "../rewards/util";
-import { createConfigNFT } from "@/app/[chain]/referendum-rewards/util";
+import { setupPinata } from "../rewards/util";
 import { NextRequest, NextResponse } from "next/server";
 import { SendAndFinalizeResult, SubstrateChain } from "@/types";
 import { DEFAULT_CHAIN, getChainInfo } from "@/config/chains";
+import { createConfigNFT } from "@/components/util-server";
+import { mergeWithDefaultConfig } from "@/components/util";
 
 type CreateConfigNFTResult = {
   data: SendAndFinalizeResult;
@@ -15,6 +16,10 @@ export async function POST(req: NextRequest) {
     const config = await req.json();
     const selectedChain = (config.chain as SubstrateChain) || DEFAULT_CHAIN;
     const selectedChainConfig = getChainInfo(selectedChain);
+
+    console.info(
+      `🌄 Creating Config NFT for successful sendout on ${selectedChain}`
+    );
     const apiPinata = await setupPinata();
 
     const newConfig = mergeWithDefaultConfig(config);
@@ -25,12 +30,12 @@ export async function POST(req: NextRequest) {
     );
 
     // TODO make this secure, by checking that the txs on chain were really those we gave the user
-    console.log("create-confing-nft result", result);
-    res.json({
+    console.log("create-config-nft result", result);
+    return res.json({
       result,
     });
   } catch (error) {
     console.error(error);
-    res.json({ error: "Invalid JSON", message: error });
+    return res.json({ error: "Invalid JSON", message: error });
   }
 }

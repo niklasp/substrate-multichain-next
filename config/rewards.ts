@@ -1,4 +1,4 @@
-import type {
+import {
   RewardConfiguration,
   RewardCriteria,
 } from "@/app/[chain]/referendum-rewards/types";
@@ -42,7 +42,7 @@ export const rewardsConfig: RewardsConfigType = {
   DEFAULT_REWARDS_CONFIG: {
     chain: SubstrateChain.Kusama,
     refIndex: "",
-    criteria: RewardCriteria.All,
+    criteria: RewardCriteria.Referenda,
     min: "1200000000000",
     max: "100000000000000000000000000000000000000000",
     first: null,
@@ -58,7 +58,7 @@ export const rewardsConfig: RewardsConfigType = {
         "This is the config NFT for the referendum rewards. You can use this NFT to verify the configuration that was used for the specific sendout.",
     },
     collectionConfig: {
-      id: 76,
+      id: 76, // not used atm as its an env variable now
       name: "",
       description: "",
       isNew: false,

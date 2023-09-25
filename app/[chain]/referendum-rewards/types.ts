@@ -202,8 +202,9 @@ export interface ConfigNFT {
   settingsCollectionId: number;
 }
 
-enum RewardCriteria {
+export enum RewardCriteria {
   All = "all",
+  Referenda = "referenda",
   Threshold = "threshold",
 }
 
