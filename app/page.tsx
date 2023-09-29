@@ -1,3 +1,5 @@
+"use client";
+
 import { title, subtitle } from "@/components/primitives";
 
 import { ChainSwitch } from "@/components/chain-switch";
@@ -8,6 +10,7 @@ import { formatBalance } from "@polkadot/util";
 import { Button } from "@nextui-org/button";
 import Link from "next/link";
 import { NFTSnippets } from "@/components/nft-snippets";
+import { usePolkadotExtension } from "@/providers/polkadot-extension-provider";
 
 export default function Home() {
   // const { data: chainDetails, isLoading } = useChainDetails();
@@ -16,42 +19,47 @@ export default function Home() {
   // const { data: accountBalance, isLoading: isAccountBalanceLoading } =
   //   useAccountBalance();
 
+  const { connect, disconnect } = usePolkadotExtension();
+
   return (
     <>
       <section
         className="relative flex flex-col items-center justify-center gap-4 py-8 md:py-10"
         style={{ height: "70vh" }}
       >
-        <div className="max-w-3xl text-center z-10">
-          <h1 className={title({ size: "lg" })}>We&nbsp;</h1>
-          <h1 className={title({ color: "greenPurple", size: "lg" })}>
-            incentivize
-          </h1>
-          <h1 className={title({ size: "lg" })}>
-            &nbsp;voting on Kusama and Polkadot
-          </h1>
-          <h2 className={subtitle({ class: "mt-4" })}>
-            Send customizable NFTs to OpenGov voters with just a few clicks.
-          </h2>
-          <div className="flex gap-2 justify-center mt-10">
-            <Button
-              size="lg"
-              variant="shadow"
-              className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg hover:-translate-y-0.5"
-            >
-              <Link href="/referendum-rewards">Create Voting Rewards 🎁</Link>
-            </Button>
-            <Button
-              size="lg"
-              color="secondary"
-              variant="shadow"
-              className="hover:-translate-y-0.5"
-            >
-              <Link href="/vote">Vote Now →</Link>
-            </Button>
-          </div>
+        <p className="font-bold text-3xl">
+          <span className="border-4 border-pink-500 py-2 px-5 rounded-full">
+            1
+          </span>{" "}
+          connect / disconnect flow
+        </p>
+        <p className="text-tiny">
+          Connection a wallet browser extension to your site
+        </p>
+        <ol className="list-outside text-tiny list-decimal text-left max-w-xl">
+          <li>
+            Do not ask the user to connect to the site without any user action.
+          </li>
+          <li>
+            The user can browse the site without connecting their browser
+            extension.
+          </li>
+          <li>
+            Do not ask again on any subsequent visit after once connected.
+          </li>
+          <li>
+            Let the user disconnect the browser extension from accessing the
+            site.
+          </li>
+        </ol>
+        <div className="flex gap-2 mt-4">
+          <Button variant="bordered" color="success" onClick={connect}>
+            connect
+          </Button>
+          <Button variant="bordered" color="danger" onClick={disconnect}>
+            disconnect
+          </Button>
         </div>
-        <NFTSnippets />
       </section>
     </>
   );

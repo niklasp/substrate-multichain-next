@@ -7,17 +7,8 @@ import { documentReadyPromise } from "./utils";
 import { useAppStore } from "@/app/zustand";
 import { stat } from "fs";
 
-export interface UsePolkadotExtensionReturnType {
-  extensionSetup: () => void;
-}
-
 export const usePolkadotExtension = () => {
-  const user = useAppStore((state) => state.user);
-  const { accounts, isExtensionReady } = user;
   const setIsExtensionReady = useAppStore((state) => state.setIsExtensionReady);
-  const setExtensionInjectedPromise = useAppStore(
-    (state) => state.setExtensionInjectedPromise
-  );
   const setAccounts = useAppStore((state) => state.setAccounts);
 
   const disconnect = () => {
@@ -32,8 +23,6 @@ export const usePolkadotExtension = () => {
     const extensionInjectedPromise = documentReadyPromise(() =>
       web3Enable(process.env.NEXT_PUBLIC_APP_NAME || "Polkadot Multi Chain App")
     );
-
-    setExtensionInjectedPromise(extensionInjectedPromise);
 
     const browserExtensions = await extensionInjectedPromise;
     if (browserExtensions.length === 0) {

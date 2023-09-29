@@ -6,6 +6,7 @@ import { NextUIProvider } from "@nextui-org/system";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ThemeProviderProps } from "next-themes/dist/types";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { PolkadotExtensionContextProvider } from "@/providers/polkadot-extension-provider";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -18,7 +19,9 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <NextUIProvider>
-        <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
+        <PolkadotExtensionContextProvider>
+          <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
+        </PolkadotExtensionContextProvider>
       </NextUIProvider>
     </QueryClientProvider>
   );
