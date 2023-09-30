@@ -1,65 +1,64 @@
 "use client";
 
-import { title, subtitle } from "@/components/primitives";
-
-import { ChainSwitch } from "@/components/chain-switch";
-import { useChainDetails } from "@/store/server/chain/queries";
-import { useAppStore } from "./zustand";
-import { useAccountBalance } from "@/hooks/use-account-balance";
-import { formatBalance } from "@polkadot/util";
 import { Button } from "@nextui-org/button";
-import Link from "next/link";
-import { NFTSnippets } from "@/components/nft-snippets";
+import { ChangeEvent, Key } from "react";
+import { Intro } from "@/components/intro";
+import { AnotherComponent } from "@/components/another-compoonent";
 import { usePolkadotExtension } from "@/providers/polkadot-extension-provider";
 
 export default function Home() {
-  // const { data: chainDetails, isLoading } = useChainDetails();
-  // const user = useAppStore((state) => state.user);
-  // console.log("user in home", user);
-  // const { data: accountBalance, isLoading: isAccountBalanceLoading } =
-  //   useAccountBalance();
+  const trimAddress = (address: string, amount: number = 3) => {
+    if (!address) {
+      return "";
+    }
+    return `${address.slice(0, amount)}...${address.slice(-amount)}`;
+  };
 
-  const { connect, disconnect } = usePolkadotExtension();
+  const {
+    connect,
+    disconnect,
+    accounts,
+    setSelectedAccountIndex,
+    isExtensionReady,
+  } = usePolkadotExtension();
+
+  const onSelectAccount = (e: ChangeEvent<HTMLSelectElement>) => {
+    const accountIdx = e.target.selectedIndex;
+    setSelectedAccountIndex(accountIdx);
+  };
 
   return (
     <>
       <section
-        className="relative flex flex-col items-center justify-center gap-4 py-8 md:py-10"
-        style={{ height: "70vh" }}
+        className="relative flex flex-col items-center gap-4 py-8 md:py-10"
+        style={{ minHeight: "70vh" }}
       >
-        <p className="font-bold text-3xl">
-          <span className="border-4 border-pink-500 py-2 px-5 rounded-full">
-            1
-          </span>{" "}
-          connect / disconnect flow
-        </p>
-        <p className="text-tiny">
-          Connection a wallet browser extension to your site
-        </p>
-        <ol className="list-outside text-tiny list-decimal text-left max-w-xl">
-          <li>
-            Do not ask the user to connect to the site without any user action.
-          </li>
-          <li>
-            The user can browse the site without connecting their browser
-            extension.
-          </li>
-          <li>
-            Do not ask again on any subsequent visit after once connected.
-          </li>
-          <li>
-            Let the user disconnect the browser extension from accessing the
-            site.
-          </li>
-        </ol>
+        <Intro />
         <div className="flex gap-2 mt-4">
-          <Button variant="bordered" color="success" onClick={connect}>
-            connect
-          </Button>
-          <Button variant="bordered" color="danger" onClick={disconnect}>
-            disconnect
-          </Button>
+          {accounts && accounts.length ? (
+            <Button variant="bordered" color="danger" onClick={disconnect}>
+              disconnect
+            </Button>
+          ) : (
+            <Button variant="bordered" color="success" onClick={connect}>
+              connect
+            </Button>
+          )}
         </div>
+        {accounts && accounts.length > 0 && (
+          <select
+            id="select-polkadot-account"
+            className="p-3 m-3"
+            onChange={onSelectAccount}
+          >
+            {accounts?.map((acc, idx) => (
+              <option key={idx} value={idx}>
+                {trimAddress(acc.address)} [{acc.meta.name}]
+              </option>
+            ))}
+          </select>
+        )}
+        <AnotherComponent />
       </section>
     </>
   );
